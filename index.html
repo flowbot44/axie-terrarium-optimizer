@@ -13,9 +13,21 @@
 
     <section class="input-section">
         <label for="ronin-address">Ronin Address (0x…)</label>
-        <input type="text" id="ronin-address" placeholder="0xYourRoninAddress" value="0xdf8b35668c8fcf82b1d1707875c98cd05b6927c4">
+        <input type="text" id="ronin-address" placeholder="0xYourRoninAddress">
         <button id="fetch-btn">Fetch &amp; Optimize</button>
         <div id="fetch-status"></div>
+    </section>
+
+    <!-- Manual paste section (shown after fetch attempt) -->
+    <section id="manual-section" class="manual-section" style="display:none;">
+        <h3>⚠️ Browser CORS Workaround</h3>
+        <p>The API server doesn't allow browser requests. To fetch your Axies, run this command in Terminal:</p>
+        <textarea id="curl-command" readonly></textarea>
+        <button id="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('curl-command').value)">Copy Command</button>
+        <p class="or-divider">— OR —</p>
+        <p>Paste the JSON output below:</p>
+        <textarea id="paste-data" placeholder="Paste the JSON output here…"></textarea>
+        <button id="paste-btn">Paste &amp; Process</button>
     </section>
 
     <section id="optimizer-results" style="display:none;">
@@ -24,9 +36,7 @@
             <span>Plots: <strong id="total-plots">0</strong></span>
             <span>Total Flame: <strong id="total-flame">0</strong></span>
         </div>
-
         <div id="plot-container"></div>
-
         <div id="all-axies-section">
             <h2>All Axies</h2>
             <div id="all-axies-grid" class="axies-grid"></div>
@@ -34,7 +44,7 @@
     </section>
 
     <footer class="footer">
-        <p>Formulas from official Terrariums V1.1 infographics · Data via Axie Infinity GraphQL</p>
+        <p>Formulas from official Terrariums V1.1 infographics · <a href="https://app.axieinfinity.com/profile/inventory/axies/" target="_blank">Axie Inventory</a></p>
     </footer>
 </div>
 <script src="script.js"></script>
