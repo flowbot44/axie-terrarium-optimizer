@@ -413,6 +413,26 @@ h1 { color: #f1c40f; font-size: 1.6rem; margin-bottom: 0.3rem; }
     color: #7f8c8d;
     border-style: dashed;
 }
+.land-boost-sum {
+    font-size: 0.7rem;
+    color: #e67e22;
+    font-weight: 600;
+    margin-left: auto;
+}
+.land-meta {
+    font-size: 0.65rem;
+    color: #7f8c8d;
+    margin-bottom: 0.4rem;
+}
+.boost-pct {
+    color: #e67e22;
+    font-weight: 600;
+    font-size: 0.6rem;
+}
+.rarity-border-mystic { border-left: 2px solid #e74c3c; }
+.rarity-border-epic { border-left: 2px solid #9b59b6; }
+.rarity-border-rare { border-left: 2px solid #3498db; }
+.rarity-border-common { border-left: 2px solid #7f8c8d; }
 
 /* Responsive additions */
 @media (max-width: 600px) {

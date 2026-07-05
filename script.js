@@ -297,29 +297,46 @@ function renderLandItems() {
     section.style.display = 'block';
     document.getElementById('land-total').textContent = LAND_ITEMS_DATA.total;
 
-    // Group by rarity
+    // Group by type, then rarity
     const groups = {};
     for (const item of LAND_ITEMS_DATA.items) {
-        const r = item.rarity || 'Unknown';
-        if (!groups[r]) groups[r] = [];
-        groups[r].push(item);
+        const t = item.type || 'any';
+        if (!groups[t]) groups[t] = {items: [], totalBoost: 0};
+        groups[t].items.push(item);
+        groups[t].totalBoost += item.boost;
     }
-    const rarityOrder = ['Mystic', 'Epic', 'Rare', 'Common', 'Unknown'];
+    // Sort types: highest total boost first
+    const sortedTypes = Object.entries(groups).sort((a, b) => b[1].totalBoost - a[1].totalBoost);
 
     const grid = document.getElementById('land-items-grid');
     grid.innerHTML = '';
-    for (const rare of rarityOrder) {
-        if (!groups[rare]) continue;
-        const items = groups[rare];
+    for (const [type, group] of sortedTypes) {
+        const items = group.items;
         const block = document.createElement('div');
         block.className = 'land-rarity-group';
+        // Sub-group by rarity
+        const byRarity = {};
+        for (const item of items) {
+            const r = item.rarity || 'Unknown';
+            if (!byRarity[r]) byRarity[r] = [];
+            byRarity[r].push(item);
+        }
+        const rarityOrder = ['Mystic', 'Epic', 'Rare', 'Common'];
+        const details = rarityOrder.filter(r => byRarity[r]).map(r =>
+            `<span class="rarity-${r.toLowerCase()}">${r} ×${byRarity[r].length}</span>`
+        ).join(' · ');
+
         block.innerHTML = `
-            <h4 class="land-rarity-title rarity-${rare.toLowerCase()}">${rare} <span class="land-count">×${items.length}</span></h4>
+            <h4 class="land-rarity-title">🏷️ ${type.charAt(0).toUpperCase() + type.slice(1)}
+                <span class="land-count">×${items.length}</span>
+                <span class="land-boost-sum">+${group.totalBoost.toFixed(2)}%</span>
+            </h4>
+            <div class="land-meta">${details}</div>
             <div class="land-item-list">
-                ${items.slice(0, 30).map(item =>
-                    `<span class="land-item-tag">${item.name}</span>`
+                ${items.slice(0, 25).map(item =>
+                    `<span class="land-item-tag rarity-border-${item.rarity.toLowerCase()}">${item.name} <span class="boost-pct">+${item.boost}%</span></span>`
                 ).join('')}
-                ${items.length > 30 ? `<span class="land-item-tag more">+${items.length - 30} more</span>` : ''}
+                ${items.length > 25 ? `<span class="land-item-tag more">+${items.length - 25} more</span>` : ''}
             </div>
         `;
         grid.appendChild(block);
