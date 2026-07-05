@@ -111,6 +111,7 @@ function sortAndRegroup() {
 }
 
 function renderAll() {
+    document.getElementById('main-results').style.display = 'block';
     const grandFlame = calcGrandFlame();
     document.getElementById('total-axies').textContent = gAxies.length;
     document.getElementById('total-plots').textContent = gPlots.length;
