@@ -46,30 +46,45 @@ const SPECIAL_GENES_MAP = {
     'agamogenesis': 'agamo',
 };
 
+// Collection priority (higher flame = higher priority for tie-breaking)
+//   Mystic(1000) > Origin(400) > Shiny(200) > Xmas(200) > Meo(200) > Japanese(60) > Nightmare(40) > Summer(20) > Normal(5)
+const COLLECTION_PRIORITY = {
+    'mystic': 100, 'origin': 90, 'shiny': 80, 'xmas': 70, 'meo': 60,
+    'japanese': 50, 'nightmare': 40, 'summer': 30, 'normal': 0
+};
+
 // === COLLECTION DETECTION ===
 
-function detectCollection(parts) {
+function detectCollection(parts, title, name) {
     if (!parts || parts.length === 0) return 'normal';
-    // Count specialGenes occurrences per collection
-    const counts = {};
-    let anySpecial = false;
+
+    // STEP 1: Detect from part specialGenes (highest priority wins)
+    let foundCollections = [];
     for (const p of parts) {
         const gene = (p.specialGenes || '').toLowerCase().trim();
         if (!gene) continue;
-        // Map to known collection
         const mapped = SPECIAL_GENES_MAP[gene];
         if (mapped) {
-            counts[mapped] = (counts[mapped] || 0) + 1;
-            anySpecial = true;
+            foundCollections.push(mapped);
         }
     }
-    if (!anySpecial) return 'normal';
-    // Pick the collection with the most matching parts
-    let maxCount = 0, best = 'normal';
-    for (const [key, count] of Object.entries(counts)) {
-        if (count > maxCount) { maxCount = count; best = key; }
+
+    if (foundCollections.length > 0) {
+        // Sort by priority (highest flame first) — first = best
+        foundCollections.sort((a, b) => (COLLECTION_PRIORITY[b] || 0) - (COLLECTION_PRIORITY[a] || 0));
+        return foundCollections[0];
     }
-    return best;
+
+    // STEP 2: No specialGenes — check title (user-tags Origin/Meo)
+    const t = (title || '').trim().toLowerCase();
+    const n = (name || '').trim().toLowerCase();
+    if (t === 'origin') return 'origin';
+    if (t === 'meo corp ii') return 'meo';
+    // Fallback: name contains "origin" (e.g. "Rare Class Origin")
+    if (n.includes('origin')) return 'origin';
+
+    // STEP 3: Nothing found
+    return 'normal';
 }
 
 // === FLAME CALCULATIONS ===
@@ -108,7 +123,7 @@ function formatNumber(n) { return Number(n).toLocaleString(); }
 function processAxies(results) {
     // Build axie objects
     const axies = results.map(axie => {
-        const collection = detectCollection(axie.parts);
+        const collection = detectCollection(axie.parts, axie.title, axie.name);
         const rarityIdx = COLLECTION_RARITY[collection] || 0;
         return {
             id: axie.id,
