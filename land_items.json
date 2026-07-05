@@ -8,7 +8,8 @@
       "tokenId": "62952237880373615740724302374877119119469",
       "itemId": 109,
       "type": "decor",
-      "boost": 1.5
+      "boost": 1.5,
+      "environment": "mystic"
     },
     {
       "name": "Statue of Gungnir",
@@ -16,7 +17,8 @@
       "tokenId": "65674496815741123448431299234331264811092",
       "itemId": 84,
       "type": "mystic",
-      "boost": 1.5
+      "boost": 1.5,
+      "environment": "mystic"
     },
     {
       "name": "Beansprout In A Clay Pot",
@@ -24,7 +26,8 @@
       "tokenId": "28243436454437892467460092416836761552172",
       "itemId": 1324,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -32,7 +35,8 @@
       "tokenId": "68737038118029569619601670701217178714415",
       "itemId": 303,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Rare Ruin Shard",
@@ -40,7 +44,8 @@
       "tokenId": "26542024619833200150143219379677920493636",
       "itemId": 68,
       "type": "mystic",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "mystic"
     },
     {
       "name": "Red Paper Propeller",
@@ -48,7 +53,8 @@
       "tokenId": "24160048051386630905899597127655543014214",
       "itemId": 838,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Acid Vase",
@@ -56,7 +62,8 @@
       "tokenId": "31305977756726338638630463883722675454890",
       "itemId": 938,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Paper Propeller",
@@ -64,7 +71,8 @@
       "tokenId": "23819765684465692442436222520223774802194",
       "itemId": 274,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Bullseye With Blue Arrow",
@@ -72,7 +80,8 @@
       "tokenId": "22118353849861000125119349483064933745519",
       "itemId": 879,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Beech Chest",
@@ -80,7 +89,8 @@
       "tokenId": "39472754562828861761751454462085112530144",
       "itemId": 1248,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Wooden Side Table",
@@ -88,7 +98,8 @@
       "tokenId": "59549414211164231106090556300559437005406",
       "itemId": 606,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Barrel",
@@ -96,7 +107,8 @@
       "tokenId": "40153319296670738688678203676948648952104",
       "itemId": 296,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Frozen Yarn",
@@ -104,7 +116,8 @@
       "tokenId": "57848002376559538788773683263400595948597",
       "itemId": 1077,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Gilded Serpent",
@@ -112,7 +125,8 @@
       "tokenId": "15993271245284107782778606549293105939537",
       "itemId": 1105,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Magic Mushroom",
@@ -120,7 +134,8 @@
       "tokenId": "16673835979125984709705355764156642362013",
       "itemId": 669,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Yarn",
@@ -128,7 +143,8 @@
       "tokenId": "57507720009638600325310308655968827736810",
       "itemId": 746,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Trimmed Grass Patch",
@@ -136,7 +152,8 @@
       "tokenId": "11909882842232846221218111260111887401999",
       "itemId": 1039,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Small Pouch",
@@ -144,7 +161,8 @@
       "tokenId": "43215860598959184859848575143834562855944",
       "itemId": 1032,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Jade Snowboard",
@@ -152,7 +170,8 @@
       "tokenId": "52743766872745461836823064151924072776986",
       "itemId": 1306,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Yarn",
@@ -160,7 +179,8 @@
       "tokenId": "57507720009638600325310308655968827737017",
       "itemId": 953,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Grandmother's Doll",
@@ -168,7 +188,8 @@
       "tokenId": "47639531368931384884872445040447549604921",
       "itemId": 1081,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -176,7 +197,8 @@
       "tokenId": "68737038118029569619601670701217178714673",
       "itemId": 561,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -184,7 +206,8 @@
       "tokenId": "68737038118029569619601670701217178714623",
       "itemId": 511,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Blue Crystal",
@@ -192,7 +215,8 @@
       "tokenId": "37431060361303230980971206817494503261234",
       "itemId": 1074,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Magic Mushroom",
@@ -200,7 +224,8 @@
       "tokenId": "16673835979125984709705355764156642362371",
       "itemId": 1027,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -208,7 +233,8 @@
       "tokenId": "68737038118029569619601670701217178714411",
       "itemId": 299,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Roped Tribal Spear",
@@ -216,7 +242,8 @@
       "tokenId": "30285130655963523248240340061427370820494",
       "itemId": 910,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "The Grandma",
@@ -224,7 +251,8 @@
       "tokenId": "46958966635089507957945695825584013181081",
       "itemId": 153,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Stella Totem",
@@ -232,7 +260,8 @@
       "tokenId": "23479483317544753978972847912792006590605",
       "itemId": 141,
       "type": "mystic",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "mystic"
     },
     {
       "name": "Hyacinthus Root In A Clay Pot",
@@ -240,7 +269,8 @@
       "tokenId": "28583718821358830930923467024268529762437",
       "itemId": 133,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Stella Totem",
@@ -248,7 +278,8 @@
       "tokenId": "23479483317544753978972847912792006590604",
       "itemId": 140,
       "type": "mystic",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "mystic"
     },
     {
       "name": "Acid Vase",
@@ -256,7 +287,8 @@
       "tokenId": "31305977756726338638630463883722675454820",
       "itemId": 868,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Jade Jug",
@@ -264,7 +296,8 @@
       "tokenId": "36410213260540415590581082995199198626843",
       "itemId": 1051,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Arctic Logs",
@@ -272,7 +305,8 @@
       "tokenId": "58528567110401415715700432478264132371605",
       "itemId": 1173,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Bone Barrel",
@@ -280,7 +314,8 @@
       "tokenId": "40493601663591677152141578284380417164406",
       "itemId": 1142,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Statue of Leek",
@@ -288,7 +323,8 @@
       "tokenId": "19736377281414430880875727231042556265658",
       "itemId": 1210,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Jug",
@@ -296,7 +332,8 @@
       "tokenId": "36069930893619477127117708387767430415327",
       "itemId": 991,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Bullseye With Red Arrow",
@@ -304,7 +341,8 @@
       "tokenId": "21778071482940061661655974875633165534161",
       "itemId": 977,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Cucumber Vines",
@@ -312,7 +350,8 @@
       "tokenId": "14972424144521292392388482726997801304755",
       "itemId": 691,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Bartender's Ice Bucket",
@@ -320,7 +359,8 @@
       "tokenId": "49681225570457015665652692685038158873659",
       "itemId": 1083,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Tulip",
@@ -328,7 +368,8 @@
       "tokenId": "45257554800484815640628822788425172124620",
       "itemId": 972,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Stone Lamp",
@@ -336,7 +377,8 @@
       "tokenId": "340282366920938463463374607431768212540",
       "itemId": 1084,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Mossy Stone",
@@ -344,7 +386,8 @@
       "tokenId": "13951577043758477001998358904702496670735",
       "itemId": 1039,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -352,7 +395,8 @@
       "tokenId": "68737038118029569619601670701217178714630",
       "itemId": 518,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Bullseye With Blue Arrow",
@@ -360,7 +404,8 @@
       "tokenId": "22118353849861000125119349483064933745517",
       "itemId": 877,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Little Matron Family",
@@ -368,7 +413,8 @@
       "tokenId": "49000660836615138738725943470174622449714",
       "itemId": 50,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Tribal Festival Spear",
@@ -376,7 +422,8 @@
       "tokenId": "30625413022884461711703714668859139031157",
       "itemId": 117,
       "type": "mystic",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "mystic"
     },
     {
       "name": "Toxic Vase",
@@ -384,7 +431,8 @@
       "tokenId": "31646260123647277102093838491154443665589",
       "itemId": 181,
       "type": "decor",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Desert Thorned Succulent",
@@ -392,7 +440,8 @@
       "tokenId": "25180895152149446296289720949950847649043",
       "itemId": 1299,
       "type": "savannah",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "savannah"
     },
     {
       "name": "Beansprout In A Clay Pot",
@@ -400,7 +449,8 @@
       "tokenId": "28243436454437892467460092416836761551998",
       "itemId": 1150,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Cucumber Vines",
@@ -408,7 +458,8 @@
       "tokenId": "14972424144521292392388482726997801305157",
       "itemId": 1093,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Basket of Wild Flower",
@@ -416,7 +467,8 @@
       "tokenId": "34028236692093846346337460743176821146622",
       "itemId": 1022,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Broken Pillar",
@@ -424,7 +476,8 @@
       "tokenId": "3402823669209384634633746074317682115643",
       "itemId": 1083,
       "type": "genesis",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "genesis"
     },
     {
       "name": "Pink Lavender",
@@ -432,7 +485,8 @@
       "tokenId": "2381976568446569244243622252022377480686",
       "itemId": 494,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Serpent Vase",
@@ -440,7 +494,8 @@
       "tokenId": "15652988878363169319315231941861337727369",
       "itemId": 393,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Icy Jack",
@@ -448,7 +503,8 @@
       "tokenId": "50702072671219831056042816507333463507862",
       "itemId": 918,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Jade Snowboard",
@@ -456,7 +512,8 @@
       "tokenId": "52743766872745461836823064151924072776801",
       "itemId": 1121,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Wooden Side Table",
@@ -464,7 +521,8 @@
       "tokenId": "59549414211164231106090556300559437005505",
       "itemId": 705,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Babushka Doll Family",
@@ -472,7 +530,8 @@
       "tokenId": "48660378469694200275262568862742854238507",
       "itemId": 299,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Trunk Of Life",
@@ -480,7 +539,8 @@
       "tokenId": "11229318108390969294291362045248350978215",
       "itemId": 167,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Noir Side Table",
@@ -488,7 +548,8 @@
       "tokenId": "60229978945006108033017305515422973427881",
       "itemId": 169,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Mossy Stone",
@@ -496,7 +557,8 @@
       "tokenId": "13951577043758477001998358904702496670549",
       "itemId": 853,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Icy finely crafted flowers",
@@ -504,7 +566,8 @@
       "tokenId": "61250826045768923423407429337718278062160",
       "itemId": 80,
       "type": "arctic",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "forest"
     },
     {
       "name": "Sturdy Trunk",
@@ -512,7 +575,8 @@
       "tokenId": "10889035741470030830827987437816582767671",
       "itemId": 1079,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Broken Jar",
@@ -520,7 +584,8 @@
       "tokenId": "26882306986754138613606593987109688706104",
       "itemId": 1080,
       "type": "genesis",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "genesis"
     },
     {
       "name": "Tribal Shield",
@@ -528,7 +593,8 @@
       "tokenId": "31986542490568215565557213098586211877681",
       "itemId": 817,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Bone Trap",
@@ -536,7 +602,8 @@
       "tokenId": "28924001188279769394386841631700297974437",
       "itemId": 677,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Beech Chest",
@@ -544,7 +611,8 @@
       "tokenId": "39472754562828861761751454462085112529006",
       "itemId": 110,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Warm pile of wood",
@@ -552,7 +620,8 @@
       "tokenId": "35389366159777600200190959172903893992732",
       "itemId": 1308,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Beech Chest",
@@ -560,7 +629,8 @@
       "tokenId": "39472754562828861761751454462085112530149",
       "itemId": 1253,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Flower of Vitality",
@@ -568,7 +638,8 @@
       "tokenId": "1701411834604692317316873037158841058154",
       "itemId": 874,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Drum of War",
@@ -576,7 +647,8 @@
       "tokenId": "38451907462066046371361330639789807895642",
       "itemId": 1114,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Wooden Snowboard",
@@ -584,7 +656,8 @@
       "tokenId": "52403484505824523373359689544492304565016",
       "itemId": 792,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Cozy Wool Cap Hanger",
@@ -592,7 +665,8 @@
       "tokenId": "53764613973508277227213187974219377410919",
       "itemId": 871,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Wool Cap Hanger",
@@ -600,7 +674,8 @@
       "tokenId": "53424331606587338763749813366787609199578",
       "itemId": 986,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Small Pouch",
@@ -608,7 +683,8 @@
       "tokenId": "43215860598959184859848575143834562855582",
       "itemId": 670,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Warm wingboots",
@@ -616,7 +692,8 @@
       "tokenId": "42535295865117307932921825928971026433005",
       "itemId": 1005,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Matryoshka Doll Family",
@@ -624,7 +701,8 @@
       "tokenId": "48320096102773261811799194255311086027813",
       "itemId": 1061,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Old Town Banner",
@@ -632,7 +710,8 @@
       "tokenId": "51382637405061707982969565722196999930518",
       "itemId": 662,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Blue Crystal",
@@ -640,7 +719,8 @@
       "tokenId": "37431060361303230980971206817494503261400",
       "itemId": 1240,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Patterned Side Table",
@@ -648,7 +728,8 @@
       "tokenId": "59889696578085169569553930907991205217351",
       "itemId": 1095,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Rainbow Yarn",
@@ -656,7 +737,8 @@
       "tokenId": "58188284743480477252237057870832364159105",
       "itemId": 129,
       "type": "decor",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Magic Mushroom",
@@ -664,7 +746,8 @@
       "tokenId": "16673835979125984709705355764156642362369",
       "itemId": 1025,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Kobalt Jug",
@@ -672,7 +755,8 @@
       "tokenId": "36750495627461354054044457602630966837346",
       "itemId": 98,
       "type": "decor",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Rain Idol Statue",
@@ -680,7 +764,8 @@
       "tokenId": "56146590541954846471456810226241754890383",
       "itemId": 143,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "mystic"
     },
     {
       "name": "Serpent Vase",
@@ -688,7 +773,8 @@
       "tokenId": "15652988878363169319315231941861337728140",
       "itemId": 1164,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Tribal Mask",
@@ -696,7 +782,8 @@
       "tokenId": "20757224382177246271265851053337860899486",
       "itemId": 670,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Broken Jar",
@@ -704,7 +791,8 @@
       "tokenId": "26882306986754138613606593987109688706265",
       "itemId": 1241,
       "type": "genesis",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "genesis"
     },
     {
       "name": "Bullseye With Blue Arrow",
@@ -712,7 +800,8 @@
       "tokenId": "22118353849861000125119349483064933745516",
       "itemId": 876,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Drum of War",
@@ -720,7 +809,8 @@
       "tokenId": "38451907462066046371361330639789807895425",
       "itemId": 897,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Tulip",
@@ -728,7 +818,8 @@
       "tokenId": "45257554800484815640628822788425172124769",
       "itemId": 1121,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Marble Lamp",
@@ -736,7 +827,8 @@
       "tokenId": "680564733841876926926749214863536424147",
       "itemId": 1235,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Marble Statue of Leek",
@@ -744,7 +836,8 @@
       "tokenId": "20076659648335369344339101838474324477206",
       "itemId": 1302,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "R0N1N-21",
@@ -752,7 +845,8 @@
       "tokenId": "71119014686476138863845292953239556194587",
       "itemId": 283,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Blossom Tree",
@@ -760,7 +854,8 @@
       "tokenId": "70098167585713323473455169130944251569158",
       "itemId": 9222,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Wind Idol Statue",
@@ -768,7 +863,8 @@
       "tokenId": "55806308175033908007993435618809986679658",
       "itemId": 874,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Basket of Strawberries",
@@ -776,7 +872,8 @@
       "tokenId": "8166776806102523123120990578362437075133",
       "itemId": 189,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Gold Wild Flower",
@@ -784,7 +881,8 @@
       "tokenId": "7145929705339707732730866756067132440709",
       "itemId": 133,
       "type": "forest",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "forest"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -792,7 +890,8 @@
       "tokenId": "68737038118029569619601670701217178714628",
       "itemId": 516,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Thicccc Cactus",
@@ -800,7 +899,8 @@
       "tokenId": "33687954325172907882874086135745052934290",
       "itemId": 146,
       "type": "savannah",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "savannah"
     },
     {
       "name": "Roped Tribal Spear",
@@ -808,7 +908,8 @@
       "tokenId": "30285130655963523248240340061427370820697",
       "itemId": 1113,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Statue of Leek",
@@ -816,7 +917,8 @@
       "tokenId": "19736377281414430880875727231042556265488",
       "itemId": 1040,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Mossy Stone",
@@ -824,7 +926,8 @@
       "tokenId": "13951577043758477001998358904702496670548",
       "itemId": 852,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Bullseye With Blue Arrow",
@@ -832,7 +935,8 @@
       "tokenId": "22118353849861000125119349483064933745518",
       "itemId": 878,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Patterned Side Table",
@@ -840,7 +944,8 @@
       "tokenId": "59889696578085169569553930907991205217350",
       "itemId": 1094,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Basket of Roses",
@@ -848,7 +953,8 @@
       "tokenId": "34368519059014784809800835350608589357920",
       "itemId": 864,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Wooden Snowboard",
@@ -856,7 +962,8 @@
       "tokenId": "52403484505824523373359689544492304565259",
       "itemId": 1035,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Beech Chest",
@@ -864,7 +971,8 @@
       "tokenId": "39472754562828861761751454462085112530145",
       "itemId": 1249,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Icy Jack",
@@ -872,7 +980,8 @@
       "tokenId": "50702072671219831056042816507333463507788",
       "itemId": 844,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Used Axe",
@@ -880,7 +989,8 @@
       "tokenId": "41514448764354492542531702106675721798869",
       "itemId": 1237,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "The Mother",
@@ -888,7 +998,8 @@
       "tokenId": "46618684268168569494482321218152244970482",
       "itemId": 1010,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Juicy Grapes",
@@ -896,7 +1007,8 @@
       "tokenId": "4763953136893138488487244504044754961680",
       "itemId": 1296,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Arctic Bonzai Tree",
@@ -904,7 +1016,8 @@
       "tokenId": "44576990066642938713702073573561635700996",
       "itemId": 260,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Jolly Tribal Shield",
@@ -912,7 +1025,8 @@
       "tokenId": "32326824857489154029020587706017980089020",
       "itemId": 700,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Flower Patch",
@@ -920,7 +1034,8 @@
       "tokenId": "12250165209153784684681485867543655612564",
       "itemId": 148,
       "type": "forest",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "forest"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -928,7 +1043,8 @@
       "tokenId": "68737038118029569619601670701217178714408",
       "itemId": 296,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Ganbaru CrypTon",
@@ -936,7 +1052,8 @@
       "tokenId": "67375908650345815765748172271490105868327",
       "itemId": 39,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Mossy Stone",
@@ -944,7 +1061,8 @@
       "tokenId": "13951577043758477001998358904702496670630",
       "itemId": 934,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Beansprout In A Clay Pot",
@@ -952,7 +1070,8 @@
       "tokenId": "28243436454437892467460092416836761552171",
       "itemId": 1323,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Acid Vase",
@@ -960,7 +1079,8 @@
       "tokenId": "31305977756726338638630463883722675454638",
       "itemId": 686,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Flower of Vitality",
@@ -968,7 +1088,8 @@
       "tokenId": "1701411834604692317316873037158841058337",
       "itemId": 1057,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Beech Trunk",
@@ -976,7 +1097,8 @@
       "tokenId": "10548753374549092367364612830384814556012",
       "itemId": 876,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Frozen Nautilus",
@@ -984,7 +1106,8 @@
       "tokenId": "54785461074271092617603311796514682044963",
       "itemId": 547,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Icy Buds",
@@ -992,7 +1115,8 @@
       "tokenId": "60570261311927046496480680122854741639664",
       "itemId": 496,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "arctic"
     },
     {
       "name": "Marble Lamp",
@@ -1000,7 +1124,8 @@
       "tokenId": "680564733841876926926749214863536423853",
       "itemId": 941,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Green Shrub",
@@ -1008,7 +1133,8 @@
       "tokenId": "5444517870735015415413993718908291384510",
       "itemId": 1214,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Arctic Logs",
@@ -1016,7 +1142,8 @@
       "tokenId": "58528567110401415715700432478264132371456",
       "itemId": 1024,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Matryoshka Doll",
@@ -1024,7 +1151,8 @@
       "tokenId": "47299249002010446421409070433015781393554",
       "itemId": 1170,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "The Mother",
@@ -1032,7 +1160,8 @@
       "tokenId": "46618684268168569494482321218152244970623",
       "itemId": 1151,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Overgrown Pillar",
@@ -1040,7 +1169,8 @@
       "tokenId": "3743106036130323098097120681749450326977",
       "itemId": 961,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Wingboots",
@@ -1048,7 +1178,8 @@
       "tokenId": "42195013498196369469458451321539258220819",
       "itemId": 275,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Travel Pouch",
@@ -1056,7 +1187,8 @@
       "tokenId": "43556142965880123323311949751266331067629",
       "itemId": 1261,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Old Town Banner",
@@ -1064,7 +1196,8 @@
       "tokenId": "51382637405061707982969565722196999930862",
       "itemId": 1006,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Mr Shiyagi's Bonzai Tree",
@@ -1072,7 +1205,8 @@
       "tokenId": "44917272433563877177165448180993403912298",
       "itemId": 106,
       "type": "forest",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "forest"
     },
     {
       "name": "Ancient Pillar",
@@ -1080,7 +1214,8 @@
       "tokenId": "4083388403051261561560495289181218537651",
       "itemId": 179,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Little Matron Family",
@@ -1088,7 +1223,8 @@
       "tokenId": "49000660836615138738725943470174622449766",
       "itemId": 102,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Voluptuous grapes",
@@ -1096,7 +1232,8 @@
       "tokenId": "5104235503814076951950619111476523172014",
       "itemId": 174,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Kobalt Pierced Bullseye",
@@ -1104,7 +1241,8 @@
       "tokenId": "22458636216781938588582724090496701956212",
       "itemId": 116,
       "type": "decor",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Golden Cheeked Warbler Nest",
@@ -1112,7 +1250,8 @@
       "tokenId": "18375247813730677027022228801315483418747",
       "itemId": 123,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Empty Broken Jar",
@@ -1120,7 +1259,8 @@
       "tokenId": "27222589353675077077069968594541456917155",
       "itemId": 675,
       "type": "genesis",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "genesis"
     },
     {
       "name": "Flower of Stamina",
@@ -1128,7 +1268,8 @@
       "tokenId": "1361129467683753853853498429727072846771",
       "itemId": 947,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Desert Succulent",
@@ -1136,7 +1277,8 @@
       "tokenId": "24840612785228507832826346342519079437379",
       "itemId": 1091,
       "type": "savannah",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "savannah"
     },
     {
       "name": "Cucumber Vines",
@@ -1144,7 +1286,8 @@
       "tokenId": "14972424144521292392388482726997801305358",
       "itemId": 1294,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Red Hydrangea",
@@ -1152,7 +1295,8 @@
       "tokenId": "19055812547572553953948978016179019842522",
       "itemId": 986,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Winter Melon Vines",
@@ -1160,7 +1304,8 @@
       "tokenId": "14632141777600353928925108119566033093627",
       "itemId": 1019,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Puff Snowglobe",
@@ -1168,7 +1313,8 @@
       "tokenId": "56486872908875784934920184833673523102597",
       "itemId": 901,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "arctic"
     },
     {
       "name": "Ruin",
@@ -1176,7 +1322,8 @@
       "tokenId": "8507059173023461586584365185794205287566",
       "itemId": 1166,
       "type": "genesis",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "MakerDao Bronze",
@@ -1184,7 +1331,8 @@
       "tokenId": "67716191017266754229211546878921874079769",
       "itemId": 25,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Pink Lavender",
@@ -1192,7 +1340,8 @@
       "tokenId": "2381976568446569244243622252022377481240",
       "itemId": 1048,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Little Matron",
@@ -1200,7 +1349,8 @@
       "tokenId": "46278401901247631031018946610720476759197",
       "itemId": 1181,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Magical Tulip",
@@ -1208,7 +1358,8 @@
       "tokenId": "45597837167405754104092197395856940336022",
       "itemId": 918,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -1216,7 +1367,8 @@
       "tokenId": "68737038118029569619601670701217178714637",
       "itemId": 525,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -1224,7 +1376,8 @@
       "tokenId": "68737038118029569619601670701217178714633",
       "itemId": 521,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Jolly Crazy Totem",
@@ -1232,7 +1385,8 @@
       "tokenId": "23139200950623815515509473305360238379915",
       "itemId": 907,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Roped Tribal Spear",
@@ -1240,7 +1394,8 @@
       "tokenId": "30285130655963523248240340061427370820590",
       "itemId": 1006,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Reed Warbler Nest",
@@ -1248,7 +1403,8 @@
       "tokenId": "18034965446809738563558854193883715207860",
       "itemId": 692,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Arctic Logs",
@@ -1256,7 +1412,8 @@
       "tokenId": "58528567110401415715700432478264132371465",
       "itemId": 1033,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Moon Crystal",
@@ -1264,7 +1421,8 @@
       "tokenId": "37090777994382292517507832210062735049833",
       "itemId": 1129,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "The Mother",
@@ -1272,7 +1430,8 @@
       "tokenId": "46618684268168569494482321218152244970483",
       "itemId": 1011,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Small Pouch",
@@ -1280,7 +1439,8 @@
       "tokenId": "43215860598959184859848575143834562855889",
       "itemId": 977,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Magical Tulip",
@@ -1288,7 +1448,8 @@
       "tokenId": "45597837167405754104092197395856940336230",
       "itemId": 1126,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Arctic Bonzai Tree",
@@ -1296,7 +1457,8 @@
       "tokenId": "44576990066642938713702073573561635701258",
       "itemId": 522,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Golden Toadstools",
@@ -1304,7 +1466,8 @@
       "tokenId": "17014118346046923173168730371588410574069",
       "itemId": 1269,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Shiny Barrel",
@@ -1312,7 +1475,8 @@
       "tokenId": "40833884030512615615604952891812185374847",
       "itemId": 127,
       "type": "decor",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -1320,7 +1484,8 @@
       "tokenId": "68737038118029569619601670701217178714631",
       "itemId": 519,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Reed Warbler Nest",
@@ -1328,7 +1493,8 @@
       "tokenId": "18034965446809738563558854193883715207861",
       "itemId": 693,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Bone Trap",
@@ -1336,7 +1502,8 @@
       "tokenId": "28924001188279769394386841631700297974146",
       "itemId": 386,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Tiny Hydrangea",
@@ -1344,7 +1511,8 @@
       "tokenId": "18715530180651615490485603408747251630339",
       "itemId": 259,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Blue Lavender",
@@ -1352,7 +1520,8 @@
       "tokenId": "2722258935367507707706996859454145692726",
       "itemId": 1078,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Beech Chest",
@@ -1360,7 +1529,8 @@
       "tokenId": "39472754562828861761751454462085112530146",
       "itemId": 1250,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Marble Lamp",
@@ -1368,7 +1538,8 @@
       "tokenId": "680564733841876926926749214863536423778",
       "itemId": 866,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Basket of Green Oranges",
@@ -1376,7 +1547,8 @@
       "tokenId": "7826494439181584659657615970930668864453",
       "itemId": 965,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Used Axe",
@@ -1384,7 +1556,8 @@
       "tokenId": "41514448764354492542531702106675721798874",
       "itemId": 1242,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Wooden Snowboard",
@@ -1392,7 +1565,8 @@
       "tokenId": "52403484505824523373359689544492304565196",
       "itemId": 972,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Old City Banner",
@@ -1400,7 +1574,8 @@
       "tokenId": "51722919771982646446432940329628768141500",
       "itemId": 188,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Ice Bucket",
@@ -1408,7 +1583,8 @@
       "tokenId": "49340943203536077202189318077606390662278",
       "itemId": 1158,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "arctic"
     },
     {
       "name": "Frozen Nautilus",
@@ -1416,7 +1592,8 @@
       "tokenId": "54785461074271092617603311796514682045386",
       "itemId": 970,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Mascot Tea Party",
@@ -1424,7 +1601,8 @@
       "tokenId": "71459297053397077327308667560671324406161",
       "itemId": 401,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Statue of Silvergale",
@@ -1432,7 +1610,8 @@
       "tokenId": "64313367348057369594577800804604191965208",
       "itemId": 24,
       "type": "mystic",
-      "boost": 1.5
+      "boost": 1.5,
+      "environment": "mystic"
     },
     {
       "name": "Winter Melon Vines",
@@ -1440,7 +1619,8 @@
       "tokenId": "14632141777600353928925108119566033093836",
       "itemId": 1228,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Basket of Pansies",
@@ -1448,7 +1628,8 @@
       "tokenId": "34708801425935723273264209958040357568661",
       "itemId": 149,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Ancient Pillar",
@@ -1456,7 +1637,8 @@
       "tokenId": "4083388403051261561560495289181218537586",
       "itemId": 114,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Crimson Serpent",
@@ -1464,7 +1646,8 @@
       "tokenId": "16333553612205046246241981156724874150015",
       "itemId": 127,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -1472,7 +1655,8 @@
       "tokenId": "68737038118029569619601670701217178714635",
       "itemId": 523,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Gilded Paper Propeller",
@@ -1480,7 +1664,8 @@
       "tokenId": "24500330418307569369362971735087311224939",
       "itemId": 107,
       "type": "decor",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Serpent Vase",
@@ -1488,7 +1673,8 @@
       "tokenId": "15652988878363169319315231941861337727648",
       "itemId": 672,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Reed Warbler Nest",
@@ -1496,7 +1682,8 @@
       "tokenId": "18034965446809738563558854193883715207859",
       "itemId": 691,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Winter Melon Vines",
@@ -1504,7 +1691,8 @@
       "tokenId": "14632141777600353928925108119566033093628",
       "itemId": 1020,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Stone Lamp",
@@ -1512,7 +1700,8 @@
       "tokenId": "340282366920938463463374607431768211744",
       "itemId": 288,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Red Hydrangea",
@@ -1520,7 +1709,8 @@
       "tokenId": "19055812547572553953948978016179019842523",
       "itemId": 987,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Yarn",
@@ -1528,7 +1718,8 @@
       "tokenId": "57507720009638600325310308655968827736693",
       "itemId": 629,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Paper Propeller",
@@ -1536,7 +1727,8 @@
       "tokenId": "23819765684465692442436222520223774802934",
       "itemId": 1014,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Small Pouch",
@@ -1544,7 +1736,8 @@
       "tokenId": "43215860598959184859848575143834562855957",
       "itemId": 1045,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Ruby Toadstools",
@@ -1552,7 +1745,8 @@
       "tokenId": "17354400712967861636632104979020178784390",
       "itemId": 134,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Sturdy Trunk",
@@ -1560,7 +1754,8 @@
       "tokenId": "10889035741470030830827987437816582767458",
       "itemId": 866,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -1568,7 +1763,8 @@
       "tokenId": "68737038118029569619601670701217178714627",
       "itemId": 515,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Red Hydrangea",
@@ -1576,7 +1772,8 @@
       "tokenId": "19055812547572553953948978016179019842435",
       "itemId": 899,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Sturdy Trunk",
@@ -1584,7 +1781,8 @@
       "tokenId": "10889035741470030830827987437816582767383",
       "itemId": 791,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Tiny Hydrangea",
@@ -1592,7 +1790,8 @@
       "tokenId": "18715530180651615490485603408747251631161",
       "itemId": 1081,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Paper Propeller",
@@ -1600,7 +1799,8 @@
       "tokenId": "23819765684465692442436222520223774803023",
       "itemId": 1103,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Cactus and friends",
@@ -1608,7 +1808,8 @@
       "tokenId": "33347671958251969419410711528313284723790",
       "itemId": 1102,
       "type": "savannah",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "savannah"
     },
     {
       "name": "Frozen Yarn",
@@ -1616,7 +1817,8 @@
       "tokenId": "57848002376559538788773683263400595948611",
       "itemId": 1091,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Grapevine",
@@ -1624,7 +1826,8 @@
       "tokenId": "4423670769972200025023869896612986749823",
       "itemId": 895,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Toasted Logs",
@@ -1632,7 +1835,8 @@
       "tokenId": "58868849477322354179163807085695900583037",
       "itemId": 1149,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Beech Trunk",
@@ -1640,7 +1844,8 @@
       "tokenId": "10548753374549092367364612830384814555854",
       "itemId": 718,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Tribal Squirrel Mask",
@@ -1648,7 +1853,8 @@
       "tokenId": "21097506749098184734729225660769629110996",
       "itemId": 724,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Grass",
@@ -1656,7 +1862,8 @@
       "tokenId": "11569600475311907757754736652680119190626",
       "itemId": 1122,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Old City Banner",
@@ -1664,7 +1871,8 @@
       "tokenId": "51722919771982646446432940329628768142349",
       "itemId": 1037,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Wool Cap Hanger",
@@ -1672,7 +1880,8 @@
       "tokenId": "53424331606587338763749813366787609199744",
       "itemId": 1152,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Barrel",
@@ -1680,7 +1889,8 @@
       "tokenId": "40153319296670738688678203676948648952837",
       "itemId": 1029,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Oak Chest",
@@ -1688,7 +1898,8 @@
       "tokenId": "39132472195907923298288079854653344318418",
       "itemId": 978,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Grandmother's Doll",
@@ -1696,7 +1907,8 @@
       "tokenId": "47639531368931384884872445040447549604519",
       "itemId": 679,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Blue Crystal",
@@ -1704,7 +1916,8 @@
       "tokenId": "37431060361303230980971206817494503261399",
       "itemId": 1239,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Sunset Snowboard",
@@ -1712,7 +1925,8 @@
       "tokenId": "53084049239666400300286438759355840987318",
       "itemId": 182,
       "type": "arctic",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "savannah"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -1720,7 +1934,8 @@
       "tokenId": "68737038118029569619601670701217178714413",
       "itemId": 301,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Logs of neverending flame.",
@@ -1728,7 +1943,8 @@
       "tokenId": "59209131844243292642627181693127668793372",
       "itemId": 28,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "forest"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -1736,7 +1952,8 @@
       "tokenId": "68737038118029569619601670701217178714253",
       "itemId": 141,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Big Ruin Shard",
@@ -1744,7 +1961,8 @@
       "tokenId": "26201742252912261686679844772246152283119",
       "itemId": 1007,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Bone Trap",
@@ -1752,7 +1970,8 @@
       "tokenId": "28924001188279769394386841631700297974903",
       "itemId": 1143,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Empty Broken Jar",
@@ -1760,7 +1979,8 @@
       "tokenId": "27222589353675077077069968594541456917431",
       "itemId": 951,
       "type": "genesis",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "genesis"
     },
     {
       "name": "Statue of Leek",
@@ -1768,7 +1988,8 @@
       "tokenId": "19736377281414430880875727231042556265141",
       "itemId": 693,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Bone Barrel",
@@ -1776,7 +1997,8 @@
       "tokenId": "40493601663591677152141578284380417164179",
       "itemId": 915,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Drum of War",
@@ -1784,7 +2006,8 @@
       "tokenId": "38451907462066046371361330639789807895803",
       "itemId": 1275,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Snow Idol Statue",
@@ -1792,7 +2015,8 @@
       "tokenId": "55466025808112969544530061011378218468368",
       "itemId": 1040,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "arctic"
     },
     {
       "name": "Blue Wild Flower",
@@ -1800,7 +2024,8 @@
       "tokenId": "6465364971497830805804117541203596017667",
       "itemId": 3,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Young Bamboo",
@@ -1808,7 +2033,8 @@
       "tokenId": "9527906273786276976974489008089509921601",
       "itemId": 833,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Bone Barrel",
@@ -1816,7 +2042,8 @@
       "tokenId": "40493601663591677152141578284380417164394",
       "itemId": 1130,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Tribal Squirrel Mask",
@@ -1824,7 +2051,8 @@
       "tokenId": "21097506749098184734729225660769629111585",
       "itemId": 1313,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Jade Snowboard",
@@ -1832,7 +2060,8 @@
       "tokenId": "52743766872745461836823064151924072776655",
       "itemId": 975,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Matryoshka Doll",
@@ -1840,7 +2069,8 @@
       "tokenId": "47299249002010446421409070433015781393235",
       "itemId": 851,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Oil lamp",
@@ -1848,7 +2078,8 @@
       "tokenId": "41174166397433554079068327499243953586987",
       "itemId": 811,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Juicy Grapes",
@@ -1856,7 +2087,8 @@
       "tokenId": "4763953136893138488487244504044754961273",
       "itemId": 889,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Bartender's Ice Bucket",
@@ -1864,7 +2096,8 @@
       "tokenId": "49681225570457015665652692685038158873675",
       "itemId": 1099,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Arctic Bonzai Tree",
@@ -1872,7 +2105,8 @@
       "tokenId": "44576990066642938713702073573561635701630",
       "itemId": 894,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Icy Buds",
@@ -1880,7 +2114,8 @@
       "tokenId": "60570261311927046496480680122854741639815",
       "itemId": 647,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "arctic"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -1888,7 +2123,8 @@
       "tokenId": "68737038118029569619601670701217178714264",
       "itemId": 152,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Flower of Vitality",
@@ -1896,7 +2132,8 @@
       "tokenId": "1701411834604692317316873037158841058219",
       "itemId": 939,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -1904,7 +2141,8 @@
       "tokenId": "68737038118029569619601670701217178714416",
       "itemId": 304,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -1912,7 +2150,8 @@
       "tokenId": "68737038118029569619601670701217178714629",
       "itemId": 517,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Golden Cheeked Warbler Nest",
@@ -1920,7 +2159,8 @@
       "tokenId": "18375247813730677027022228801315483418671",
       "itemId": 47,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Frozen Fishbones",
@@ -1928,7 +2168,8 @@
       "tokenId": "55125743441192031081066686403946450256063",
       "itemId": 191,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "arctic"
     },
     {
       "name": "Winter Melon Vines",
@@ -1936,7 +2177,8 @@
       "tokenId": "14632141777600353928925108119566033093830",
       "itemId": 1222,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Desert Aloe",
@@ -1944,7 +2186,8 @@
       "tokenId": "25521177519070384759753095557382615859323",
       "itemId": 123,
       "type": "savannah",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "savannah"
     },
     {
       "name": "Cucumber Vines",
@@ -1952,7 +2195,8 @@
       "tokenId": "14972424144521292392388482726997801305160",
       "itemId": 1096,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Sprout In A Clay Pot",
@@ -1960,7 +2204,8 @@
       "tokenId": "27903154087516954003996717809404993340594",
       "itemId": 1202,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Cactus and friends",
@@ -1968,7 +2213,8 @@
       "tokenId": "33347671958251969419410711528313284723778",
       "itemId": 1090,
       "type": "savannah",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "savannah"
     },
     {
       "name": "Tribal Spear",
@@ -1976,7 +2222,8 @@
       "tokenId": "29944848289042584784776965453995602608590",
       "itemId": 462,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Blue Wild Flower",
@@ -1984,7 +2231,8 @@
       "tokenId": "6465364971497830805804117541203596018652",
       "itemId": 988,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Warbler Nest",
@@ -1992,7 +2240,8 @@
       "tokenId": "17694683079888800100095479586451946996556",
       "itemId": 844,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Icy Buds",
@@ -2000,7 +2249,8 @@
       "tokenId": "60570261311927046496480680122854741640353",
       "itemId": 1185,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "arctic"
     },
     {
       "name": "Blue Wild Flower",
@@ -2008,7 +2258,8 @@
       "tokenId": "6465364971497830805804117541203596018669",
       "itemId": 1005,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Yarn",
@@ -2016,7 +2267,8 @@
       "tokenId": "57507720009638600325310308655968827737046",
       "itemId": 982,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Trimmed Grass Patch",
@@ -2024,7 +2276,8 @@
       "tokenId": "11909882842232846221218111260111887401344",
       "itemId": 384,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Matryoshka Doll Family",
@@ -2032,7 +2285,8 @@
       "tokenId": "48320096102773261811799194255311086026754",
       "itemId": 2,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Frozen Nautilus",
@@ -2040,7 +2294,8 @@
       "tokenId": "54785461074271092617603311796514682045387",
       "itemId": 971,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Small Pouch",
@@ -2048,7 +2303,8 @@
       "tokenId": "43215860598959184859848575143834562854920",
       "itemId": 8,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Jade Snowboard",
@@ -2056,7 +2312,8 @@
       "tokenId": "52743766872745461836823064151924072776960",
       "itemId": 1280,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Ice Bucket",
@@ -2064,7 +2321,8 @@
       "tokenId": "49340943203536077202189318077606390662136",
       "itemId": 1016,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "arctic"
     },
     {
       "name": "Old Town Banner",
@@ -2072,7 +2330,8 @@
       "tokenId": "51382637405061707982969565722196999930497",
       "itemId": 641,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Babushka Doll Family",
@@ -2080,7 +2339,8 @@
       "tokenId": "48660378469694200275262568862742854238868",
       "itemId": 660,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Bundle of wood",
@@ -2088,7 +2348,8 @@
       "tokenId": "35049083792856661736727584565472125780976",
       "itemId": 1008,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Jade Jug",
@@ -2096,7 +2357,8 @@
       "tokenId": "36410213260540415590581082995199198626842",
       "itemId": 1050,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Toasted Logs",
@@ -2104,7 +2366,8 @@
       "tokenId": "58868849477322354179163807085695900582888",
       "itemId": 1000,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Ruin",
@@ -2112,7 +2375,8 @@
       "tokenId": "8507059173023461586584365185794205287567",
       "itemId": 1167,
       "type": "genesis",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Jack In The Box",
@@ -2120,7 +2384,8 @@
       "tokenId": "50361790304298892592579441899901695296498",
       "itemId": 1010,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Reed Warbler Nest",
@@ -2128,7 +2393,8 @@
       "tokenId": "18034965446809738563558854193883715208076",
       "itemId": 908,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Tribal Spear",
@@ -2136,7 +2402,8 @@
       "tokenId": "29944848289042584784776965453995602609278",
       "itemId": 1150,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Tribal Squirrel Mask",
@@ -2144,7 +2411,8 @@
       "tokenId": "21097506749098184734729225660769629111584",
       "itemId": 1312,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Bartender's Ice Bucket",
@@ -2152,7 +2420,8 @@
       "tokenId": "49681225570457015665652692685038158873856",
       "itemId": 1280,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Beech Chest",
@@ -2160,7 +2429,8 @@
       "tokenId": "39472754562828861761751454462085112529883",
       "itemId": 987,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Gilded Serpent",
@@ -2168,7 +2438,8 @@
       "tokenId": "15993271245284107782778606549293105939143",
       "itemId": 711,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Matryoshka Doll",
@@ -2176,7 +2447,8 @@
       "tokenId": "47299249002010446421409070433015781393410",
       "itemId": 1026,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Arctic Bonzai Tree",
@@ -2184,7 +2456,8 @@
       "tokenId": "44576990066642938713702073573561635701629",
       "itemId": 893,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Bundle of wood",
@@ -2192,7 +2465,8 @@
       "tokenId": "35049083792856661736727584565472125780772",
       "itemId": 804,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Bug Plushie",
@@ -2200,7 +2474,8 @@
       "tokenId": "61591108412689861886870803945150046273728",
       "itemId": 192,
       "type": "decor",
-      "boost": 1.5
+      "boost": 1.5,
+      "environment": "mystic"
     },
     {
       "name": "Statue of Pinaka",
@@ -2208,7 +2483,8 @@
       "tokenId": "63973084981136431131114426197172423753750",
       "itemId": 22,
       "type": "mystic",
-      "boost": 1.5
+      "boost": 1.5,
+      "environment": "mystic"
     },
     {
       "name": "Magic Mushroom",
@@ -2216,7 +2492,8 @@
       "tokenId": "16673835979125984709705355764156642361350",
       "itemId": 6,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Wise Bamboo ",
@@ -2224,7 +2501,8 @@
       "tokenId": "10208471007628153903901238222953046343869",
       "itemId": 189,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Roped Tribal Spear",
@@ -2232,7 +2510,8 @@
       "tokenId": "30285130655963523248240340061427370820716",
       "itemId": 1132,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Blue Lavender",
@@ -2240,7 +2519,8 @@
       "tokenId": "2722258935367507707706996859454145692725",
       "itemId": 1077,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Desert Succulent",
@@ -2248,7 +2528,8 @@
       "tokenId": "24840612785228507832826346342519079437378",
       "itemId": 1090,
       "type": "savannah",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "savannah"
     },
     {
       "name": "Broken Jar",
@@ -2256,7 +2537,8 @@
       "tokenId": "26882306986754138613606593987109688706103",
       "itemId": 1079,
       "type": "genesis",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "genesis"
     },
     {
       "name": "Tribal Shield",
@@ -2264,7 +2546,8 @@
       "tokenId": "31986542490568215565557213098586211877241",
       "itemId": 377,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Beech Trunk",
@@ -2272,7 +2555,8 @@
       "tokenId": "10548753374549092367364612830384814556156",
       "itemId": 1020,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Drum",
@@ -2280,7 +2564,8 @@
       "tokenId": "38111625095145107907897956032358039683472",
       "itemId": 400,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Wooden Side Table",
@@ -2288,7 +2573,8 @@
       "tokenId": "59549414211164231106090556300559437006000",
       "itemId": 1200,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Big Ruin Shard",
@@ -2296,7 +2582,8 @@
       "tokenId": "26201742252912261686679844772246152283118",
       "itemId": 1006,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Gilded Serpent",
@@ -2304,7 +2591,8 @@
       "tokenId": "15993271245284107782778606549293105939339",
       "itemId": 907,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Bullseye With Blue Arrow",
@@ -2312,7 +2600,8 @@
       "tokenId": "22118353849861000125119349483064933745939",
       "itemId": 1299,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Matryoshka Doll Family",
@@ -2320,7 +2609,8 @@
       "tokenId": "48320096102773261811799194255311086026979",
       "itemId": 227,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "The Mother",
@@ -2328,7 +2618,8 @@
       "tokenId": "46618684268168569494482321218152244969524",
       "itemId": 52,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Ruin",
@@ -2336,7 +2627,8 @@
       "tokenId": "8507059173023461586584365185794205286649",
       "itemId": 249,
       "type": "genesis",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Arctic Bonzai Tree",
@@ -2344,7 +2636,8 @@
       "tokenId": "44576990066642938713702073573561635701067",
       "itemId": 331,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Warm wingboots",
@@ -2352,7 +2645,8 @@
       "tokenId": "42535295865117307932921825928971026432709",
       "itemId": 709,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Matryoshka Doll",
@@ -2360,7 +2654,8 @@
       "tokenId": "47299249002010446421409070433015781393100",
       "itemId": 716,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Drum",
@@ -2368,7 +2663,8 @@
       "tokenId": "38111625095145107907897956032358039684078",
       "itemId": 1006,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "CoinGecko",
@@ -2376,7 +2672,8 @@
       "tokenId": "67035626283424877302284797664058337657170",
       "itemId": 338,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Gold Wild Flower",
@@ -2384,7 +2681,8 @@
       "tokenId": "7145929705339707732730866756067132440717",
       "itemId": 141,
       "type": "forest",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "forest"
     },
     {
       "name": "Chopped Bone Trap",
@@ -2392,7 +2690,8 @@
       "tokenId": "29264283555200707857850216239132066186150",
       "itemId": 934,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Lunacian Wine Bucket",
@@ -2400,7 +2699,8 @@
       "tokenId": "50021507937377954129116067292469927084063",
       "itemId": 31,
       "type": "luna",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "luna"
     },
     {
       "name": "Boots of Travel",
@@ -2408,7 +2708,8 @@
       "tokenId": "42875578232038246396385200536402794643601",
       "itemId": 145,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Shiny Barrel",
@@ -2416,7 +2717,8 @@
       "tokenId": "40833884030512615615604952891812185374842",
       "itemId": 122,
       "type": "decor",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Thicccc Cactus",
@@ -2424,7 +2726,8 @@
       "tokenId": "33687954325172907882874086135745052934355",
       "itemId": 211,
       "type": "savannah",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "savannah"
     },
     {
       "name": "Bullseye With Red Arrow",
@@ -2432,7 +2735,8 @@
       "tokenId": "21778071482940061661655974875633165533583",
       "itemId": 399,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Serpent Vase",
@@ -2440,7 +2744,8 @@
       "tokenId": "15652988878363169319315231941861337727979",
       "itemId": 1003,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Jolly Tribal Shield",
@@ -2448,7 +2753,8 @@
       "tokenId": "32326824857489154029020587706017980089022",
       "itemId": 702,
       "type": "mystic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Gilded Serpent",
@@ -2456,7 +2762,8 @@
       "tokenId": "15993271245284107782778606549293105939340",
       "itemId": 908,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Babushka Doll Family",
@@ -2464,7 +2771,8 @@
       "tokenId": "48660378469694200275262568862742854239077",
       "itemId": 869,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Overgrown Pillar",
@@ -2472,7 +2780,8 @@
       "tokenId": "3743106036130323098097120681749450326706",
       "itemId": 690,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Icy Buds",
@@ -2480,7 +2789,8 @@
       "tokenId": "60570261311927046496480680122854741640160",
       "itemId": 992,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "arctic"
     },
     {
       "name": "Wind Idol Statue",
@@ -2488,7 +2798,8 @@
       "tokenId": "55806308175033908007993435618809986679390",
       "itemId": 606,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "mystic"
     },
     {
       "name": "Cozy Wool Cap Hanger",
@@ -2496,7 +2807,8 @@
       "tokenId": "53764613973508277227213187974219377410729",
       "itemId": 681,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Travel Pouch",
@@ -2504,7 +2816,8 @@
       "tokenId": "43556142965880123323311949751266331067231",
       "itemId": 863,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Wingboots",
@@ -2512,7 +2825,8 @@
       "tokenId": "42195013498196369469458451321539258221548",
       "itemId": 1004,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Matryoshka Doll Family",
@@ -2520,7 +2834,8 @@
       "tokenId": "48320096102773261811799194255311086027613",
       "itemId": 861,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Warm wingboots",
@@ -2528,7 +2843,8 @@
       "tokenId": "42535295865117307932921825928971026433170",
       "itemId": 1170,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Jack In The Box",
@@ -2536,7 +2852,8 @@
       "tokenId": "50361790304298892592579441899901695296499",
       "itemId": 1011,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Wooden Snowboard",
@@ -2544,7 +2861,8 @@
       "tokenId": "52403484505824523373359689544492304565410",
       "itemId": 1186,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Jade Snowboard",
@@ -2552,7 +2870,8 @@
       "tokenId": "52743766872745461836823064151924072776078",
       "itemId": 398,
       "type": "arctic",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -2560,7 +2879,8 @@
       "tokenId": "68737038118029569619601670701217178714634",
       "itemId": 522,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Voluptuous grapes",
@@ -2568,7 +2888,8 @@
       "tokenId": "5104235503814076951950619111476523171914",
       "itemId": 74,
       "type": "any",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Shiny Barrel",
@@ -2576,7 +2897,8 @@
       "tokenId": "40833884030512615615604952891812185374782",
       "itemId": 62,
       "type": "decor",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Red Hydrangea",
@@ -2584,7 +2906,8 @@
       "tokenId": "19055812547572553953948978016179019842188",
       "itemId": 652,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Acid Vase",
@@ -2592,7 +2915,8 @@
       "tokenId": "31305977756726338638630463883722675455006",
       "itemId": 1054,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Basket of Wild Flower",
@@ -2600,7 +2924,8 @@
       "tokenId": "34028236692093846346337460743176821146095",
       "itemId": 495,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Tribal Spear",
@@ -2608,7 +2933,8 @@
       "tokenId": "29944848289042584784776965453995602608823",
       "itemId": 695,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Cucumber Vines",
@@ -2616,7 +2942,8 @@
       "tokenId": "14972424144521292392388482726997801304952",
       "itemId": 888,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Beech Chest",
@@ -2624,7 +2951,8 @@
       "tokenId": "39472754562828861761751454462085112530148",
       "itemId": 1252,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Mossy Ruin",
@@ -2632,7 +2960,8 @@
       "tokenId": "8847341539944400050047739793225973498202",
       "itemId": 346,
       "type": "genesis",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Puff Snowglobe",
@@ -2640,7 +2969,8 @@
       "tokenId": "56486872908875784934920184833673523102726",
       "itemId": 1030,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "arctic"
     },
     {
       "name": "Oak Chest",
@@ -2648,7 +2978,8 @@
       "tokenId": "39132472195907923298288079854653344318219",
       "itemId": 779,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Basket of Green Oranges",
@@ -2656,7 +2987,8 @@
       "tokenId": "7826494439181584659657615970930668864568",
       "itemId": 1080,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Patterned Side Table",
@@ -2664,7 +2996,8 @@
       "tokenId": "59889696578085169569553930907991205216942",
       "itemId": 686,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Grandmother's Doll",
@@ -2672,7 +3005,8 @@
       "tokenId": "47639531368931384884872445040447549604719",
       "itemId": 879,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Sweet Baby Doll",
@@ -2680,7 +3014,8 @@
       "tokenId": "47979813735852323348335819647879317815364",
       "itemId": 68,
       "type": "decor",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "any"
     },
     {
       "name": "Cucumber Vines",
@@ -2688,7 +3023,8 @@
       "tokenId": "14972424144521292392388482726997801304756",
       "itemId": 692,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Statue of Leek",
@@ -2696,7 +3032,8 @@
       "tokenId": "19736377281414430880875727231042556265610",
       "itemId": 1162,
       "type": "mystic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "mystic"
     },
     {
       "name": "Basket of Wild Flower",
@@ -2704,7 +3041,8 @@
       "tokenId": "34028236692093846346337460743176821146647",
       "itemId": 1047,
       "type": "forest",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "forest"
     },
     {
       "name": "Red Hydrangea",
@@ -2712,7 +3050,8 @@
       "tokenId": "19055812547572553953948978016179019842796",
       "itemId": 1260,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Empty Broken Jar",
@@ -2720,7 +3059,8 @@
       "tokenId": "27222589353675077077069968594541456917430",
       "itemId": 950,
       "type": "genesis",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "genesis"
     },
     {
       "name": "Oak Chest",
@@ -2728,7 +3068,8 @@
       "tokenId": "39132472195907923298288079854653344318393",
       "itemId": 953,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Jack In The Box",
@@ -2736,7 +3077,8 @@
       "tokenId": "50361790304298892592579441899901695295777",
       "itemId": 289,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Babushka Doll Family",
@@ -2744,7 +3086,8 @@
       "tokenId": "48660378469694200275262568862742854239078",
       "itemId": 870,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Basket of Oranges",
@@ -2752,7 +3095,8 @@
       "tokenId": "7486212072260646196194241363498900653041",
       "itemId": 1009,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Cucumber Vines",
@@ -2760,7 +3104,8 @@
       "tokenId": "14972424144521292392388482726997801304702",
       "itemId": 638,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Aave Phantom Altar",
@@ -2768,7 +3113,8 @@
       "tokenId": "69077320484950508083065045308648946925641",
       "itemId": 73,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Frozen Nautilus",
@@ -2776,7 +3122,8 @@
       "tokenId": "54785461074271092617603311796514682044938",
       "itemId": 522,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Patterned Side Table",
@@ -2784,7 +3131,8 @@
       "tokenId": "59889696578085169569553930907991205217201",
       "itemId": 945,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Bullseye With Red Arrow",
@@ -2792,7 +3140,8 @@
       "tokenId": "21778071482940061661655974875633165534028",
       "itemId": 844,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Grapevine",
@@ -2800,7 +3149,8 @@
       "tokenId": "4423670769972200025023869896612986749660",
       "itemId": 732,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Small Pouch",
@@ -2808,7 +3158,8 @@
       "tokenId": "43215860598959184859848575143834562855418",
       "itemId": 506,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Babushka Doll Family",
@@ -2816,7 +3167,8 @@
       "tokenId": "48660378469694200275262568862742854238436",
       "itemId": 228,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Oak Chest",
@@ -2824,7 +3176,8 @@
       "tokenId": "39132472195907923298288079854653344318369",
       "itemId": 929,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Jug",
@@ -2832,7 +3185,8 @@
       "tokenId": "36069930893619477127117708387767430415476",
       "itemId": 1140,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Drum",
@@ -2840,7 +3194,8 @@
       "tokenId": "38111625095145107907897956032358039683471",
       "itemId": 399,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Kyber Ancient Stone",
@@ -2848,7 +3203,8 @@
       "tokenId": "68737038118029569619601670701217178714412",
       "itemId": 300,
       "type": "genesis",
-      "boost": 0.75
+      "boost": 0.75,
+      "environment": "genesis"
     },
     {
       "name": "Beansprout In A Clay Pot",
@@ -2856,7 +3212,8 @@
       "tokenId": "28243436454437892467460092416836761552010",
       "itemId": 1162,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Cactus and friends",
@@ -2864,7 +3221,8 @@
       "tokenId": "33347671958251969419410711528313284723393",
       "itemId": 705,
       "type": "savannah",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "savannah"
     },
     {
       "name": "Reed Warbler Nest",
@@ -2872,7 +3230,8 @@
       "tokenId": "18034965446809738563558854193883715207858",
       "itemId": 690,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Warm pile of wood",
@@ -2880,7 +3239,8 @@
       "tokenId": "35389366159777600200190959172903893992399",
       "itemId": 975,
       "type": "forest",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "forest"
     },
     {
       "name": "Beech Chest",
@@ -2888,7 +3248,8 @@
       "tokenId": "39472754562828861761751454462085112530147",
       "itemId": 1251,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Golden Toadstools",
@@ -2896,7 +3257,8 @@
       "tokenId": "17014118346046923173168730371588410573675",
       "itemId": 875,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Red Hydrangea",
@@ -2904,7 +3266,8 @@
       "tokenId": "19055812547572553953948978016179019842249",
       "itemId": 713,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Frozen Nautilus",
@@ -2912,7 +3275,8 @@
       "tokenId": "54785461074271092617603311796514682045305",
       "itemId": 889,
       "type": "any",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "arctic"
     },
     {
       "name": "Young Bamboo",
@@ -2920,7 +3284,8 @@
       "tokenId": "9527906273786276976974489008089509921743",
       "itemId": 975,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Little Matron",
@@ -2928,7 +3293,8 @@
       "tokenId": "46278401901247631031018946610720476759031",
       "itemId": 1015,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Jade Jug",
@@ -2936,7 +3302,8 @@
       "tokenId": "36410213260540415590581082995199198627017",
       "itemId": 1225,
       "type": "decor",
-      "boost": 0.1
+      "boost": 0.1,
+      "environment": "any"
     },
     {
       "name": "Little Matron",
@@ -2944,7 +3311,8 @@
       "tokenId": "46278401901247631031018946610720476758292",
       "itemId": 276,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Grapevine",
@@ -2952,7 +3320,8 @@
       "tokenId": "4423670769972200025023869896612986750156",
       "itemId": 1228,
       "type": "any",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Old Town Banner",
@@ -2960,7 +3329,8 @@
       "tokenId": "51382637405061707982969565722196999930516",
       "itemId": 660,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     },
     {
       "name": "Ice Bucket",
@@ -2968,7 +3338,8 @@
       "tokenId": "49340943203536077202189318077606390661433",
       "itemId": 313,
       "type": "arctic",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "arctic"
     },
     {
       "name": "Traditional Snack Box",
@@ -2976,7 +3347,8 @@
       "tokenId": "69757885218792385009991794523512483359643",
       "itemId": 11163,
       "type": "decor",
-      "boost": 0.05
+      "boost": 0.05,
+      "environment": "any"
     }
   ],
   "fetched_at": "2026-07-05T19:01:24Z"

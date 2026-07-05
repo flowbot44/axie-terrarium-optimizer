@@ -76,7 +76,12 @@ function calcIndividualFlame(axie) {
 
 function calcPlotFlame(plot) {
     let total = plot.axies.reduce((s, a) => s + calcIndividualFlame(a), 0);
-    if (plot.landItemBoost) total = Math.floor(total * (1 + plot.landItemBoost / 100));
+    let landBoost = plot.landItemBoost || 0;
+    // If plot environment is set, matching items get ×2 multiplier
+    if (plot.plotEnv && landBoost > 0) {
+        landBoost *= 2;
+    }
+    total = Math.floor(total * (1 + landBoost / 100));
     if (plot.fortuneSlipActive) total = Math.floor(total * 1.10);
     return total;
 }
@@ -100,7 +105,8 @@ function sortAndRegroup() {
             axies: chunk,
             index: newPlots.length,
             landItemBoost: 0,
-            fortuneSlipActive: false
+            fortuneSlipActive: false,
+            plotEnv: ''
         });
     }
     // Preserve landItemBoost/fortuneSlip from existing plots if same count
@@ -181,6 +187,18 @@ function renderAll() {
                 <label>Fortune Slip:</label>
                 <input type="checkbox" class="slip-check" data-plot="${idx}" ${plot.fortuneSlipActive ? 'checked' : ''}>
             </div>
+            <div class="ctrl-group">
+                <label>Plot Env:</label>
+                <select class="env-select" data-plot="${idx}">
+                    <option value="">— select —</option>
+                    <option value="savannah" ${plot.plotEnv === 'savannah' ? 'selected' : ''}>Savannah 🏜️</option>
+                    <option value="forest" ${plot.plotEnv === 'forest' ? 'selected' : ''}>Forest 🌲</option>
+                    <option value="arctic" ${plot.plotEnv === 'arctic' ? 'selected' : ''}>Arctic ❄️</option>
+                    <option value="mystic" ${plot.plotEnv === 'mystic' ? 'selected' : ''}>Mystic ✨</option>
+                    <option value="genesis" ${plot.plotEnv === 'genesis' ? 'selected' : ''}>Genesis 🏛️</option>
+                    <option value="luna" ${plot.plotEnv === 'luna' ? 'selected' : ''}>Luna's Landing 🌙</option>
+                </select>
+            </div>
         `;
 
         // Axies grid
@@ -260,6 +278,14 @@ function renderAll() {
         });
     });
 
+    document.querySelectorAll('.env-select').forEach(el => {
+        el.addEventListener('change', () => {
+            const plotIdx = parseInt(el.dataset.plot);
+            gPlots[plotIdx].plotEnv = el.value;
+            renderAll();
+        });
+    });
+
     // Loading state
     document.getElementById('loading-indicator').style.display = 'none';
 }
@@ -297,23 +323,36 @@ function renderLandItems() {
     section.style.display = 'block';
     document.getElementById('land-total').textContent = LAND_ITEMS_DATA.total;
 
-    // Group by type, then rarity
+    // Group by environment, then rarity
     const groups = {};
     for (const item of LAND_ITEMS_DATA.items) {
-        const t = item.type || 'any';
-        if (!groups[t]) groups[t] = {items: [], totalBoost: 0};
-        groups[t].items.push(item);
-        groups[t].totalBoost += item.boost;
+        const env = item.environment || 'any';
+        if (!groups[env]) groups[env] = {items: [], totalBoost: 0};
+        groups[env].items.push(item);
+        groups[env].totalBoost += item.boost;
     }
-    // Sort types: highest total boost first
-    const sortedTypes = Object.entries(groups).sort((a, b) => b[1].totalBoost - a[1].totalBoost);
+    // Sort environments in game order
+    const envOrder = ['mystic', 'genesis', 'arctic', 'forest', 'savannah', 'luna', 'any'];
+    const sortedTypes = envOrder
+        .filter(e => groups[e])
+        .map(e => [e, groups[e]]);
+
+    const envLabels = {
+        mystic: 'Mystic ✨', genesis: 'Genesis 🏛️', arctic: 'Arctic ❄️',
+        forest: 'Forest 🌲', savannah: 'Savannah 🏜️', luna: "Luna's Landing 🌙", any: 'Universal'
+    };
+    const envColors = {
+        mystic: '#9b59b6', genesis: '#3498db', arctic: '#85c1e9',
+        forest: '#2ecc71', savannah: '#e67e22', luna: '#e74c3c', any: '#95a5a6'
+    };
 
     const grid = document.getElementById('land-items-grid');
     grid.innerHTML = '';
-    for (const [type, group] of sortedTypes) {
+    for (const [env, group] of sortedTypes) {
         const items = group.items;
         const block = document.createElement('div');
         block.className = 'land-rarity-group';
+        const color = envColors[env] || '#95a5a6';
         // Sub-group by rarity
         const byRarity = {};
         for (const item of items) {
@@ -327,14 +366,15 @@ function renderLandItems() {
         ).join(' · ');
 
         block.innerHTML = `
-            <h4 class="land-rarity-title">🏷️ ${type.charAt(0).toUpperCase() + type.slice(1)}
+            <h4 class="land-rarity-title" style="border-left: 3px solid ${color}; padding-left: 10px;">
+                ${envLabels[env] || env}
                 <span class="land-count">×${items.length}</span>
                 <span class="land-boost-sum">+${group.totalBoost.toFixed(2)}%</span>
             </h4>
             <div class="land-meta">${details}</div>
             <div class="land-item-list">
                 ${items.slice(0, 25).map(item =>
-                    `<span class="land-item-tag rarity-border-${item.rarity.toLowerCase()}">${item.name} <span class="boost-pct">+${item.boost}%</span></span>`
+                    `<span class="land-item-tag">${item.name} <span class="boost-pct">+${item.boost}%</span></span>`
                 ).join('')}
                 ${items.length > 25 ? `<span class="land-item-tag more">+${items.length - 25} more</span>` : ''}
             </div>
