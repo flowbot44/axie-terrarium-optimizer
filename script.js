@@ -215,26 +215,20 @@ function renderResults(axies, plots, collectionStats) {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Load from saved dataset
-    document.getElementById('load-btn').addEventListener('click', async () => {
+    // Load from saved dataset (data.js provides AXIES_DATASET)
+    document.getElementById('load-btn').addEventListener('click', () => {
         const loading = document.getElementById('loading-indicator');
         loading.style.display = 'flex';
         loading.querySelector('.load-status').textContent = 'Loading 1,188 Axies from dataset...';
         document.getElementById('load-error').textContent = '';
 
         try {
-            const resp = await fetch('axies_data.json');
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
-            const data = await resp.json();
-
-            if (!data.axies || data.axies.length === 0) {
-                throw new Error('No Axies found in dataset');
+            if (typeof AXIES_DATASET === 'undefined' || !AXIES_DATASET.axies) {
+                throw new Error('AXIES_DATASET not found. data.js may not have loaded.');
             }
-
+            const data = AXIES_DATASET;
             loading.querySelector('.load-status').textContent =
-                `✅ Loaded ${data.axies.length} Axies (owner: ${data.owner}) — optimizing...`;
-
-            // Process after a tick so UI updates
+                `✅ Loaded ${data.axies.length} Axies (${data.owner}) — optimizing...`;
             setTimeout(() => processAxies(data.axies), 100);
         } catch (err) {
             loading.style.display = 'none';
