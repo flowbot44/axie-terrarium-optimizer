@@ -260,3 +260,118 @@ h1 { color: #f1c40f; font-size: 1.6rem; margin-bottom: 0.3rem; }
 
 /* Collapsible toggle */
 .plot-axies-grid.collapsed { display: none; }
+
+/* === EVOLVED PARTS CONTROLS === */
+.plot-controls {
+    padding: 0.6rem 1rem;
+    background: #162a38;
+    border-bottom: 1px solid #2a3f52;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    font-size: 0.75rem;
+}
+.ctrl-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+.ctrl-group label {
+    color: #95a5a6;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 4px;
+}
+.btn-sm {
+    background: #0f1923;
+    border: 1px solid #2a3f52;
+    border-radius: 4px;
+    color: #7f8c8d;
+    padding: 2px 7px;
+    font-size: 0.65rem;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+.btn-sm:hover {
+    background: #1a2d3d;
+    border-color: #5dade2;
+    color: #bdc3c7;
+}
+.btn-sm:active {
+    background: #e67e22;
+    color: #fff;
+}
+.land-slider {
+    width: 70px;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #2a3f52;
+    border-radius: 2px;
+    outline: none;
+}
+.land-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #e67e22;
+    cursor: pointer;
+}
+.land-val { color: #e67e22; font-size: 0.65rem; min-width: 28px; }
+.slip-check {
+    width: 16px;
+    height: 16px;
+    accent-color: #e67e22;
+    cursor: pointer;
+}
+
+/* Per-axie evolved parts selector */
+.evo-selector {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+}
+.evo-label {
+    font-size: 0.55rem;
+    color: #555;
+    margin-right: 2px;
+    line-height: 14px;
+}
+.evo-dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+    text-align: center;
+    font-size: 0.55rem;
+    border-radius: 3px;
+    background: #0f1923;
+    border: 1px solid #2a3f52;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.1s;
+}
+.evo-dot:hover {
+    border-color: #5dade2;
+    color: #bdc3c7;
+}
+.evo-dot.active {
+    background: #e67e22;
+    border-color: #e67e22;
+    color: #fff;
+    font-weight: 700;
+}
+
+/* Responsive additions */
+@media (max-width: 600px) {
+    .plot-controls { flex-direction: column; align-items: stretch; gap: 8px; }
+    .ctrl-group { justify-content: center; }
+    .evo-selector { gap: 1px; }
+    .evo-dot { width: 12px; height: 12px; line-height: 12px; font-size: 0.5rem; }
+}
