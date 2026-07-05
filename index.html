@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axie Terrarium Optimizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h1>Axie Terrarium Optimizer</h1>
+    <p class="site-intro">Maximize your Atia's Flame. Uses official formulas &amp; collection values.</p>
+
+    <section class="input-section">
+        <label for="ronin-address">Ronin Address (0x…)</label>
+        <input type="text" id="ronin-address" placeholder="0xYourRoninAddress" value="0xdf8b35668c8fcf82b1d1707875c98cd05b6927c4">
+        <button id="fetch-btn">Fetch &amp; Optimize</button>
+        <div id="fetch-status"></div>
+    </section>
+
+    <section id="optimizer-results" style="display:none;">
+        <div class="summary-bar">
+            <span>Total Axies: <strong id="total-axies">0</strong></span>
+            <span>Plots: <strong id="total-plots">0</strong></span>
+            <span>Total Flame: <strong id="total-flame">0</strong></span>
+        </div>
+
+        <div id="plot-container"></div>
+
+        <div id="all-axies-section">
+            <h2>All Axies</h2>
+            <div id="all-axies-grid" class="axies-grid"></div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>Formulas from official Terrariums V1.1 infographics · Data via Axie Infinity GraphQL</p>
+    </footer>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
