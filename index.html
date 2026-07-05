@@ -8,43 +8,75 @@
 </head>
 <body>
 <div class="container">
-    <h1>Axie Terrarium Optimizer</h1>
-    <p class="site-intro">Maximize your Atia's Flame. Uses official formulas &amp; collection values.</p>
+    <header class="site-header">
+        <h1>🧬 Axie Terrarium Optimizer</h1>
+        <p class="site-intro">Maximize your Atia's Flame. Uses official formulas &amp; collection values.</p>
+    </header>
 
-    <section class="input-section">
+    <!-- PRIMARY: Load saved dataset -->
+    <section class="load-section card">
+        <h2>📦 Load Your Collection</h2>
+        <p>1,188 Axies saved as dataset. One click to optimize.</p>
+        <button id="load-btn" class="btn-primary">🚀 Load &amp; Optimize</button>
+        <div id="load-error" class="error-text"></div>
+    </section>
+
+    <!-- OR divider -->
+    <div class="or-divider"><span>or fetch live</span></div>
+
+    <!-- SECONDARY: Live fetch -->
+    <section class="input-section card">
+        <h2>🌐 Fetch from Ronin</h2>
         <label for="ronin-address">Ronin Address (0x…)</label>
         <input type="text" id="ronin-address" placeholder="0xYourRoninAddress">
-        <button id="fetch-btn">Fetch &amp; Optimize</button>
-        <div id="fetch-status"></div>
+        <button id="fetch-btn" class="btn-secondary">Fetch &amp; Optimize</button>
+        <div id="fetch-status" class="status-text"></div>
     </section>
 
-    <!-- Manual paste section (shown after fetch attempt) -->
-    <section id="manual-section" class="manual-section" style="display:none;">
-        <h3>⚠️ Browser CORS Workaround</h3>
-        <p>The API server doesn't allow browser requests. To fetch your Axies, run this command in Terminal:</p>
+    <!-- Manual paste (shown after a failed fetch) -->
+    <section id="manual-section" class="manual-section card" style="display:none;">
+        <h3>⚙️ Manual Paste</h3>
+        <p>If CORS blocks the live fetch, run this in Terminal:</p>
         <textarea id="curl-command" readonly></textarea>
-        <button id="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('curl-command').value)">Copy Command</button>
-        <p class="or-divider">— OR —</p>
-        <p>Paste the JSON output below:</p>
+        <button id="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('curl-command').value)">📋 Copy Command</button>
+        <p class="or-mini">— or —</p>
         <textarea id="paste-data" placeholder="Paste the JSON output here…"></textarea>
-        <button id="paste-btn">Paste &amp; Process</button>
+        <button id="paste-btn" class="btn-secondary">Paste &amp; Process</button>
     </section>
 
-    <section id="optimizer-results" style="display:none;">
-        <div class="summary-bar">
-            <span>Total Axies: <strong id="total-axies">0</strong></span>
-            <span>Plots: <strong id="total-plots">0</strong></span>
-            <span>Total Flame: <strong id="total-flame">0</strong></span>
-        </div>
-        <div id="plot-container"></div>
-        <div id="all-axies-section">
-            <h2>All Axies</h2>
-            <div id="all-axies-grid" class="axies-grid"></div>
-        </div>
-    </section>
+    <!-- Loading indicator -->
+    <div id="loading-indicator" class="loading" style="display:none;">
+        <div class="spinner"></div>
+        <span class="load-status">Loading...</span>
+    </div>
 
-    <footer class="footer">
-        <p>Formulas from official Terrariums V1.1 infographics · <a href="https://app.axieinfinity.com/profile/inventory/axies/" target="_blank">Axie Inventory</a></p>
+    <!-- RESULTS (hidden until loaded) -->
+    <div id="main-results" class="results-section" style="display:none;">
+        <section class="summary-bar card">
+            <div class="stat-item"><span class="stat-num" id="total-axies">0</span><span class="stat-label">Axies</span></div>
+            <div class="stat-item"><span class="stat-num" id="total-plots">0</span><span class="stat-label">Plots (×30)</span></div>
+            <div class="stat-item"><span class="stat-num" id="grand-flame">0</span><span class="stat-label">Total Flame</span></div>
+        </section>
+
+        <section class="collection-breakdown card">
+            <h3>📊 Collection Breakdown</h3>
+            <div id="collection-stats"></div>
+        </section>
+
+        <section class="plots-section">
+            <h3>🏕️ Plots (Flame-optimized)</h3>
+            <div id="plot-container"></div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <p>
+            <a href="https://axieinfinity.com" target="_blank">Axie Infinity</a> ·
+            <a href="https://app.axieinfinity.com/profile/" target="_blank">Inventory</a> ·
+            <a href="https://app.axieinfinity.com/terra/" target="_blank">My Land</a> ·
+            <a href="https://flowbot44.github.io/axie-terrarium-charts/" target="_blank">Info Charts</a>
+        </p>
+        <p class="footer-note">Data fetched <span id="dataset-date">2026-07-05</span> — 1,188 Axies. Not affiliated with Sky Mavis.</p>
     </footer>
 </div>
 <script src="script.js"></script>
