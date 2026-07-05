@@ -34,9 +34,13 @@ const COLLECTION_PRIORITY = {
 let gAxies = [];       // All axie objects
 let gPlots = [];       // Plot objects
 
-// === COLLECTION DETECTION ===
+// === COLLECTION DETECTION & EVOLVED PARTS ===
+function countEvolvedParts(parts) {
+    if (!parts) return 0;
+    return parts.filter(p => p.id && p.id.endsWith('-2')).length;
+}
+
 function detectCollection(parts, title, name) {
-    if (!parts || parts.length === 0) return 'normal';
     let foundCollections = [];
     for (const p of parts) {
         const gene = (p.specialGenes || '').toLowerCase().trim();
@@ -265,6 +269,8 @@ function processAxies(results) {
     gAxies = results.map(axie => {
         const collection = detectCollection(axie.parts, axie.title, axie.name);
         const rarityIdx = COLLECTION_RARITY[collection] || 0;
+        // Use pre-detected evolvedParts from dataset, or detect from -2 suffix
+        const evoParts = (axie.evolvedParts !== undefined) ? axie.evolvedParts : countEvolvedParts(axie.parts);
         return {
             id: axie.id,
             name: axie.name,
@@ -274,7 +280,7 @@ function processAxies(results) {
             collectionLabel: COLLECTION_LABELS[collection] || 'Normal',
             rarityIdx,
             baseFlame: getBaseFlame(collection),
-            evolvedParts: 0,
+            evolvedParts: evoParts,
             currentFlame: 0,
             accessories: [],
         };
@@ -284,6 +290,41 @@ function processAxies(results) {
 }
 
 function getBaseFlame(c) { return COLLECTION_FLAME[c] || 5; }
+
+function renderLandItems() {
+    if (typeof LAND_ITEMS_DATA === 'undefined' || !LAND_ITEMS_DATA.items) return;
+    const section = document.getElementById('land-items-section');
+    section.style.display = 'block';
+    document.getElementById('land-total').textContent = LAND_ITEMS_DATA.total;
+
+    // Group by rarity
+    const groups = {};
+    for (const item of LAND_ITEMS_DATA.items) {
+        const r = item.rarity || 'Unknown';
+        if (!groups[r]) groups[r] = [];
+        groups[r].push(item);
+    }
+    const rarityOrder = ['Mystic', 'Epic', 'Rare', 'Common', 'Unknown'];
+
+    const grid = document.getElementById('land-items-grid');
+    grid.innerHTML = '';
+    for (const rare of rarityOrder) {
+        if (!groups[rare]) continue;
+        const items = groups[rare];
+        const block = document.createElement('div');
+        block.className = 'land-rarity-group';
+        block.innerHTML = `
+            <h4 class="land-rarity-title rarity-${rare.toLowerCase()}">${rare} <span class="land-count">×${items.length}</span></h4>
+            <div class="land-item-list">
+                ${items.slice(0, 30).map(item =>
+                    `<span class="land-item-tag">${item.name}</span>`
+                ).join('')}
+                ${items.length > 30 ? `<span class="land-item-tag more">+${items.length - 30} more</span>` : ''}
+            </div>
+        `;
+        grid.appendChild(block);
+    }
+}
 
 // === INITIALIZATION ===
 document.addEventListener('DOMContentLoaded', () => {
@@ -299,6 +340,8 @@ document.addEventListener('DOMContentLoaded', () => {
             loading.querySelector('.load-status').textContent =
                 `✅ Loaded ${data.axies.length} Axies — optimizing...`;
             setTimeout(() => processAxies(data.axies), 100);
+            // Render land items in parallel
+            setTimeout(() => renderLandItems(), 200);
         } catch (err) {
             loading.style.display = 'none';
             document.getElementById('load-error').textContent = '❌ ' + err.message;
