@@ -1,6 +1,17 @@
-/* Axie Terrarium Optimizer - script.js v2 with evolved parts */
+// Axie Terrarium Optimizer — script.js v3 (Optimizer Edition)
+// Evolved parts removed from plot level. Flame-per-env inputs + land item optimizer.
 
 // === CONSTANTS ===
+const ENVIRONMENTS = [
+    { key: 'forest',    label: 'Forest',    icon: '🌲', color: '#2ecc71' },
+    { key: 'arctic',    label: 'Arctic',    icon: '❄️', color: '#85c1e9' },
+    { key: 'savannah',  label: 'Savannah',  icon: '🏜️', color: '#e67e22' },
+    { key: 'mystic',    label: 'Mystic',    icon: '✨', color: '#9b59b6' },
+    { key: 'genesis',   label: 'Genesis',   icon: '🏛️', color: '#3498db' },
+    { key: 'luna',      label: "Luna's Landing", icon: '🌙', color: '#e74c3c' },
+];
+const MAX_ITEMS_PER_PLOT = 8;
+
 const COLLECTION_FLAME = {
     normal: 5, summer: 20, nightmare: 40, japanese: 60,
     shiny: 200, xmas: 200, meo: 200, origin: 400,
@@ -8,18 +19,9 @@ const COLLECTION_FLAME = {
 };
 const COLLECTION_LABELS = {
     normal: 'Normal', summer: 'Summer', nightmare: 'Nightmare',
-    japanese: 'Japanese', shiny: 'Shiny', xmas: 'Xmas',
-    meo: 'Meo', origin: 'Origin', mystic: 'Mystic', agamo: 'Agamo Genesis'
+    japanese: 'Japanese', shiny: 'Shiny',
+    xmas: 'Xmas', meo: 'Meo', origin: 'Origin', mystic: 'Mystic', agamo: 'Agamo Genesis'
 };
-const COLLECTION_RARITY = {
-    normal: 0, summer: 1, nightmare: 1, japanese: 1,
-    shiny: 2, xmas: 2, meo: 2, origin: 2, mystic: 3, agamo: 3
-};
-const EVOLVED_MULT = [1.0, 1.1, 1.2, 1.3, 1.45, 1.68]; // index 0 = 1 evo part, 1 = 2 parts, etc.
-const ACCESSORY_MATRIX = [
-    [0.1, 0.3, 1.0, 3.0], [0.2, 0.5, 1.5, 4.0],
-    [0.5, 1.0, 2.5, 5.5], [1.0, 2.0, 4.5, 9.0]
-];
 const SPECIAL_GENES_MAP = {
     'summer2022': 'summer', 'japan': 'japanese', 'xmas2019': 'xmas',
     'nightmare': 'nightmare', 'summershiny2022': 'shiny', 'nightmareshiny': 'shiny',
@@ -30,27 +32,27 @@ const COLLECTION_PRIORITY = {
     japanese: 50, nightmare: 40, summer: 30, normal: 0
 };
 
-// === GLOBAL STATE ===
-let gAxies = [];       // All axie objects
-let gPlots = [];       // Plot objects
+const EVOLVED_MULT = [1.0, 1.1, 1.2, 1.3, 1.45, 1.68]; // indexed at 0 = 1 part
 
-// === COLLECTION DETECTION & EVOLVED PARTS ===
-function countEvolvedParts(parts) {
-    if (!parts) return 0;
-    return parts.filter(p => p.id && p.id.endsWith('-2')).length;
-}
+// === GLOBAL STATE ===
+let gAxies = [];
+let gLandItems = [];
+let gAllAxiesFlame = 0; // total flame of all axies loaded
+
+// === HELPERS ===
+function formatNumber(n) { return Number(n).toLocaleString(); }
 
 function detectCollection(parts, title, name) {
-    let foundCollections = [];
+    let found = [];
     for (const p of parts) {
         const gene = (p.specialGenes || '').toLowerCase().trim();
         if (!gene) continue;
         const mapped = SPECIAL_GENES_MAP[gene];
-        if (mapped) foundCollections.push(mapped);
+        if (mapped) found.push(mapped);
     }
-    if (foundCollections.length > 0) {
-        foundCollections.sort((a, b) => (COLLECTION_PRIORITY[b] || 0) - (COLLECTION_PRIORITY[a] || 0));
-        return foundCollections[0];
+    if (found.length > 0) {
+        found.sort((a, b) => (COLLECTION_PRIORITY[b] || 0) - (COLLECTION_PRIORITY[a] || 0));
+        return found[0];
     }
     const t = (title || '').trim().toLowerCase();
     const n = (name || '').trim().toLowerCase();
@@ -61,241 +63,23 @@ function detectCollection(parts, title, name) {
     return 'normal';
 }
 
-// === FLAME CALCULATIONS ===
-function formatNumber(n) { return Number(n).toLocaleString(); }
-
-function calcEvolvedMultiplier(evolvedParts) {
-    const idx = Math.min(Math.max(evolvedParts - 1, 0), 5);
-    return EVOLVED_MULT[idx];
+function countEvolvedParts(parts) {
+    if (!parts) return 0;
+    return parts.filter(p => p.id && p.id.endsWith('-2')).length;
 }
 
 function calcIndividualFlame(axie) {
     const base = axie.baseFlame || COLLECTION_FLAME.normal;
-    return Math.round(base * calcEvolvedMultiplier(axie.evolvedParts));
+    const idx = Math.min(Math.max(axie.evolvedParts - 1, 0), 5);
+    return Math.round(base * EVOLVED_MULT[idx]);
 }
 
-function calcPlotFlame(plot) {
-    let total = plot.axies.reduce((s, a) => s + calcIndividualFlame(a), 0);
-    let landBoost = plot.landItemBoost || 0;
-    // If plot environment is set, matching items get ×2 multiplier
-    if (plot.plotEnv && landBoost > 0) {
-        landBoost *= 2;
-    }
-    total = Math.floor(total * (1 + landBoost / 100));
-    if (plot.fortuneSlipActive) total = Math.floor(total * 1.10);
-    return total;
-}
-
-function calcGrandFlame() {
-    return gPlots.reduce((s, p) => s + calcPlotFlame(p), 0);
-}
-
-function refreshAllFlame() {
-    gAxies.forEach(a => { a.currentFlame = calcIndividualFlame(a); });
-    sortAndRegroup();
-}
-
-function sortAndRegroup() {
-    gAxies.sort((a, b) => b.currentFlame - a.currentFlame || a.name.localeCompare(b.name));
-    const PLOT_SIZE = 30;
-    const newPlots = [];
-    for (let i = 0; i < gAxies.length; i += PLOT_SIZE) {
-        const chunk = gAxies.slice(i, i + PLOT_SIZE);
-        newPlots.push({
-            axies: chunk,
-            index: newPlots.length,
-            landItemBoost: 0,
-            fortuneSlipActive: false,
-            plotEnv: ''
-        });
-    }
-    // Preserve landItemBoost/fortuneSlip from existing plots if same count
-    if (gPlots.length > 0 && gPlots.length === newPlots.length) {
-        for (let i = 0; i < newPlots.length; i++) {
-            newPlots[i].landItemBoost = gPlots[i].landItemBoost || 0;
-            newPlots[i].fortuneSlipActive = gPlots[i].fortuneSlipActive || false;
-        }
-    }
-    gPlots = newPlots;
-    renderAll();
-}
-
-function renderAll() {
-    document.getElementById('main-results').style.display = 'block';
-    const grandFlame = calcGrandFlame();
-    document.getElementById('total-axies').textContent = gAxies.length;
-    document.getElementById('total-plots').textContent = gPlots.length;
-    document.getElementById('grand-flame').textContent = formatNumber(grandFlame);
-
-    // Collection breakdown
-    const stats = {};
-    gAxies.forEach(a => { stats[a.collectionLabel] = (stats[a.collectionLabel] || 0) + 1; });
-    const statsDiv = document.getElementById('collection-stats');
-    statsDiv.innerHTML = '';
-    Object.entries(stats).sort((a, b) => b[1] - a[1]).forEach(([label, count]) => {
-        const flame = COLLECTION_FLAME[Object.keys(COLLECTION_LABELS).find(k => COLLECTION_LABELS[k] === label)] || 5;
-        const chip = document.createElement('span');
-        chip.className = 'stat-chip';
-        chip.innerHTML = `<strong>${label}</strong> ×${count} <span class="chip-flame">${flame}🔥</span>`;
-        statsDiv.appendChild(chip);
-    });
-
-    // Plot cards
-    const plotContainer = document.getElementById('plot-container');
-    plotContainer.innerHTML = '';
-    gPlots.forEach((plot, idx) => {
-        const plotFlame = calcPlotFlame(plot);
-        const top3 = plot.axies.slice(0, 3).map(a =>
-            `${a.name} (${a.collectionLabel}, ${a.currentFlame}🔥)`
-        ).join(', ');
-
-        const card = document.createElement('div');
-        card.className = 'plot-card';
-
-        // Header
-        const header = document.createElement('div');
-        header.className = 'plot-header';
-        header.innerHTML = `
-            <h3>Plot ${idx + 1}</h3>
-            <div class="plot-summary">
-                <span class="plot-flame">${formatNumber(plotFlame)} 🔥</span>
-                <span class="plot-count">${plot.axies.length} Axies</span>
-            </div>
-            <div class="plot-preview">Top: ${top3}</div>
-        `;
-
-        // Controls bar
-        const controls = document.createElement('div');
-        controls.className = 'plot-controls';
-        controls.innerHTML = `
-            <div class="ctrl-group">
-                <label>Evolved:</label>
-                <button class="evo-btn btn-sm" data-action="batch-evo" data-plot="${idx}" data-evo="0">0</button>
-                <button class="evo-btn btn-sm" data-action="batch-evo" data-plot="${idx}" data-evo="1">1</button>
-                <button class="evo-btn btn-sm" data-action="batch-evo" data-plot="${idx}" data-evo="2">2</button>
-                <button class="evo-btn btn-sm" data-action="batch-evo" data-plot="${idx}" data-evo="3">3</button>
-                <button class="evo-btn btn-sm" data-action="batch-evo" data-plot="${idx}" data-evo="4">4</button>
-                <button class="evo-btn btn-sm" data-action="batch-evo" data-plot="${idx}" data-evo="5">5</button>
-                <button class="evo-btn btn-sm" data-action="batch-evo" data-plot="${idx}" data-evo="6">6</button>
-            </div>
-            <div class="ctrl-group">
-                <label>Land Item:</label>
-                <input type="range" class="land-slider" min="0" max="100" value="${plot.landItemBoost || 0}" data-plot="${idx}">
-                <span class="land-val">${plot.landItemBoost || 0}%</span>
-            </div>
-            <div class="ctrl-group">
-                <label>Fortune Slip:</label>
-                <input type="checkbox" class="slip-check" data-plot="${idx}" ${plot.fortuneSlipActive ? 'checked' : ''}>
-            </div>
-            <div class="ctrl-group">
-                <label>Plot Env:</label>
-                <select class="env-select" data-plot="${idx}">
-                    <option value="">— select —</option>
-                    <option value="savannah" ${plot.plotEnv === 'savannah' ? 'selected' : ''}>Savannah 🏜️</option>
-                    <option value="forest" ${plot.plotEnv === 'forest' ? 'selected' : ''}>Forest 🌲</option>
-                    <option value="arctic" ${plot.plotEnv === 'arctic' ? 'selected' : ''}>Arctic ❄️</option>
-                    <option value="mystic" ${plot.plotEnv === 'mystic' ? 'selected' : ''}>Mystic ✨</option>
-                    <option value="genesis" ${plot.plotEnv === 'genesis' ? 'selected' : ''}>Genesis 🏛️</option>
-                    <option value="luna" ${plot.plotEnv === 'luna' ? 'selected' : ''}>Luna's Landing 🌙</option>
-                </select>
-            </div>
-        `;
-
-        // Axies grid
-        const grid = document.createElement('div');
-        grid.className = 'plot-axies-grid';
-        const PLOT_SIZE = 30;
-        const from = idx * PLOT_SIZE;
-        const to = Math.min(from + PLOT_SIZE, gAxies.length);
-        for (let i = from; i < to; i++) {
-            const a = gAxies[i];
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'axie-card';
-            cardDiv.dataset.axieIdx = i;
-            cardDiv.innerHTML = `
-                <img src="${a.image}" alt="${a.name}" loading="lazy" onerror="this.src='https://axieinfinity.com/static/media/default-axie.png'">
-                <div class="axie-name" title="${a.name}">${a.name}</div>
-                <div class="axie-stats">
-                    <span class="axie-collection">${a.collectionLabel}</span>
-                    <span class="axie-flame">${a.currentFlame}🔥</span>
-                </div>
-                <div class="axie-class">${a.class}</div>
-                <div class="evo-selector">
-                    <span class="evo-label">Evo:</span>
-                    ${[0,1,2,3,4,5,6].map(n =>
-                        `<span class="evo-dot ${a.evolvedParts === n ? 'active' : ''}" data-idx="${i}" data-evo="${n}">${n}</span>`
-                    ).join('')}
-                </div>
-            `;
-            grid.appendChild(cardDiv);
-        }
-
-        card.appendChild(header);
-        card.appendChild(controls);
-        card.appendChild(grid);
-        plotContainer.appendChild(card);
-    });
-
-    // Attach event listeners
-    document.querySelectorAll('.evo-dot').forEach(el => {
-        el.addEventListener('click', () => {
-            const idx = parseInt(el.dataset.idx);
-            const evo = parseInt(el.dataset.evo);
-            gAxies[idx].evolvedParts = evo;
-            gAxies[idx].currentFlame = calcIndividualFlame(gAxies[idx]);
-            renderAll();
-        });
-    });
-
-    document.querySelectorAll('[data-action="batch-evo"]').forEach(el => {
-        el.addEventListener('click', () => {
-            const plotIdx = parseInt(el.dataset.plot);
-            const evo = parseInt(el.dataset.evo);
-            const from = plotIdx * 30;
-            const to = Math.min(from + 30, gAxies.length);
-            for (let i = from; i < to; i++) {
-                gAxies[i].evolvedParts = evo;
-                gAxies[i].currentFlame = calcIndividualFlame(gAxies[i]);
-            }
-            renderAll();
-        });
-    });
-
-    document.querySelectorAll('.land-slider').forEach(el => {
-        el.addEventListener('input', () => {
-            const plotIdx = parseInt(el.dataset.plot);
-            gPlots[plotIdx].landItemBoost = parseInt(el.value);
-            el.nextElementSibling.textContent = el.value + '%';
-            renderAll();
-        });
-    });
-
-    document.querySelectorAll('.slip-check').forEach(el => {
-        el.addEventListener('change', () => {
-            const plotIdx = parseInt(el.dataset.plot);
-            gPlots[plotIdx].fortuneSlipActive = el.checked;
-            renderAll();
-        });
-    });
-
-    document.querySelectorAll('.env-select').forEach(el => {
-        el.addEventListener('change', () => {
-            const plotIdx = parseInt(el.dataset.plot);
-            gPlots[plotIdx].plotEnv = el.value;
-            renderAll();
-        });
-    });
-
-    // Loading state
-    document.getElementById('loading-indicator').style.display = 'none';
-}
+function getBaseFlame(c) { return COLLECTION_FLAME[c] || 5; }
 
 // === PROCESS AXIES ===
 function processAxies(results) {
     gAxies = results.map(axie => {
         const collection = detectCollection(axie.parts, axie.title, axie.name);
-        const rarityIdx = COLLECTION_RARITY[collection] || 0;
-        // Use pre-detected evolvedParts from dataset, or detect from -2 suffix
         const evoParts = (axie.evolvedParts !== undefined) ? axie.evolvedParts : countEvolvedParts(axie.parts);
         return {
             id: axie.id,
@@ -304,39 +88,51 @@ function processAxies(results) {
             class: axie.class,
             collection,
             collectionLabel: COLLECTION_LABELS[collection] || 'Normal',
-            rarityIdx,
             baseFlame: getBaseFlame(collection),
             evolvedParts: evoParts,
             currentFlame: 0,
-            accessories: [],
         };
     });
     gAxies.forEach(a => { a.currentFlame = calcIndividualFlame(a); });
-    sortAndRegroup();
+    gAllAxiesFlame = gAxies.reduce((s, a) => s + a.currentFlame, 0);
+    renderSummary();
+    renderCollectionBreakdown();
+    renderLandInventory();
+    renderFlameInputs();
+    document.getElementById('main-results').style.display = 'block';
+    document.getElementById('loading-indicator').style.display = 'none';
 }
 
-function getBaseFlame(c) { return COLLECTION_FLAME[c] || 5; }
+// === RENDER: Summary ===
+function renderSummary() {
+    document.getElementById('total-axies').textContent = gAxies.length;
+    document.getElementById('total-flame').textContent = formatNumber(gAllAxiesFlame);
+    document.getElementById('land-total').textContent = gLandItems.length;
+}
 
-function renderLandItems() {
-    if (typeof LAND_ITEMS_DATA === 'undefined' || !LAND_ITEMS_DATA.items) return;
-    const section = document.getElementById('land-items-section');
-    section.style.display = 'block';
-    document.getElementById('land-total').textContent = LAND_ITEMS_DATA.total;
+// === RENDER: Collection Breakdown ===
+function renderCollectionBreakdown() {
+    const stats = {};
+    gAxies.forEach(a => { stats[a.collectionLabel] = (stats[a.collectionLabel] || 0) + 1; });
+    const div = document.getElementById('collection-stats');
+    div.innerHTML = '';
+    Object.entries(stats).sort((a, b) => b[1] - a[1]).forEach(([label, count]) => {
+        const key = Object.keys(COLLECTION_LABELS).find(k => COLLECTION_LABELS[k] === label);
+        const flame = COLLECTION_FLAME[key] || 5;
+        const chip = document.createElement('span');
+        chip.className = 'stat-chip';
+        chip.innerHTML = `<strong>${label}</strong> ×${count} <span class="chip-flame">${flame}🔥</span>`;
+        div.appendChild(chip);
+    });
+}
 
-    // Group by environment, then rarity
-    const groups = {};
-    for (const item of LAND_ITEMS_DATA.items) {
-        const env = item.environment || 'any';
-        if (!groups[env]) groups[env] = {items: [], totalBoost: 0};
-        groups[env].items.push(item);
-        groups[env].totalBoost += item.boost;
-    }
-    // Sort environments in game order
+// === RENDER: Land Items Inventory ===
+function renderLandInventory() {
+    if (!gLandItems.length) return;
+    const grid = document.getElementById('land-items-body');
+    grid.innerHTML = '';
+
     const envOrder = ['mystic', 'genesis', 'arctic', 'forest', 'savannah', 'luna', 'any'];
-    const sortedTypes = envOrder
-        .filter(e => groups[e])
-        .map(e => [e, groups[e]]);
-
     const envLabels = {
         mystic: 'Mystic ✨', genesis: 'Genesis 🏛️', arctic: 'Arctic ❄️',
         forest: 'Forest 🌲', savannah: 'Savannah 🏜️', luna: "Luna's Landing 🌙", any: 'Universal'
@@ -346,14 +142,22 @@ function renderLandItems() {
         forest: '#2ecc71', savannah: '#e67e22', luna: '#e74c3c', any: '#95a5a6'
     };
 
-    const grid = document.getElementById('land-items-grid');
-    grid.innerHTML = '';
-    for (const [env, group] of sortedTypes) {
-        const items = group.items;
-        const block = document.createElement('div');
-        block.className = 'land-rarity-group';
+    const groups = {};
+    for (const item of gLandItems) {
+        const env = item.environment || 'any';
+        if (!groups[env]) groups[env] = [];
+        groups[env].push(item);
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'land-items-grid';
+
+    for (const env of envOrder) {
+        if (!groups[env]) continue;
+        const items = groups[env];
         const color = envColors[env] || '#95a5a6';
-        // Sub-group by rarity
+        const totalBoost = items.reduce((s, i) => s + i.boost, 0);
+
         const byRarity = {};
         for (const item of items) {
             const r = item.rarity || 'Unknown';
@@ -365,22 +169,312 @@ function renderLandItems() {
             `<span class="rarity-${r.toLowerCase()}">${r} ×${byRarity[r].length}</span>`
         ).join(' · ');
 
+        const block = document.createElement('div');
+        block.className = 'land-rarity-group';
         block.innerHTML = `
-            <h4 class="land-rarity-title" style="border-left: 3px solid ${color}; padding-left: 10px;">
+            <h4 class="land-rarity-title" style="border-left: 3px solid ${color}; padding-left: 8px;">
                 ${envLabels[env] || env}
                 <span class="land-count">×${items.length}</span>
-                <span class="land-boost-sum">+${group.totalBoost.toFixed(2)}%</span>
+                <span class="land-boost-sum">+${totalBoost.toFixed(2)}%</span>
             </h4>
             <div class="land-meta">${details}</div>
             <div class="land-item-list">
-                ${items.slice(0, 25).map(item =>
+                ${items.slice(0, 30).map(item =>
                     `<span class="land-item-tag">${item.name} <span class="boost-pct">+${item.boost}%</span></span>`
                 ).join('')}
-                ${items.length > 25 ? `<span class="land-item-tag more">+${items.length - 25} more</span>` : ''}
+                ${items.length > 30 ? `<span class="land-item-tag more">+${items.length - 30} more</span>` : ''}
             </div>
         `;
-        grid.appendChild(block);
+        wrapper.appendChild(block);
     }
+    grid.appendChild(wrapper);
+}
+
+// === RENDER: Flame Inputs ===
+function renderFlameInputs() {
+    const div = document.getElementById('flame-inputs');
+    div.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'flame-input-grid';
+
+    for (const env of ENVIRONMENTS) {
+        const row = document.createElement('div');
+        row.className = 'flame-input-row';
+        row.style.borderLeft = `3px solid ${env.color}`;
+        row.innerHTML = `
+            <span class="env-label"><span class="env-icon">${env.icon}</span>${env.label}</span>
+            <div class="input-group">
+                <span class="input-label">Flame 🔥</span>
+                <input type="number" min="0" step="1000" value="0"
+                       class="flame-val" data-env="${env.key}" placeholder="0">
+            </div>
+            <div class="input-group">
+                <span class="input-label">Plots 🏕️</span>
+                <input type="number" min="0" max="99" value="0"
+                       class="plots-val" data-env="${env.key}" placeholder="0">
+            </div>
+        `;
+        grid.appendChild(row);
+    }
+    div.appendChild(grid);
+}
+
+// === OPTIMIZER ===
+function getEnvIndex(key) {
+    return ENVIRONMENTS.findIndex(e => e.key === key);
+}
+
+function optimize() {
+    // 1. Read inputs
+    const flameByEnv = {};
+    const plotsByEnv = {};
+    let hasAny = false;
+    for (const env of ENVIRONMENTS) {
+        const fEl = document.querySelector(`.flame-val[data-env="${env.key}"]`);
+        const pEl = document.querySelector(`.plots-val[data-env="${env.key}"]`);
+        const flame = parseInt(fEl.value) || 0;
+        const plots = parseInt(pEl.value) || 0;
+        flameByEnv[env.key] = flame;
+        plotsByEnv[env.key] = plots;
+        if (flame > 0) hasAny = true;
+    }
+
+    if (!hasAny) {
+        document.getElementById('optimize-error').textContent = 'Enter at least one environment with flame > 0.';
+        return;
+    }
+    document.getElementById('optimize-error').textContent = '';
+
+    // 2. Calculate total item slots per environment
+    const slotsByEnv = {};
+    let totalSlots = 0;
+    for (const env of ENVIRONMENTS) {
+        slotsByEnv[env.key] = (plotsByEnv[env.key] || 0) * MAX_ITEMS_PER_PLOT;
+        totalSlots += slotsByEnv[env.key];
+    }
+
+    if (totalSlots === 0) {
+        document.getElementById('optimize-error').textContent = 'Enter at least 1 plot.';
+        return;
+    }
+
+    // 3. Prepare land items
+    const items = gLandItems.map(item => ({ ...item }));
+    items.sort((a, b) => b.boost - a.boost); // highest boost first
+
+    // 4. Greedy allocation
+    //    Phase A: Assign matching items to their environment
+    //    Phase B: Assign remaining items (universal + unmatched leftovers) to highest-marginal-value environment
+    const assigned = {}; // env.key -> [{item, matched: bool}]
+    for (const env of ENVIRONMENTS) {
+        assigned[env.key] = [];
+    }
+    const unassigned = [];
+
+    // Phase A: matching items
+    const remaining = [];
+    for (const item of items) {
+        const env = item.environment;
+        if (env && env !== 'any') {
+            const key = env;
+            if (assigned[key] && assigned[key].length < slotsByEnv[key]) {
+                assigned[key].push({ item, matched: true });
+            } else {
+                remaining.push(item); // env-specific but no room → try elsewhere
+            }
+        } else {
+            remaining.push(item); // universal
+        }
+    }
+
+    // Phase B: assign remaining items to best environment
+    for (const item of remaining) {
+        const isUniversal = item.environment === 'any' || !item.environment;
+        let bestEnv = null;
+        let bestValue = -1;
+
+        for (const env of ENVIRONMENTS) {
+            const key = env.key;
+            if (assigned[key].length >= slotsByEnv[key]) continue;
+            const flame = flameByEnv[key];
+            if (flame === 0) continue;
+
+            const isMatch = env.key === item.environment;
+            // marginal benefit = flame × boost (×2 if matched)
+            let marginal;
+            if (isMatch) {
+                marginal = flame * (item.boost * 2 / 100);
+            } else {
+                marginal = flame * (item.boost / 100);
+            }
+            if (marginal > bestValue) {
+                bestValue = marginal;
+                bestEnv = key;
+            }
+        }
+
+        if (bestEnv) {
+            const isMatch = bestEnv === item.environment && !isUniversal;
+            assigned[bestEnv].push({ item, matched: isMatch || false });
+        } else {
+            unassigned.push(item);
+        }
+    }
+
+    // 5. Calculate results
+    const results = [];
+    let totalOriginalFlame = 0;
+    let totalOptimizedFlame = 0;
+    for (const env of ENVIRONMENTS) {
+        const key = env.key;
+        const flame = flameByEnv[key];
+        const slots = slotsByEnv[key];
+        const items = assigned[key];
+        let boostSum = 0;
+        let matchedBoostSum = 0;
+        let unmatchedBoostSum = 0;
+        for (const a of items) {
+            boostSum += a.item.boost;
+            if (a.matched) matchedBoostSum += a.item.boost;
+            else unmatchedBoostSum += a.item.boost;
+        }
+        // Effective boost: matching gets ×2, non-matching gets ×1
+        const effectiveBoost = matchedBoostSum * 2 + unmatchedBoostSum;
+        const originalFlame = flame;
+        const optimizedFlame = Math.floor(flame * (1 + effectiveBoost / 100));
+        totalOriginalFlame += originalFlame;
+        totalOptimizedFlame += optimizedFlame;
+
+        results.push({
+            env,
+            flame,
+            slots,
+            totalSlots: slots,
+            usedSlots: items.length,
+            items,
+            matchedBoostSum,
+            unmatchedBoostSum,
+            effectiveBoost,
+            originalFlame,
+            optimizedFlame,
+        });
+    }
+
+    renderOptimizationResults(results, unassigned, totalOriginalFlame, totalOptimizedFlame);
+}
+
+// === RENDER: Optimization Results ===
+function renderOptimizationResults(results, unassigned, totalOriginal, totalOptimized) {
+    const section = document.getElementById('optimization-results');
+    section.style.display = 'block';
+
+    // Summary bar
+    const summary = document.getElementById('opt-summary');
+    const pctGain = totalOriginal > 0 ? ((totalOptimized - totalOriginal) / totalOriginal * 100).toFixed(1) : 0;
+    summary.innerHTML = `
+        <div class="stat-item"><span class="stat-num">${formatNumber(totalOriginal)}</span><span class="stat-label">Base Flame</span></div>
+        <div class="stat-item"><span class="stat-num" style="color:#2ecc71">${formatNumber(totalOptimized)}</span><span class="stat-label">Optimized Flame</span></div>
+        <div class="stat-item"><span class="stat-num" style="color:#f1c40f">+${pctGain}%</span><span class="stat-label">Gain</span></div>
+        <div class="stat-item"><span class="stat-num">${gLandItems.length - unassigned.length}</span><span class="stat-label">Items Used</span></div>
+    `;
+
+    // Detail cards
+    const details = document.getElementById('opt-details');
+    details.innerHTML = '';
+
+    for (const r of results) {
+        if (r.flame === 0 && r.items.length === 0) continue;
+
+        const card = document.createElement('div');
+        card.className = 'opt-env-card';
+
+        // Header
+        const header = document.createElement('div');
+        header.className = 'opt-env-header';
+        header.innerHTML = `
+            <h3>${r.env.icon} ${r.env.label}</h3>
+            <div class="opt-numbers">
+                <span class="opt-base">${formatNumber(r.flame)}🔥</span>
+                <span class="opt-boost-total">+${r.effectiveBoost.toFixed(2)}%</span>
+                <span class="opt-result">→ ${formatNumber(r.optimizedFlame)}🔥</span>
+                <span class="opt-slots">${r.usedSlots}/${r.totalSlots} slots</span>
+            </div>
+        `;
+        card.appendChild(header);
+
+        // Slot visual bar
+        if (r.totalSlots > 0) {
+            const bar = document.createElement('div');
+            bar.className = 'opt-slot-bar';
+            for (let i = 0; i < r.totalSlots; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'opt-slot';
+                if (i < r.items.length) {
+                    slot.classList.add('filled');
+                    if (r.items[i].matched) slot.classList.add('matched');
+                }
+                bar.appendChild(slot);
+            }
+            card.appendChild(bar);
+        }
+
+        // Items table
+        if (r.items.length > 0) {
+            const itemsDiv = document.createElement('div');
+            itemsDiv.className = 'opt-items-list';
+            let tableHTML = `
+                <table class="opt-items-table">
+                    <thead><tr><th>Item</th><th>Rarity</th><th>Boost</th><th>Match</th></tr></thead>
+                    <tbody>
+            `;
+            for (const a of r.items) {
+                const rarityClass = a.item.rarity ? `rarity-${a.item.rarity.toLowerCase()}` : '';
+                tableHTML += `
+                    <tr>
+                        <td class="opt-item-name">${a.item.name}</td>
+                        <td class="opt-item-rarity ${rarityClass}">${a.item.rarity || '—'}</td>
+                        <td class="opt-item-boost">+${a.item.boost}%</td>
+                        <td>${a.matched
+                            ? '<span class="opt-item-matched">✓ ×2</span>'
+                            : '<span class="opt-item-not-matched">×1</span>'
+                        }</td>
+                    </tr>
+                `;
+            }
+            tableHTML += '</tbody></table>';
+            itemsDiv.innerHTML = tableHTML;
+            card.appendChild(itemsDiv);
+        } else {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'opt-items-list';
+            emptyDiv.innerHTML = '<p style="color:#555; font-size:0.75rem; text-align:center;">No items assigned (no flame entered or no slots available)</p>';
+            card.appendChild(emptyDiv);
+        }
+
+        details.appendChild(card);
+    }
+
+    // Unassigned items
+    if (unassigned.length > 0) {
+        const uDiv = document.createElement('div');
+        uDiv.className = 'opt-unassigned';
+        uDiv.innerHTML = `
+            <h4>📦 Unassigned Items (${unassigned.length})</h4>
+            <p style="color:#555; font-size:0.7rem; margin-bottom:0.5rem;">
+                These items couldn't be assigned — all plot slots are filled, or no matching environment with flame was available.
+            </p>
+            <div class="opt-unassigned-list">
+                ${unassigned.sort((a,b) => b.boost - a.boost).slice(0, 20).map(item =>
+                    `<span class="land-item-tag">${item.name} +${item.boost}%</span>`
+                ).join('')}
+                ${unassigned.length > 20 ? `<span class="land-item-tag more">+${unassigned.length - 20} more</span>` : ''}
+            </div>
+        `;
+        details.appendChild(uDiv);
+    }
+
+    // Scroll to results
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // === INITIALIZATION ===
@@ -392,69 +486,22 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('load-error').textContent = '';
         try {
             if (typeof AXIES_DATASET === 'undefined' || !AXIES_DATASET.axies)
-                throw new Error('AXIES_DATASET not found.');
+                throw new Error('AXIES_DATASET not found in data.js');
+            if (typeof LAND_ITEMS_DATA === 'undefined' || !LAND_ITEMS_DATA.items)
+                throw new Error('LAND_ITEMS_DATA not found in land_data.js');
+
             const data = AXIES_DATASET;
+            gLandItems = LAND_ITEMS_DATA.items;
+
             loading.querySelector('.load-status').textContent =
-                `✅ Loaded ${data.axies.length} Axies — optimizing...`;
+                `✅ Loaded ${data.axies.length} Axies + ${gLandItems.length} Land Items`;
+
             setTimeout(() => processAxies(data.axies), 100);
-            // Render land items in parallel
-            setTimeout(() => renderLandItems(), 200);
         } catch (err) {
             loading.style.display = 'none';
             document.getElementById('load-error').textContent = '❌ ' + err.message;
         }
     });
 
-    document.getElementById('fetch-btn').addEventListener('click', async () => {
-        const addr = document.getElementById('ronin-address').value.trim();
-        if (!addr) { alert('Enter your Ronin address'); return; }
-        const status = document.getElementById('fetch-status');
-        status.textContent = '⏳ Fetching...';
-        document.getElementById('manual-section').style.display = 'block';
-        document.getElementById('curl-command').value = generateCurlCommand(addr);
-        try {
-            const resp = await fetch('https://graphql-gateway.axieinfinity.com/graphql', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    query: `query GetAxieBriefList($owner: String, $from: Int, $size: Int) {
-                        axies(owner: $owner, from: $from, size: $size) {
-                            total results { id name stage class breedCount image title
-                            parts { id name class type specialGenes } } }
-                    }`,
-                    variables: { owner: addr, from: 0, size: 200 }
-                })
-            });
-            const result = await resp.json();
-            if (result.errors) throw new Error(result.errors.map(e => e.message).join(', '));
-            const data = result.data?.axies;
-            if (!data || !data.results || data.results.length === 0) { status.textContent = 'No Axies found.'; return; }
-            status.textContent = `✅ Fetched ${data.total} Axies!`;
-            document.getElementById('loading-indicator').style.display = 'flex';
-            setTimeout(() => processAxies(data.results), 100);
-        } catch (err) {
-            status.textContent = '❌ CORS blocked. Use "Load from saved dataset" or paste below.';
-        }
-    });
-
-    document.getElementById('paste-btn').addEventListener('click', () => {
-        const raw = document.getElementById('paste-data').value.trim();
-        if (!raw) { alert('Paste JSON first.'); return; }
-        try {
-            const parsed = JSON.parse(raw);
-            const data = parsed?.data?.axies || parsed;
-            if (!data || !data.results) throw new Error('Missing results');
-            document.getElementById('fetch-status').textContent = `✅ Loaded ${data.total || data.results.length} Axies!`;
-            document.getElementById('loading-indicator').style.display = 'flex';
-            setTimeout(() => processAxies(data.results), 100);
-        } catch (e) { alert('Invalid JSON: ' + e.message); }
-    });
-
-    document.getElementById('ronin-address').value = '0xdf8b35668c8fcf82b1d1707875c98cd05b6927c4';
+    document.getElementById('optimize-btn').addEventListener('click', optimize);
 });
-
-function generateCurlCommand(address) {
-    const inner = `query GetAxieBriefList($owner: String,$from: Int,$size: Int){axies(owner:$owner,from:$from,size:$size){total results{id name stage class breedCount image title parts{id name class type specialGenes}}}}`;
-    const vars = `{"owner":"${address}","from":0,"size":200}`;
-    return `curl -s -X POST https://graphql-gateway.axieinfinity.com/graphql \\\n  -H "Content-Type: application/json" \\\n  -H "User-Agent: Mozilla/5.0" \\\n  -d '{"query":"${inner}","variables":${vars}}'`;
-}

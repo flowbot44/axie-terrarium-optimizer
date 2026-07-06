@@ -9,39 +9,16 @@
 <body>
 <div class="container">
     <header class="site-header">
-        <h1>🧬 Axie Terrarium Optimizer</h1>
-        <p class="site-intro">Maximize your Atia's Flame. Uses official formulas &amp; collection values.</p>
+        <h1>🧬 Terrarium Optimizer</h1>
+        <p class="site-intro">Maximize Atia's Flame — assign your land items optimally.</p>
     </header>
 
     <!-- PRIMARY: Load saved dataset -->
     <section class="load-section card">
         <h2>📦 Load Your Collection</h2>
-        <p>1,188 Axies saved as dataset. One click to optimize.</p>
-        <button id="load-btn" class="btn-primary">🚀 Load &amp; Optimize</button>
+        <p>1,188 Axies + 372 Land Items saved as dataset.</p>
+        <button id="load-btn" class="btn-primary">🚀 Load Data</button>
         <div id="load-error" class="error-text"></div>
-    </section>
-
-    <!-- OR divider -->
-    <div class="or-divider"><span>or fetch live</span></div>
-
-    <!-- SECONDARY: Live fetch -->
-    <section class="input-section card">
-        <h2>🌐 Fetch from Ronin</h2>
-        <label for="ronin-address">Ronin Address (0x…)</label>
-        <input type="text" id="ronin-address" placeholder="0xYourRoninAddress">
-        <button id="fetch-btn" class="btn-secondary">Fetch &amp; Optimize</button>
-        <div id="fetch-status" class="status-text"></div>
-    </section>
-
-    <!-- Manual paste (shown after a failed fetch) -->
-    <section id="manual-section" class="manual-section card" style="display:none;">
-        <h3>⚙️ Manual Paste</h3>
-        <p>If CORS blocks the live fetch, run this in Terminal:</p>
-        <textarea id="curl-command" readonly></textarea>
-        <button id="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('curl-command').value)">📋 Copy Command</button>
-        <p class="or-mini">— or —</p>
-        <textarea id="paste-data" placeholder="Paste the JSON output here…"></textarea>
-        <button id="paste-btn" class="btn-secondary">Paste &amp; Process</button>
     </section>
 
     <!-- Loading indicator -->
@@ -52,29 +29,52 @@
 
     <!-- RESULTS (hidden until loaded) -->
     <div id="main-results" class="results-section" style="display:none;">
+
+        <!-- Summary stats -->
         <section class="summary-bar card">
             <div class="stat-item"><span class="stat-num" id="total-axies">0</span><span class="stat-label">Axies</span></div>
-            <div class="stat-item"><span class="stat-num" id="total-plots">0</span><span class="stat-label">Plots (×30)</span></div>
-            <div class="stat-item"><span class="stat-num" id="grand-flame">0</span><span class="stat-label">Total Flame</span></div>
+            <div class="stat-item"><span class="stat-num" id="total-flame">0</span><span class="stat-label">Total Flame</span></div>
+            <div class="stat-item"><span class="stat-num" id="land-total">0</span><span class="stat-label">Land Items</span></div>
         </section>
 
-        <section class="collection-breakdown card">
-            <h3>📊 Collection Breakdown</h3>
-            <div id="collection-stats"></div>
+        <!-- Collection breakdown (collapsible) -->
+        <section class="card collapsible">
+            <div class="collapsible-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                <h3>📊 Collection Breakdown</h3>
+                <span class="collapse-toggle">▼</span>
+            </div>
+            <div class="collapsible-body">
+                <div id="collection-stats"></div>
+            </div>
         </section>
 
-        <section class="plots-section">
-            <h3>🏕️ Plots (Flame-optimized)</h3>
-            <div id="plot-container"></div>
+        <!-- Land items inventory (collapsible) -->
+        <section class="card collapsible">
+            <div class="collapsible-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                <h3>🏺 Land Items Inventory</h3>
+                <span class="collapse-toggle">▼</span>
+            </div>
+            <div class="collapsible-body" id="land-items-body"></div>
         </section>
-    </div>
 
-    <!-- LAND ITEMS (hidden until loaded) -->
-    <div id="land-items-section" class="results-section" style="display:none;">
-        <section class="card">
-            <h2>🏺 Land Items (<span id="land-total">0</span>)</h2>
-            <div id="land-items-grid" class="land-items-grid"></div>
+        <!-- === FLAME PER ENVIRONMENT === -->
+        <section class="card flame-input-section">
+            <h3>🔥 Flame Per Environment</h3>
+            <p class="section-desc">Enter the total Flame your Axies produce on each environment type &amp; how many plots you have there.</p>
+            <div id="flame-inputs"></div>
+            <div style="text-align:center; margin-top:1rem;">
+                <button id="optimize-btn" class="btn-primary">⚡ Optimize Land Items</button>
+            </div>
+            <div id="optimize-error" class="error-text" style="margin-top:0.5rem;"></div>
         </section>
+
+        <!-- === OPTIMIZATION RESULTS === -->
+        <section id="optimization-results" style="display:none;">
+            <h3>📋 Optimization Results</h3>
+            <div id="opt-summary" class="card summary-bar"></div>
+            <div id="opt-details"></div>
+        </section>
+
     </div>
 
     <footer class="site-footer">
@@ -84,7 +84,7 @@
             <a href="https://app.axieinfinity.com/terra/" target="_blank">My Land</a> ·
             <a href="https://flowbot44.github.io/axie-terrarium-charts/" target="_blank">Info Charts</a>
         </p>
-        <p class="footer-note">Data fetched <span id="dataset-date">2026-07-05</span> — 1,188 Axies. Not affiliated with Sky Mavis.</p>
+        <p class="footer-note">Data fetched <span id="dataset-date">2026-07-05</span>. Not affiliated with Sky Mavis.</p>
     </footer>
 </div>
 <script src="data.js"></script>
