@@ -1,10 +1,10 @@
 const ENVIRONMENTS = [
-    { key: 'savannah', label: 'Savannah', color: 'var(--savannah)', defaultFlame: 5000000, rewardPool: 14000 },
-    { key: 'forest', label: 'Forest', color: 'var(--forest)', defaultFlame: 12000000, rewardPool: 28000 },
-    { key: 'arctic', label: 'Arctic', color: 'var(--arctic)', defaultFlame: 15000000, rewardPool: 40000 },
-    { key: 'mystic', label: 'Mystic', color: 'var(--mystic)', defaultFlame: 25000000, rewardPool: 65000 },
-    { key: 'genesis', label: 'Genesis', color: 'var(--genesis)', defaultFlame: 50000000, rewardPool: 150000 },
-    { key: 'luna', label: "Luna's Landing", color: 'var(--luna)', defaultFlame: 80000000, rewardPool: 250000 },
+    { key: 'savannah', label: 'Savannah', color: 'var(--savannah)', defaultPlots: 20, defaultFlame: 5000000, rewardPool: 14000 },
+    { key: 'forest', label: 'Forest', color: 'var(--forest)', defaultPlots: 2, defaultFlame: 12000000, rewardPool: 28000 },
+    { key: 'arctic', label: 'Arctic', color: 'var(--arctic)', defaultPlots: 8, defaultFlame: 15000000, rewardPool: 40000 },
+    { key: 'mystic', label: 'Mystic', color: 'var(--mystic)', defaultPlots: 8, defaultFlame: 25000000, rewardPool: 65000 },
+    { key: 'genesis', label: 'Genesis', color: 'var(--genesis)', defaultPlots: 0, defaultFlame: 50000000, rewardPool: 150000 },
+    { key: 'luna', label: "Luna's Landing", color: 'var(--luna)', defaultPlots: 0, defaultFlame: 80000000, rewardPool: 250000 },
 ];
 
 const COLLECTION_FLAME = {
@@ -102,7 +102,7 @@ function renderInputs() {
             </div>
             <div class="input-group">
                 <label>Plots Owned</label>
-                <input type="number" min="0" value="0" id="plots-${env.key}">
+                <input type="number" min="0" value="${env.defaultPlots || 0}" id="plots-${env.key}">
             </div>
             <div class="input-group">
                 <label>Global Total Flame</label>
