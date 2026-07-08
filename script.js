@@ -1,46 +1,50 @@
-// Axie Terrarium Optimizer — script.js v3 (Optimizer Edition)
-// Evolved parts removed from plot level. Flame-per-env inputs + land item optimizer.
-
-// === CONSTANTS ===
 const ENVIRONMENTS = [
-    { key: 'forest',    label: 'Forest',    icon: '🌲', color: '#2ecc71' },
-    { key: 'arctic',    label: 'Arctic',    icon: '❄️', color: '#85c1e9' },
-    { key: 'savannah',  label: 'Savannah',  icon: '🏜️', color: '#e67e22' },
-    { key: 'mystic',    label: 'Mystic',    icon: '✨', color: '#9b59b6' },
-    { key: 'genesis',   label: 'Genesis',   icon: '🏛️', color: '#3498db' },
-    { key: 'luna',      label: "Luna's Landing", icon: '🌙', color: '#e74c3c' },
+    { key: 'savannah', label: 'Savannah', color: 'var(--savannah)', defaultFlame: 5000000, rewardPool: 14000 },
+    { key: 'forest', label: 'Forest', color: 'var(--forest)', defaultFlame: 12000000, rewardPool: 28000 },
+    { key: 'arctic', label: 'Arctic', color: 'var(--arctic)', defaultFlame: 15000000, rewardPool: 40000 },
+    { key: 'mystic', label: 'Mystic', color: 'var(--mystic)', defaultFlame: 25000000, rewardPool: 65000 },
+    { key: 'genesis', label: 'Genesis', color: 'var(--genesis)', defaultFlame: 50000000, rewardPool: 150000 },
+    { key: 'luna', label: "Luna's Landing", color: 'var(--luna)', defaultFlame: 80000000, rewardPool: 250000 },
 ];
-const MAX_ITEMS_PER_PLOT = 8;
 
 const COLLECTION_FLAME = {
     normal: 5, summer: 20, nightmare: 40, japanese: 60,
     shiny: 200, xmas: 200, meo: 200, origin: 400,
     mystic: 1000, agamo: 2000
 };
-const COLLECTION_LABELS = {
-    normal: 'Normal', summer: 'Summer', nightmare: 'Nightmare',
-    japanese: 'Japanese', shiny: 'Shiny',
-    xmas: 'Xmas', meo: 'Meo', origin: 'Origin', mystic: 'Mystic', agamo: 'Agamo Genesis'
-};
+
 const SPECIAL_GENES_MAP = {
     'summer2022': 'summer', 'japan': 'japanese', 'xmas2019': 'xmas',
     'nightmare': 'nightmare', 'summershiny2022': 'shiny', 'nightmareshiny': 'shiny',
     'mystic': 'mystic', 'origin': 'origin', 'meo': 'meo', 'agamo': 'agamo', 'agamogenesis': 'agamo'
 };
+
 const COLLECTION_PRIORITY = {
     mystic: 100, origin: 90, shiny: 80, xmas: 70, meo: 60,
     japanese: 50, nightmare: 40, summer: 30, normal: 0
 };
 
-const EVOLVED_MULT = [1.0, 1.1, 1.2, 1.3, 1.45, 1.68]; // indexed at 0 = 1 part
+const EVOLVED_MULT = [1.0, 1.1, 1.2, 1.3, 1.45, 1.68]; // 0=1 part, 5=6 parts
 
-// === GLOBAL STATE ===
 let gAxies = [];
-let gLandItems = [];
-let gAllAxiesFlame = 0; // total flame of all axies loaded
+let gItems = [];
 
-// === HELPERS ===
-function formatNumber(n) { return Number(n).toLocaleString(); }
+function init() {
+    if (typeof USER_DATA === 'undefined') {
+        alert("Please run fetch_user_data.py first to generate user_data.js");
+        return;
+    }
+    
+    document.getElementById('stat-axies').textContent = USER_DATA.axies.length;
+    document.getElementById('stat-items').textContent = USER_DATA.items.length;
+    
+    processAxies();
+    gItems = USER_DATA.items;
+    
+    renderInputs();
+    
+    document.getElementById('btn-optimize').addEventListener('click', optimize);
+}
 
 function detectCollection(parts, title, name) {
     let found = [];
@@ -63,445 +67,168 @@ function detectCollection(parts, title, name) {
     return 'normal';
 }
 
-function countEvolvedParts(parts) {
-    if (!parts) return 0;
-    return parts.filter(p => p.id && p.id.endsWith('-2')).length;
-}
-
-function calcIndividualFlame(axie) {
-    const base = axie.baseFlame || COLLECTION_FLAME.normal;
-    const idx = Math.min(Math.max(axie.evolvedParts - 1, 0), 5);
-    return Math.round(base * EVOLVED_MULT[idx]);
-}
-
-function getBaseFlame(c) { return COLLECTION_FLAME[c] || 5; }
-
-// === PROCESS AXIES ===
-function processAxies(results) {
-    gAxies = results.map(axie => {
-        const collection = detectCollection(axie.parts, axie.title, axie.name);
-        const evoParts = (axie.evolvedParts !== undefined) ? axie.evolvedParts : countEvolvedParts(axie.parts);
+function processAxies() {
+    gAxies = USER_DATA.axies.map(axie => {
+        const collection = detectCollection(axie.parts || [], axie.title, axie.name);
+        const evoParts = axie.evolvedParts || 0;
+        
+        const base = COLLECTION_FLAME[collection] || 5;
+        const idx = Math.min(Math.max(evoParts - 1, 0), 5);
+        const flame = Math.round(base * (evoParts > 0 ? EVOLVED_MULT[idx] : 1.0));
+        
         return {
             id: axie.id,
             name: axie.name,
-            image: axie.image,
-            class: axie.class,
-            collection,
-            collectionLabel: COLLECTION_LABELS[collection] || 'Normal',
-            baseFlame: getBaseFlame(collection),
-            evolvedParts: evoParts,
-            currentFlame: 0,
+            flame: flame
         };
     });
-    gAxies.forEach(a => { a.currentFlame = calcIndividualFlame(a); });
-    gAllAxiesFlame = gAxies.reduce((s, a) => s + a.currentFlame, 0);
-    renderSummary();
-    renderCollectionBreakdown();
-    renderLandInventory();
-    renderFlameInputs();
-    document.getElementById('main-results').style.display = 'block';
-    document.getElementById('loading-indicator').style.display = 'none';
+    // Sort axies by flame descending
+    gAxies.sort((a, b) => b.flame - a.flame);
 }
 
-// === RENDER: Summary ===
-function renderSummary() {
-    document.getElementById('total-axies').textContent = gAxies.length;
-    document.getElementById('total-flame').textContent = formatNumber(gAllAxiesFlame);
-    document.getElementById('land-total').textContent = gLandItems.length;
-}
-
-// === RENDER: Collection Breakdown ===
-function renderCollectionBreakdown() {
-    const stats = {};
-    gAxies.forEach(a => { stats[a.collectionLabel] = (stats[a.collectionLabel] || 0) + 1; });
-    const div = document.getElementById('collection-stats');
-    div.innerHTML = '';
-    Object.entries(stats).sort((a, b) => b[1] - a[1]).forEach(([label, count]) => {
-        const key = Object.keys(COLLECTION_LABELS).find(k => COLLECTION_LABELS[k] === label);
-        const flame = COLLECTION_FLAME[key] || 5;
-        const chip = document.createElement('span');
-        chip.className = 'stat-chip';
-        chip.innerHTML = `<strong>${label}</strong> ×${count} <span class="chip-flame">${flame}🔥</span>`;
-        div.appendChild(chip);
-    });
-}
-
-// === RENDER: Land Items Inventory ===
-function renderLandInventory() {
-    if (!gLandItems.length) return;
-    const grid = document.getElementById('land-items-body');
-    grid.innerHTML = '';
-
-    const envOrder = ['mystic', 'genesis', 'arctic', 'forest', 'savannah', 'luna', 'any'];
-    const envLabels = {
-        mystic: 'Mystic ✨', genesis: 'Genesis 🏛️', arctic: 'Arctic ❄️',
-        forest: 'Forest 🌲', savannah: 'Savannah 🏜️', luna: "Luna's Landing 🌙", any: 'Universal'
-    };
-    const envColors = {
-        mystic: '#9b59b6', genesis: '#3498db', arctic: '#85c1e9',
-        forest: '#2ecc71', savannah: '#e67e22', luna: '#e74c3c', any: '#95a5a6'
-    };
-
-    const groups = {};
-    for (const item of gLandItems) {
-        const env = item.environment || 'any';
-        if (!groups[env]) groups[env] = [];
-        groups[env].push(item);
-    }
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'land-items-grid';
-
-    for (const env of envOrder) {
-        if (!groups[env]) continue;
-        const items = groups[env];
-        const color = envColors[env] || '#95a5a6';
-        const totalBoost = items.reduce((s, i) => s + i.boost, 0);
-
-        const byRarity = {};
-        for (const item of items) {
-            const r = item.rarity || 'Unknown';
-            if (!byRarity[r]) byRarity[r] = [];
-            byRarity[r].push(item);
-        }
-        const rarityOrder = ['Mystic', 'Epic', 'Rare', 'Common'];
-        const details = rarityOrder.filter(r => byRarity[r]).map(r =>
-            `<span class="rarity-${r.toLowerCase()}">${r} ×${byRarity[r].length}</span>`
-        ).join(' · ');
-
-        const block = document.createElement('div');
-        block.className = 'land-rarity-group';
-        block.innerHTML = `
-            <h4 class="land-rarity-title" style="border-left: 3px solid ${color}; padding-left: 8px;">
-                ${envLabels[env] || env}
-                <span class="land-count">×${items.length}</span>
-                <span class="land-boost-sum">+${totalBoost.toFixed(2)}%</span>
-            </h4>
-            <div class="land-meta">${details}</div>
-            <div class="land-item-list">
-                ${items.slice(0, 30).map(item =>
-                    `<span class="land-item-tag">${item.name} <span class="boost-pct">+${item.boost}%</span></span>`
-                ).join('')}
-                ${items.length > 30 ? `<span class="land-item-tag more">+${items.length - 30} more</span>` : ''}
-            </div>
-        `;
-        wrapper.appendChild(block);
-    }
-    grid.appendChild(wrapper);
-}
-
-// === RENDER: Flame Inputs ===
-function renderFlameInputs() {
-    const div = document.getElementById('flame-inputs');
-    div.innerHTML = '';
-    const grid = document.createElement('div');
-    grid.className = 'flame-input-grid';
-
-    for (const env of ENVIRONMENTS) {
+function renderInputs() {
+    const container = document.getElementById('env-inputs');
+    container.innerHTML = '';
+    
+    ENVIRONMENTS.forEach(env => {
         const row = document.createElement('div');
-        row.className = 'flame-input-row';
-        row.style.borderLeft = `3px solid ${env.color}`;
+        row.className = 'input-row';
+        row.style.borderLeft = `4px solid ${env.color}`;
+        row.style.paddingLeft = '1rem';
+        
         row.innerHTML = `
-            <span class="env-label"><span class="env-icon">${env.icon}</span>${env.label}</span>
-            <div class="input-group">
-                <span class="input-label">Flame 🔥</span>
-                <input type="number" min="0" step="1000" value="0"
-                       class="flame-val" data-env="${env.key}" placeholder="0">
+            <div class="env-label">
+                ${env.label}
             </div>
             <div class="input-group">
-                <span class="input-label">Plots 🏕️</span>
-                <input type="number" min="0" max="99" value="0"
-                       class="plots-val" data-env="${env.key}" placeholder="0">
+                <label>Plots Owned</label>
+                <input type="number" min="0" value="0" id="plots-${env.key}">
+            </div>
+            <div class="input-group">
+                <label>Global Total Flame</label>
+                <input type="number" min="1" value="${env.defaultFlame}" id="global-${env.key}">
             </div>
         `;
-        grid.appendChild(row);
-    }
-    div.appendChild(grid);
-}
-
-// === OPTIMIZER ===
-function getEnvIndex(key) {
-    return ENVIRONMENTS.findIndex(e => e.key === key);
+        container.appendChild(row);
+    });
 }
 
 function optimize() {
-    // 1. Read inputs
-    const flameByEnv = {};
-    const plotsByEnv = {};
-    let hasAny = false;
-    for (const env of ENVIRONMENTS) {
-        const fEl = document.querySelector(`.flame-val[data-env="${env.key}"]`);
-        const pEl = document.querySelector(`.plots-val[data-env="${env.key}"]`);
-        const flame = parseInt(fEl.value) || 0;
-        const plots = parseInt(pEl.value) || 0;
-        flameByEnv[env.key] = flame;
-        plotsByEnv[env.key] = plots;
-        if (flame > 0) hasAny = true;
-    }
-
-    if (!hasAny) {
-        document.getElementById('optimize-error').textContent = 'Enter at least one environment with flame > 0.';
-        return;
-    }
-    document.getElementById('optimize-error').textContent = '';
-
-    // 2. Calculate total item slots per environment
-    const slotsByEnv = {};
-    let totalSlots = 0;
-    for (const env of ENVIRONMENTS) {
-        slotsByEnv[env.key] = (plotsByEnv[env.key] || 0) * MAX_ITEMS_PER_PLOT;
-        totalSlots += slotsByEnv[env.key];
-    }
-
-    if (totalSlots === 0) {
-        document.getElementById('optimize-error').textContent = 'Enter at least 1 plot.';
-        return;
-    }
-
-    // 3. Prepare land items
-    const items = gLandItems.map(item => ({ ...item }));
-    items.sort((a, b) => b.boost - a.boost); // highest boost first
-
-    // 4. Greedy allocation
-    //    Phase A: Assign matching items to their environment
-    //    Phase B: Assign remaining items (universal + unmatched leftovers) to highest-marginal-value environment
-    const assigned = {}; // env.key -> [{item, matched: bool}]
-    for (const env of ENVIRONMENTS) {
-        assigned[env.key] = [];
-    }
-    const unassigned = [];
-
-    // Phase A: matching items
-    const remaining = [];
-    for (const item of items) {
-        const env = item.environment;
-        if (env && env !== 'any') {
-            const key = env;
-            if (assigned[key] && assigned[key].length < slotsByEnv[key]) {
-                assigned[key].push({ item, matched: true });
-            } else {
-                remaining.push(item); // env-specific but no room → try elsewhere
-            }
-        } else {
-            remaining.push(item); // universal
-        }
-    }
-
-    // Phase B: assign remaining items to best environment
-    for (const item of remaining) {
-        const isUniversal = item.environment === 'any' || !item.environment;
-        let bestEnv = null;
-        let bestValue = -1;
-
-        for (const env of ENVIRONMENTS) {
-            const key = env.key;
-            if (assigned[key].length >= slotsByEnv[key]) continue;
-            const flame = flameByEnv[key];
-            if (flame === 0) continue;
-
-            const isMatch = env.key === item.environment;
-            // marginal benefit = flame × boost (×2 if matched)
-            let marginal;
-            if (isMatch) {
-                marginal = flame * (item.boost * 2 / 100);
-            } else {
-                marginal = flame * (item.boost / 100);
-            }
-            if (marginal > bestValue) {
-                bestValue = marginal;
-                bestEnv = key;
-            }
-        }
-
-        if (bestEnv) {
-            const isMatch = bestEnv === item.environment && !isUniversal;
-            assigned[bestEnv].push({ item, matched: isMatch || false });
-        } else {
-            unassigned.push(item);
-        }
-    }
-
-    // 5. Calculate results
-    const results = [];
-    let totalOriginalFlame = 0;
-    let totalOptimizedFlame = 0;
-    for (const env of ENVIRONMENTS) {
-        const key = env.key;
-        const flame = flameByEnv[key];
-        const slots = slotsByEnv[key];
-        const items = assigned[key];
-        let boostSum = 0;
-        let matchedBoostSum = 0;
-        let unmatchedBoostSum = 0;
-        for (const a of items) {
-            boostSum += a.item.boost;
-            if (a.matched) matchedBoostSum += a.item.boost;
-            else unmatchedBoostSum += a.item.boost;
-        }
-        // Effective boost: matching gets ×2, non-matching gets ×1
-        const effectiveBoost = matchedBoostSum * 2 + unmatchedBoostSum;
-        const originalFlame = flame;
-        const optimizedFlame = Math.floor(flame * (1 + effectiveBoost / 100));
-        totalOriginalFlame += originalFlame;
-        totalOptimizedFlame += optimizedFlame;
-
-        results.push({
-            env,
-            flame,
-            slots,
-            totalSlots: slots,
-            usedSlots: items.length,
-            items,
-            matchedBoostSum,
-            unmatchedBoostSum,
-            effectiveBoost,
-            originalFlame,
-            optimizedFlame,
-        });
-    }
-
-    renderOptimizationResults(results, unassigned, totalOriginalFlame, totalOptimizedFlame);
-}
-
-// === RENDER: Optimization Results ===
-function renderOptimizationResults(results, unassigned, totalOriginal, totalOptimized) {
-    const section = document.getElementById('optimization-results');
-    section.style.display = 'block';
-
-    // Summary bar
-    const summary = document.getElementById('opt-summary');
-    const pctGain = totalOriginal > 0 ? ((totalOptimized - totalOriginal) / totalOriginal * 100).toFixed(1) : 0;
-    summary.innerHTML = `
-        <div class="stat-item"><span class="stat-num">${formatNumber(totalOriginal)}</span><span class="stat-label">Base Flame</span></div>
-        <div class="stat-item"><span class="stat-num" style="color:#2ecc71">${formatNumber(totalOptimized)}</span><span class="stat-label">Optimized Flame</span></div>
-        <div class="stat-item"><span class="stat-num" style="color:#f1c40f">+${pctGain}%</span><span class="stat-label">Gain</span></div>
-        <div class="stat-item"><span class="stat-num">${gLandItems.length - unassigned.length}</span><span class="stat-label">Items Used</span></div>
-    `;
-
-    // Detail cards
-    const details = document.getElementById('opt-details');
-    details.innerHTML = '';
-
-    for (const r of results) {
-        if (r.flame === 0 && r.items.length === 0) continue;
-
-        const card = document.createElement('div');
-        card.className = 'opt-env-card';
-
-        // Header
-        const header = document.createElement('div');
-        header.className = 'opt-env-header';
-        header.innerHTML = `
-            <h3>${r.env.icon} ${r.env.label}</h3>
-            <div class="opt-numbers">
-                <span class="opt-base">${formatNumber(r.flame)}🔥</span>
-                <span class="opt-boost-total">+${r.effectiveBoost.toFixed(2)}%</span>
-                <span class="opt-result">→ ${formatNumber(r.optimizedFlame)}🔥</span>
-                <span class="opt-slots">${r.usedSlots}/${r.totalSlots} slots</span>
-            </div>
-        `;
-        card.appendChild(header);
-
-        // Slot visual bar
-        if (r.totalSlots > 0) {
-            const bar = document.createElement('div');
-            bar.className = 'opt-slot-bar';
-            for (let i = 0; i < r.totalSlots; i++) {
-                const slot = document.createElement('div');
-                slot.className = 'opt-slot';
-                if (i < r.items.length) {
-                    slot.classList.add('filled');
-                    if (r.items[i].matched) slot.classList.add('matched');
-                }
-                bar.appendChild(slot);
-            }
-            card.appendChild(bar);
-        }
-
-        // Items table
-        if (r.items.length > 0) {
-            const itemsDiv = document.createElement('div');
-            itemsDiv.className = 'opt-items-list';
-            let tableHTML = `
-                <table class="opt-items-table">
-                    <thead><tr><th>Item</th><th>Rarity</th><th>Boost</th><th>Match</th></tr></thead>
-                    <tbody>
-            `;
-            for (const a of r.items) {
-                const rarityClass = a.item.rarity ? `rarity-${a.item.rarity.toLowerCase()}` : '';
-                tableHTML += `
-                    <tr>
-                        <td class="opt-item-name">${a.item.name}</td>
-                        <td class="opt-item-rarity ${rarityClass}">${a.item.rarity || '—'}</td>
-                        <td class="opt-item-boost">+${a.item.boost}%</td>
-                        <td>${a.matched
-                            ? '<span class="opt-item-matched">✓ ×2</span>'
-                            : '<span class="opt-item-not-matched">×1</span>'
-                        }</td>
-                    </tr>
-                `;
-            }
-            tableHTML += '</tbody></table>';
-            itemsDiv.innerHTML = tableHTML;
-            card.appendChild(itemsDiv);
-        } else {
-            const emptyDiv = document.createElement('div');
-            emptyDiv.className = 'opt-items-list';
-            emptyDiv.innerHTML = '<p style="color:#555; font-size:0.75rem; text-align:center;">No items assigned (no flame entered or no slots available)</p>';
-            card.appendChild(emptyDiv);
-        }
-
-        details.appendChild(card);
-    }
-
-    // Unassigned items
-    if (unassigned.length > 0) {
-        const uDiv = document.createElement('div');
-        uDiv.className = 'opt-unassigned';
-        uDiv.innerHTML = `
-            <h4>📦 Unassigned Items (${unassigned.length})</h4>
-            <p style="color:#555; font-size:0.7rem; margin-bottom:0.5rem;">
-                These items couldn't be assigned — all plot slots are filled, or no matching environment with flame was available.
-            </p>
-            <div class="opt-unassigned-list">
-                ${unassigned.sort((a,b) => b.boost - a.boost).slice(0, 20).map(item =>
-                    `<span class="land-item-tag">${item.name} +${item.boost}%</span>`
-                ).join('')}
-                ${unassigned.length > 20 ? `<span class="land-item-tag more">+${unassigned.length - 20} more</span>` : ''}
-            </div>
-        `;
-        details.appendChild(uDiv);
-    }
-
-    // Scroll to results
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// === INITIALIZATION ===
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('load-btn').addEventListener('click', () => {
-        const loading = document.getElementById('loading-indicator');
-        loading.style.display = 'flex';
-        loading.querySelector('.load-status').textContent = 'Loading 1,188 Axies from dataset...';
-        document.getElementById('load-error').textContent = '';
-        try {
-            if (typeof AXIES_DATASET === 'undefined' || !AXIES_DATASET.axies)
-                throw new Error('AXIES_DATASET not found in data.js');
-            if (typeof LAND_ITEMS_DATA === 'undefined' || !LAND_ITEMS_DATA.items)
-                throw new Error('LAND_ITEMS_DATA not found in land_data.js');
-
-            const data = AXIES_DATASET;
-            gLandItems = LAND_ITEMS_DATA.items;
-
-            loading.querySelector('.load-status').textContent =
-                `✅ Loaded ${data.axies.length} Axies + ${gLandItems.length} Land Items`;
-
-            setTimeout(() => processAxies(data.axies), 100);
-        } catch (err) {
-            loading.style.display = 'none';
-            document.getElementById('load-error').textContent = '❌ ' + err.message;
+    // 1. Gather Inputs
+    const userPlots = [];
+    ENVIRONMENTS.forEach(env => {
+        const count = parseInt(document.getElementById(`plots-${env.key}`).value) || 0;
+        const globalFlame = parseInt(document.getElementById(`global-${env.key}`).value) || env.defaultFlame;
+        
+        for (let i = 0; i < count; i++) {
+            userPlots.push({
+                envKey: env.key,
+                label: env.label,
+                color: env.color,
+                rewardPool: env.rewardPool,
+                globalFlame: globalFlame,
+                items: [],
+                axies: [],
+                itemBoost: 0,
+                baseFlame: 0,
+                finalFlame: 0,
+                expectedBaxs: 0
+            });
         }
     });
+    
+    if (userPlots.length === 0) {
+        alert("Please enter at least 1 plot.");
+        return;
+    }
+    
+    // 2. Assign Land Items greedily to maximize (1 + itemBoost) * (rewardPool / globalFlame)
+    // Actually, land items only fit specific environments (or 'any').
+    // Let's just assign highest boost items to each plot of that environment.
+    let availableItems = [...gItems].sort((a, b) => b.boost - a.boost);
+    
+    userPlots.forEach(plot => {
+        let itemsForPlot = [];
+        // First try to fill with environment specific or 'any' items
+        for (let i = 0; i < availableItems.length && itemsForPlot.length < 8; i++) {
+            const item = availableItems[i];
+            if (item.environment === plot.envKey || item.environment === 'any') {
+                itemsForPlot.push(item);
+                plot.itemBoost += item.boost;
+                availableItems.splice(i, 1);
+                i--; // adjust index after removal
+            }
+        }
+        plot.items = itemsForPlot;
+        // Multiplier = (1 + itemBoost) * (rewardPool / globalFlame)
+        plot.multiplier = (1 + plot.itemBoost) * (plot.rewardPool / plot.globalFlame);
+    });
+    
+    // 3. Sort plots by multiplier descending to assign Axies
+    userPlots.sort((a, b) => b.multiplier - a.multiplier);
+    
+    // 4. Assign Axies
+    let axieIdx = 0;
+    userPlots.forEach(plot => {
+        while (plot.axies.length < 30 && axieIdx < gAxies.length) {
+            const axie = gAxies[axieIdx++];
+            plot.axies.push(axie);
+            plot.baseFlame += axie.flame;
+        }
+        plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost));
+        // bAXS = (Plot Flame / (Global Flame + Plot Flame - Previous Plot Flame?))
+        // Since Global Flame usually already includes your previous setup, we'll just use simple division
+        plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
+    });
+    
+    renderResults(userPlots);
+}
 
-    document.getElementById('optimize-btn').addEventListener('click', optimize);
-});
+function renderResults(plots) {
+    const container = document.getElementById('plots-grid');
+    container.innerHTML = '';
+    
+    let totalBaxs = 0;
+    
+    plots.forEach((plot, index) => {
+        totalBaxs += plot.expectedBaxs;
+        
+        const card = document.createElement('div');
+        card.className = 'plot-card';
+        card.style.borderTopColor = plot.color;
+        
+        card.innerHTML = `
+            <div class="plot-title">
+                <span>${plot.label} Plot #${index + 1}</span>
+                <span class="baxs-value">+${plot.expectedBaxs.toFixed(2)} bAXS</span>
+            </div>
+            <div class="plot-detail">
+                <span class="label">Assigned Axies</span>
+                <span>${plot.axies.length} / 30</span>
+            </div>
+            <div class="plot-detail">
+                <span class="label">Base Flame</span>
+                <span>${plot.baseFlame.toLocaleString()}</span>
+            </div>
+            <div class="plot-detail">
+                <span class="label">Land Items</span>
+                <span>${plot.items.length} / 8</span>
+            </div>
+            <div class="plot-detail">
+                <span class="label">Item Boost</span>
+                <span style="color: #2ecc71;">+${(plot.itemBoost * 100).toFixed(0)}%</span>
+            </div>
+            <div class="plot-detail" style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem;">
+                <span class="label">Final Plot Flame</span>
+                <span style="font-weight: bold; color: #fbbf24;">${plot.finalFlame.toLocaleString()}</span>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+    
+    document.getElementById('total-baxs-val').textContent = totalBaxs.toFixed(2);
+    document.getElementById('results-container').style.display = 'block';
+    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+}
+
+window.onload = init;

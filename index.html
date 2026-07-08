@@ -4,91 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Axie Terrarium Optimizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
-    <header class="site-header">
-        <h1>🧬 Terrarium Optimizer</h1>
-        <p class="site-intro">Maximize Atia's Flame — assign your land items optimally.</p>
+    <header>
+        <h1>Terrarium Optimizer</h1>
+        <p class="subtitle">Maximize your bAXS rewards across your land plots.</p>
     </header>
 
-    <!-- PRIMARY: Load saved dataset -->
-    <section class="load-section card">
-        <h2>📦 Load Your Collection</h2>
-        <p>1,188 Axies + 372 Land Items saved as dataset.</p>
-        <button id="load-btn" class="btn-primary">🚀 Load Data</button>
-        <div id="load-error" class="error-text"></div>
-    </section>
-
-    <!-- Loading indicator -->
-    <div id="loading-indicator" class="loading" style="display:none;">
-        <div class="spinner"></div>
-        <span class="load-status">Loading...</span>
+    <div class="glass-panel" id="collection-stats">
+        <h2>Your Collection</h2>
+        <div class="grid-2" style="margin-top: 1.5rem;">
+            <div class="stat-box">
+                <div class="stat-value" id="stat-axies">0</div>
+                <div class="stat-label">Total Axies</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="stat-items">0</div>
+                <div class="stat-label">Land Items</div>
+            </div>
+        </div>
     </div>
 
-    <!-- RESULTS (hidden until loaded) -->
-    <div id="main-results" class="results-section" style="display:none;">
-
-        <!-- Summary stats -->
-        <section class="summary-bar card">
-            <div class="stat-item"><span class="stat-num" id="total-axies">0</span><span class="stat-label">Axies</span></div>
-            <div class="stat-item"><span class="stat-num" id="total-flame">0</span><span class="stat-label">Total Flame</span></div>
-            <div class="stat-item"><span class="stat-num" id="land-total">0</span><span class="stat-label">Land Items</span></div>
-        </section>
-
-        <!-- Collection breakdown (collapsible) -->
-        <section class="card collapsible">
-            <div class="collapsible-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                <h3>📊 Collection Breakdown</h3>
-                <span class="collapse-toggle">▼</span>
-            </div>
-            <div class="collapsible-body">
-                <div id="collection-stats"></div>
-            </div>
-        </section>
-
-        <!-- Land items inventory (collapsible) -->
-        <section class="card collapsible">
-            <div class="collapsible-header" onclick="this.parentElement.classList.toggle('collapsed')">
-                <h3>🏺 Land Items Inventory</h3>
-                <span class="collapse-toggle">▼</span>
-            </div>
-            <div class="collapsible-body" id="land-items-body"></div>
-        </section>
-
-        <!-- === FLAME PER ENVIRONMENT === -->
-        <section class="card flame-input-section">
-            <h3>🔥 Flame Per Environment</h3>
-            <p class="section-desc">Enter the total Flame your Axies produce on each environment type &amp; how many plots you have there.</p>
-            <div id="flame-inputs"></div>
-            <div style="text-align:center; margin-top:1rem;">
-                <button id="optimize-btn" class="btn-primary">⚡ Optimize Land Items</button>
-            </div>
-            <div id="optimize-error" class="error-text" style="margin-top:0.5rem;"></div>
-        </section>
-
-        <!-- === OPTIMIZATION RESULTS === -->
-        <section id="optimization-results" style="display:none;">
-            <h3>📋 Optimization Results</h3>
-            <div id="opt-summary" class="card summary-bar"></div>
-            <div id="opt-details"></div>
-        </section>
-
-    </div>
-
-    <footer class="site-footer">
-        <p>
-            <a href="https://axieinfinity.com" target="_blank">Axie Infinity</a> ·
-            <a href="https://app.axieinfinity.com/profile/" target="_blank">Inventory</a> ·
-            <a href="https://app.axieinfinity.com/terra/" target="_blank">My Land</a> ·
-            <a href="https://flowbot44.github.io/axie-terrarium-charts/" target="_blank">Info Charts</a>
+    <div class="glass-panel">
+        <h2 style="margin-bottom: 1.5rem;">Global Environment State</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+            Enter your plots and the global total flame for each environment to optimize your bAXS output. (Assuming ~14,000 bAXS reward pool per tier for estimation)
         </p>
-        <p class="footer-note">Data fetched <span id="dataset-date">2026-07-05</span>. Not affiliated with Sky Mavis.</p>
-    </footer>
+        <div id="env-inputs"></div>
+        <button id="btn-optimize">Optimize Assignments</button>
+    </div>
+
+    <div id="results-container" style="display: none;">
+        <h2 style="text-align: center; margin-top: 3rem;">Optimization Results</h2>
+        <div class="total-baxs">Total Expected: <span id="total-baxs-val">0</span> bAXS/tick</div>
+        <div class="results-grid" id="plots-grid"></div>
+    </div>
 </div>
-<script src="data.js"></script>
-<script src="land_data.js"></script>
+
+<script src="user_data.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
