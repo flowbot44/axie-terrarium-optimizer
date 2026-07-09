@@ -41,13 +41,13 @@ def fetch_page(query, variables):
         time.sleep(2)
     return None
 
-def fetch_all(query, data_key, fields_callback=None):
+def fetch_all(query, data_key, fields_callback=None, page_size=PAGE_SIZE):
     all_results = []
     total = None
     offset = 0
     while total is None or offset < total:
         print(f"  Fetching {data_key} offset={offset}...", end=" ", flush=True)
-        result = fetch_page(query, {"owner": RONIN, "from": offset, "size": PAGE_SIZE})
+        result = fetch_page(query, {"owner": RONIN, "from": offset, "size": page_size})
         if result is None or "errors" in result:
             print(f"FAILED: {result.get('errors', 'Unknown error')}")
             break
@@ -132,7 +132,7 @@ print("\nFetching Land Items...")
 items = fetch_all(ITEMS_QUERY, "items", process_items)
 
 print("\nFetching Accessories (Equipments)...")
-accessories = fetch_all(EQUIPMENTS_QUERY, "equipments")
+accessories = fetch_all(EQUIPMENTS_QUERY, "equipments", page_size=32)
 
 user_data = {
     "owner": RONIN,
