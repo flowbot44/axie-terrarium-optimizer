@@ -1,11 +1,11 @@
 
 const ENVIRONMENTS = [
-    { key: 'savannah', label: 'Savannah', color: 'var(--savannah)', defaultPlots: 20, defaultFlame: 5000000, rewardPool: 7.59 },
-    { key: 'forest', label: 'Forest', color: 'var(--forest)', defaultPlots: 2, defaultFlame: 12000000, rewardPool: 24.11 },
-    { key: 'arctic', label: 'Arctic', color: 'var(--arctic)', defaultPlots: 8, defaultFlame: 15000000, rewardPool: 54.02 },
-    { key: 'mystic', label: 'Mystic', color: 'var(--mystic)', defaultPlots: 8, defaultFlame: 25000000, rewardPool: 66.67 },
-    { key: 'genesis', label: 'Genesis', color: 'var(--genesis)', defaultPlots: 0, defaultFlame: 50000000, rewardPool: 41.96 },
-    { key: 'luna', label: "Luna's Landing", color: 'var(--luna)', defaultPlots: 0, defaultFlame: 80000000, rewardPool: 13.99 },
+    { key: 'savannah', label: 'Savannah', color: 'var(--savannah)', defaultPlots: 20, defaultFlame: 5000000, rewardPool: 7.59, globalCons: 25, localCons: 30 },
+    { key: 'forest', label: 'Forest', color: 'var(--forest)', defaultPlots: 2, defaultFlame: 12000000, rewardPool: 24.11, globalCons: 75, localCons: 90 },
+    { key: 'arctic', label: 'Arctic', color: 'var(--arctic)', defaultPlots: 8, defaultFlame: 15000000, rewardPool: 54.02, globalCons: 225, localCons: 270 },
+    { key: 'mystic', label: 'Mystic', color: 'var(--mystic)', defaultPlots: 8, defaultFlame: 25000000, rewardPool: 66.67, globalCons: 500, localCons: 600 },
+    { key: 'genesis', label: 'Genesis', color: 'var(--genesis)', defaultPlots: 0, defaultFlame: 50000000, rewardPool: 41.96, globalCons: 10000, localCons: 12000 },
+    { key: 'luna', label: "Luna's Landing", color: 'var(--luna)', defaultPlots: 0, defaultFlame: 80000000, rewardPool: 13.99, globalCons: 30000, localCons: 36000 },
 ];
 
 const COLLECTION_FLAME = {
@@ -22,13 +22,13 @@ const SPECIAL_GENES_MAP = {
 
 const EVOLVED_MULT = [1.0, 1.1, 1.2, 1.3, 1.45, 1.68];
 
-const ITEM_MULT = {
-    savannah: { 's': 1.2, 'default': 1.0 },
-    forest:   { 'f': 1.2, 'default': 1.0 },
-    arctic:   { 'a': 1.2, 'default': 1.0 },
-    mystic:   { 'm': 1.5, 'default': 1.0 },
-    genesis:  { 's': 1.2, 'f': 1.2, 'a': 1.2, 'm': 1.2, 'default': 1.2 },
-    luna:     { 's': 1.5, 'f': 1.5, 'a': 1.5, 'm': 1.5, 'default': 1.5 }
+const ENV_MULT = {
+    savannah: 1.2,
+    forest: 1.2,
+    arctic: 1.2,
+    mystic: 1.5,
+    genesis: 1.2,
+    luna: 1.5
 };
 
 const RARITY_BOOST = { 'Common': 0.0005, 'Rare': 0.0010, 'Epic': 0.0075, 'Mystic': 0.0150 };
@@ -54,7 +54,45 @@ function init() {
     
     renderInputs();
     
+    // Load economy settings
+    const savedBaxs = localStorage.getItem('baxsPrice');
+    if (savedBaxs) document.getElementById('baxs-price').value = savedBaxs;
+    
+    const savedSale = localStorage.getItem('luniumSale');
+    if (savedSale !== null) {
+        document.getElementById('lunium-sale').checked = (savedSale === 'true');
+    }
+    updateLuniumPrice();
+    
     document.getElementById('btn-optimize').addEventListener('click', optimize);
+}
+
+async function fetchAxsPrice() {
+    try {
+        const btn = document.querySelector('button[onclick="fetchAxsPrice()"]');
+        if (btn) btn.textContent = "↻ ...";
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=axie-infinity&vs_currencies=usd');
+        const data = await res.json();
+        const price = data['axie-infinity'].usd;
+        document.getElementById('baxs-price').value = price;
+        localStorage.setItem('baxsPrice', price);
+        if (btn) btn.textContent = "↻ Update";
+    } catch(e) {
+        console.error("Failed to fetch AXS price", e);
+        const btn = document.querySelector('button[onclick="fetchAxsPrice()"]');
+        if (btn) btn.textContent = "Failed!";
+        setTimeout(() => { if (btn) btn.textContent = "↻ Update"; }, 2000);
+    }
+}
+
+function updateLuniumPrice() {
+    const isSale = document.getElementById('lunium-sale').checked;
+    localStorage.setItem('luniumSale', isSale);
+    // Sale: 3,375,000 for $99.99 (50% bonus on 2,250,000)
+    // Regular: 2,250,000 for $99.99
+    const luniumPerPack = isSale ? 3375000 : 2250000;
+    const pricePerLunium = 99.99 / luniumPerPack;
+    document.getElementById('lunium-price').value = pricePerLunium.toFixed(8);
 }
 
 function processAxies() {
@@ -64,22 +102,30 @@ function processAxies() {
         
         if (axie.title === 'Mystic') {
             collection = 'mystic';
-            isMystic = true;
         } else if (axie.title === 'Origin') {
             collection = 'origin';
-        } else if (axie.title === 'MEO Corp') {
+        } else if (axie.title && axie.title.includes('MEO Corp')) {
             collection = 'meo';
         } else if (axie.title === 'Agamogenesis') {
             collection = 'agamo';
-        } else {
-            if (axie.parts) {
-                for (let p of axie.parts) {
-                    if (p.specialGenes) {
-                        let mapped = SPECIAL_GENES_MAP[p.specialGenes.toLowerCase()];
-                        if (mapped) {
-                            if (collection === 'normal' || COLLECTION_FLAME[mapped] > COLLECTION_FLAME[collection]) {
-                                collection = mapped;
-                            }
+        }
+        
+        if (axie.parts) {
+            for (let p of axie.parts) {
+                if (p.specialGenes) {
+                    let sg = p.specialGenes.toLowerCase();
+                    let mapped = null;
+                    if (sg.includes('mystic')) mapped = 'mystic';
+                    else if (sg.includes('japan')) mapped = 'japanese';
+                    else if (sg.includes('xmas')) mapped = 'xmas';
+                    else if (sg.includes('summer')) mapped = 'summer';
+                    else if (sg.includes('nightmare')) mapped = 'nightmare';
+                    
+                    if (sg.includes('shiny')) mapped = 'shiny'; // Shiny overrides base if higher flame
+                    
+                    if (mapped) {
+                        if (collection === 'normal' || COLLECTION_FLAME[mapped] > COLLECTION_FLAME[collection]) {
+                            collection = mapped;
                         }
                     }
                 }
@@ -89,7 +135,8 @@ function processAxies() {
         const base = COLLECTION_FLAME[collection] || 5;
         let evCount = axie.evolvedParts || 0;
         if (evCount > 5) evCount = 5;
-        const mult = EVOLVED_MULT[evCount];
+        const version = document.getElementById('version-select') ? document.getElementById('version-select').value : '1.0';
+        const mult = (version === '1.1') ? EVOLVED_MULT[evCount] : 1.0;
         const flame = base * mult;
         
         return {
@@ -148,6 +195,18 @@ function renderInputs() {
 }
 
 function optimize() {
+    processAxies();
+    const version = document.getElementById('version-select') ? document.getElementById('version-select').value : '1.0';
+    window.terrariumVersion = version;
+    const slipsMult = (version === '1.1') ? 1.10 : 1.0;
+
+    const baxsPrice = parseFloat(document.getElementById('baxs-price').value) || 0;
+    const luniumPrice = parseFloat(document.getElementById('lunium-price').value) || 0;
+    localStorage.setItem('baxsPrice', baxsPrice);
+    localStorage.setItem('luniumPrice', luniumPrice);
+    window.baxsPrice = baxsPrice;
+    window.luniumPrice = luniumPrice;
+    
     const userPlots = [];
     ENVIRONMENTS.forEach(env => {
         const plotsStr = document.getElementById(`plots-${env.key}`).value;
@@ -177,56 +236,51 @@ function optimize() {
         return;
     }
     
-    let availableItems = [...gItems];
+    let availableItems = (version === '1.1') ? [...gItems] : [];
     availableItems.forEach(i => {
         i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005;
-        i.prefix = i.itemAlias ? i.itemAlias.charAt(0).toLowerCase() : 'u';
     });
+    
+    const TIER_ORDER = { luna: 6, genesis: 5, mystic: 4, arctic: 3, forest: 2, savannah: 1 };
+    userPlots.sort((a, b) => TIER_ORDER[b.env.key] - TIER_ORDER[a.env.key]);
     
     userPlots.forEach(plot => {
         let envKey = plot.env.key;
+        let envMult = ENV_MULT[envKey] || 1.0;
+        
+        // Genesis and Luna match all items
+        let isUniversal = (envKey === 'genesis' || envKey === 'luna');
+        
         availableItems.sort((a, b) => {
-            const multA = ITEM_MULT[envKey][a.prefix] || ITEM_MULT[envKey]['default'];
-            const multB = ITEM_MULT[envKey][b.prefix] || ITEM_MULT[envKey]['default'];
-            return (b.baseBoost * multB) - (a.baseBoost * multA);
+            const matchA = (isUniversal || (a.environment && a.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+            const matchB = (isUniversal || (b.environment && b.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+            const finalA = a.baseBoost * matchA;
+            const finalB = b.baseBoost * matchB;
+            return finalB - finalA;
         });
         
-        const itemsToTake = Math.min(8, availableItems.length);
-        plot.items = availableItems.splice(0, itemsToTake);
-        
         let boost = 0;
+        plot.items = [];
+        for (let j = 0; j < 8; j++) {
+            if (availableItems.length > 0) {
+                let item = availableItems.shift();
+                plot.items.push(item);
+            }
+        }
+        
         plot.items.forEach(i => {
-            const mult = ITEM_MULT[envKey][i.prefix] || ITEM_MULT[envKey]['default'];
-            i.finalBoost = i.baseBoost * mult;
+            const match = (isUniversal || (i.environment && i.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+            i.finalBoost = i.baseBoost * match;
             boost += i.finalBoost;
         });
         plot.itemBoost = boost;
     });
     
-    let axieIndex = 0;
-    
-    while (axieIndex < gAxies.length) {
-        let bestPlot = null;
-        let bestMarginalBaxs = -1;
-        
-        for (let plot of userPlots) {
-            if (plot.axies.length >= 30) continue;
-            const marginalVal = (1 + plot.itemBoost) * 1.10 * (plot.rewardPool / plot.globalFlame); // Factor in 10% fortune buff
-            if (marginalVal > bestMarginalBaxs) {
-                bestMarginalBaxs = marginalVal;
-                bestPlot = plot;
-            }
-        }
-        
-        if (!bestPlot) break;
-        bestPlot.axies.push(gAxies[axieIndex]);
-        axieIndex++;
-    }
-    
-    const sortedAccessories = [...gAccessories].sort((a, b) => {
+    // 1. Assign accessories to the top Axies
+    const sortedAccessories = (version === '1.1') ? [...gAccessories].sort((a, b) => {
         const rarities = { 'Mystic': 4, 'Epic': 3, 'Rare': 2, 'Common': 1 };
         return (rarities[b.rarity] || 0) - (rarities[a.rarity] || 0);
-    });
+    }) : [];
     
     let accAssignments = [];
     for (let i = 0; i < sortedAccessories.length && i < gAxies.length; i++) {
@@ -236,25 +290,191 @@ function optimize() {
         });
     }
     
-    userPlots.forEach(plot => {
-        plot.baseFlame = 0;
-        for (let axie of plot.axies) {
-            let axieFlame = axie.flame;
-            // Add accessory boost if equipped to this axie
-            let eq = accAssignments.find(a => a.axie.id === axie.id);
-            if (eq) {
-                // Approximate matrix from Normal
-                if (eq.accessory.rarity === 'Common') axieFlame += 0.1;
-                else if (eq.accessory.rarity === 'Rare') axieFlame += 0.3;
-                else if (eq.accessory.rarity === 'Epic') axieFlame += 1.0;
-                else if (eq.accessory.rarity === 'Mystic') axieFlame += 3.0;
-            }
-            plot.baseFlame += axieFlame;
+    // 2. Compute effective flame for all Axies
+    let axiesWithFlame = gAxies.map(axie => {
+        let axieFlame = axie.flame;
+        let eq = accAssignments.find(a => a.axie.id === axie.id);
+        if (eq) {
+            if (eq.accessory.rarity === 'Common') axieFlame += 0.1;
+            else if (eq.accessory.rarity === 'Rare') axieFlame += 0.3;
+            else if (eq.accessory.rarity === 'Epic') axieFlame += 1.0;
+            else if (eq.accessory.rarity === 'Mystic') axieFlame += 3.0;
         }
-        // Plot Flame = Base * (1 + ItemBoost) * (1 + FortuneBuff)
-        plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost) * 1.10);
-        plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
+        return { ...axie, effectiveFlame: axieFlame };
     });
+    
+    // Sort Axies by effective flame descending
+    axiesWithFlame.sort((a, b) => b.effectiveFlame - a.effectiveFlame);
+    
+    // 3. Group Axies into chunks of 30
+    let chunks = [];
+    for (let i = 0; i < axiesWithFlame.length; i += 30) {
+        let chunkAxies = axiesWithFlame.slice(i, i + 30);
+        let chunkFlame = chunkAxies.reduce((sum, a) => sum + a.effectiveFlame, 0);
+        chunks.push({ axies: chunkAxies, baseFlame: chunkFlame });
+    }
+    
+    // 4. Assign chunks to the most profitable plot
+    let availablePlots = [...userPlots];
+    
+    for (let chunk of chunks) {
+        let bestPlot = null;
+        let bestPlotIndex = -1;
+        let bestProfit = -Infinity;
+        
+        let eligiblePlots = [];
+        
+        for (let j = 0; j < availablePlots.length; j++) {
+            let plot = availablePlots[j];
+            let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * slipsMult);
+            let expectedBaxs = (finalFlame / plot.globalFlame) * plot.rewardPool;
+            let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
+            
+            let netProfit;
+            let passiveProfit;
+            let threshold;
+            let globalCost = 0;
+            
+            if (window.baxsPrice > 0) {
+                let baxsRevenue = expectedBaxs * window.baxsPrice;
+                let globalCons = plot.env.globalCons || 0;
+                globalCost = globalCons * window.luniumPrice;
+                netProfit = baxsRevenue - globalCost;
+                passiveProfit = passiveBaxs * window.baxsPrice;
+                threshold = passiveProfit + (globalCost * 0.25); // Require margin of 1/4 of global cost
+            } else {
+                netProfit = expectedBaxs; // Fallback if prices are 0
+                passiveProfit = passiveBaxs;
+                threshold = passiveBaxs;
+            }
+            
+            if (netProfit > 0 && netProfit > threshold) {
+                eligiblePlots.push({
+                    index: j,
+                    plot: plot,
+                    netProfit: netProfit,
+                    globalCost: globalCost
+                });
+            }
+        }
+        
+        if (eligiblePlots.length > 0) {
+            let maxProfit = Math.max(...eligiblePlots.map(p => p.netProfit));
+            let competitivePlots = eligiblePlots.filter(p => p.netProfit >= maxProfit - 0.001);
+            
+            // Sort by cost ascending, then by profit descending
+            competitivePlots.sort((a, b) => {
+                if (a.globalCost !== b.globalCost) {
+                    return a.globalCost - b.globalCost;
+                }
+                return b.netProfit - a.netProfit;
+            });
+            
+            bestPlot = competitivePlots[0].plot;
+            bestPlotIndex = competitivePlots[0].index;
+            bestProfit = competitivePlots[0].netProfit;
+        }
+        
+        // Only assign if it's profitable and better than passive
+        if (bestPlot && bestProfit > 0) {
+            bestPlot.axies = chunk.axies;
+            bestPlot.baseFlame = chunk.baseFlame;
+            bestPlot.finalFlame = Math.floor(chunk.baseFlame * (1 + bestPlot.itemBoost) * slipsMult);
+            bestPlot.expectedBaxs = (bestPlot.finalFlame / bestPlot.globalFlame) * bestPlot.rewardPool;
+            availablePlots.splice(bestPlotIndex, 1);
+        } else {
+            // No profitable plots left for remaining chunks
+            break;
+        }
+    }
+    
+    // 5. Re-assign items based on the actual base flame of the assigned Axie teams
+    availableItems = (version === '1.1') ? [...gItems] : [];
+    availableItems.forEach(i => {
+        i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005;
+    });
+    
+    // Sort active plots by baseFlame descending, so strongest Axie teams get best items
+    let activePlots = userPlots.filter(p => p.axies.length > 0);
+    activePlots.sort((a, b) => b.baseFlame - a.baseFlame);
+    
+    let passivePlots = userPlots.filter(p => p.axies.length === 0);
+    
+    // Helper function to assign items to a sorted list of plots
+    const distributeItems = (plotList) => {
+        plotList.forEach(plot => {
+            plot.items = [];
+            let envKey = plot.env.key;
+            let envMult = ENV_MULT[envKey] || 1.0;
+            let isUniversal = (envKey === 'genesis' || envKey === 'luna');
+            
+            availableItems.sort((a, b) => {
+                const matchA = (isUniversal || (a.environment && a.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+                const matchB = (isUniversal || (b.environment && b.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+                return (b.baseBoost * matchB) - (a.baseBoost * matchA);
+            });
+            
+            let boost = 0;
+            for (let j = 0; j < 8; j++) {
+                if (availableItems.length > 0) {
+                    let item = availableItems.shift();
+                    plot.items.push(item);
+                    const match = (isUniversal || (item.environment && item.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+                    item.finalBoost = item.baseBoost * match;
+                    boost += item.finalBoost;
+                }
+            }
+            plot.itemBoost = boost;
+            if (plot.axies.length > 0) {
+                plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost) * slipsMult);
+                plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
+            }
+        });
+    };
+    
+    let stable = false;
+    while (!stable) {
+        // Reset available items for redistribution
+        availableItems = (version === '1.1') ? [...gItems] : [];
+        availableItems.forEach(i => i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005);
+        
+        distributeItems(activePlots);
+        
+        stable = true;
+        for (let i = activePlots.length - 1; i >= 0; i--) {
+            let plot = activePlots[i];
+            let globalCons = plot.env.globalCons || 0;
+            let globalCost = globalCons * window.luniumPrice;
+            let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
+            
+            let netProfit;
+            let threshold;
+            if (window.baxsPrice > 0) {
+                netProfit = (plot.expectedBaxs * window.baxsPrice) - globalCost;
+                let passiveProfit = passiveBaxs * window.baxsPrice;
+                threshold = passiveProfit + (globalCost * 0.25);
+            } else {
+                netProfit = plot.expectedBaxs;
+                threshold = passiveBaxs;
+            }
+            
+            if (netProfit <= threshold) {
+                plot.axies = [];
+                plot.baseFlame = 0;
+                plot.finalFlame = 0;
+                plot.expectedBaxs = 0;
+                plot.items = [];
+                plot.itemBoost = 0;
+                passivePlots.push(plot);
+                activePlots.splice(i, 1);
+                stable = false; // Need to redistribute items among remaining plots
+            }
+        }
+    }
+    distributeItems(passivePlots); // Give leftover items to passive plots
+    
+    // Sort all plots by final flame power descending for rendering
+    userPlots.sort((a, b) => b.finalFlame - a.finalFlame);
     
     renderResults(userPlots, accAssignments);
 }
@@ -291,6 +511,8 @@ function renderResults(plots, accAssignments) {
     let totalSlips = 0;
     
     plots.forEach((plot, index) => {
+        if (plot.axies.length === 0) return;
+        
         totalBaxs += plot.expectedBaxs;
         let slipsCost = FORTUNE_SLIPS[plot.env.key] || 0;
         totalSlips += slipsCost;
@@ -305,9 +527,17 @@ function renderResults(plots, accAssignments) {
         // Show just the top 5 axies to keep it clean, or all of them in a scrollable list
         let axiesHtml = plot.axies.map(a => `<li>${a.name} (${a.flame.toFixed(1)} Flame)</li>`).join('');
         
+        let globalCons = plot.env.globalCons || 0;
+        let localCons = plot.env.localCons || 0;
+        let baxsRevenue = plot.expectedBaxs * (window.baxsPrice || 0);
+        let globalCost = globalCons * (window.luniumPrice || 0);
+        let netGlobal = baxsRevenue - globalCost;
+        let profitColor = netGlobal < 0 ? '#e74c3c' : (netGlobal < 0.05 ? '#f39c12' : '#2ecc71');
+        
         card.innerHTML = `
             <div class="plot-summary" style="cursor: pointer;" onclick="toggleDetails(this)">
                 <div class="plot-title">${plot.env.label} Plot #${index + 1} <span style="font-size: 0.8em; opacity: 0.7;">(Click for details)</span></div>
+                ${window.terrariumVersion === '1.1' ? `
                 <div class="plot-detail">
                     <span class="label">Item Boost</span>
                     <span style="color: #2ecc71;">+${(plot.itemBoost * 100).toFixed(2)}%</span>
@@ -316,6 +546,7 @@ function renderResults(plots, accAssignments) {
                     <span class="label">Fortune Slips Buff</span>
                     <span style="color: #f1c40f;">+10% (-${slipsCost}/day)</span>
                 </div>
+                ` : ''}
                 <div class="plot-detail">
                     <span class="label">Working Axies</span>
                     <span>${plot.axies.length}</span>
@@ -328,14 +559,32 @@ function renderResults(plots, accAssignments) {
                     <span class="label" style="color: #3498db;">Expected Reward</span>
                     <span style="color: #3498db; font-weight: 800;">~${plot.expectedBaxs.toFixed(2)} bAXS</span>
                 </div>
+                <div class="plot-detail" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem; margin-top: 0.5rem;">
+                    <span class="label">Earnings ($)</span>
+                    <span style="color: #2ecc71;">+$${baxsRevenue.toFixed(3)}</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label">Global Lunium Cost ($)</span>
+                    <span style="color: #e74c3c;">-$${globalCost.toFixed(3)} (${globalCons}/Tick)</span>
+                </div>
+                <div class="plot-detail" style="margin-bottom: 0.5rem;">
+                    <span class="label">Global Net Profit ($)</span>
+                    <span style="color: ${profitColor}; font-weight: bold;">$${netGlobal.toFixed(3)}</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label" style="font-size: 0.75em; color: var(--text-secondary);">Local Lunium Cons.</span>
+                    <span style="font-size: 0.75em; color: var(--text-secondary);">${localCons}/Tick (Free Limit)</span>
+                </div>
             </div>
             <div class="plot-expanded" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.1);">
+                ${window.terrariumVersion === '1.1' ? `
                 <div style="margin-bottom: 1rem;">
                     <strong>Land Items (${plot.items.length}/8)</strong>
                     <ul style="color: var(--text-secondary); margin-left: 1.2rem; font-size: 0.85rem; margin-top: 0.3rem;">
                         ${itemsHtml}
                     </ul>
                 </div>
+                ` : ''}
                 <div>
                     <strong>Assigned Axies (${plot.axies.length}/30)</strong>
                     <ul style="color: var(--text-secondary); margin-left: 1.2rem; font-size: 0.85rem; margin-top: 0.3rem; max-height: 150px; overflow-y: auto;">
@@ -348,7 +597,61 @@ function renderResults(plots, accAssignments) {
         container.appendChild(card);
     });
     
-    document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(2)} <span style="font-size:0.6em; color:var(--text-secondary); font-weight:normal;">(Costs ${totalSlips} Slips/day)</span>`;
+    let passivePlots = plots.filter(p => p.axies.length === 0);
+    if (passivePlots.length > 0) {
+        const passiveHeader = document.createElement('div');
+        passiveHeader.style.gridColumn = '1 / -1';
+        passiveHeader.style.marginTop = '2rem';
+        passiveHeader.innerHTML = `
+            <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: var(--text-primary); font-size: 1.2rem;">Passive Plots (Unused)</h3>
+                <p style="margin: 0.2rem 0 0 0; color: var(--text-secondary); font-size: 0.9rem;">
+                    These plots are more profitable running passively on free Local Lunium. (150 Base Flame, 16.6% Uptime)
+                </p>
+            </div>
+        `;
+        container.appendChild(passiveHeader);
+        
+        let totalPassiveBaxs = 0;
+        passivePlots.forEach((plot, index) => {
+            let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
+            let passiveRevenue = passiveBaxs * (window.baxsPrice || 0);
+            totalPassiveBaxs += passiveBaxs;
+            
+            const pCard = document.createElement('div');
+            pCard.className = 'plot-card';
+            pCard.style.borderTopColor = plot.env.color;
+            pCard.style.opacity = '0.85';
+            
+            pCard.innerHTML = `
+                <div class="plot-title">${plot.env.label} Plot (Passive)</div>
+                <div class="plot-detail">
+                    <span class="label">Assumed FP</span>
+                    <span>150</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label">Uptime (Local Lunium)</span>
+                    <span>16.67% (1 Day On / 5 Off)</span>
+                </div>
+                <div class="plot-detail" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem; margin-top: 0.5rem;">
+                    <span class="label" style="color: #3498db;">Passive Reward</span>
+                    <span style="color: #3498db; font-weight: bold;">~${passiveBaxs.toFixed(3)} bAXS</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label">Earnings ($)</span>
+                    <span style="color: #2ecc71;">+$${passiveRevenue.toFixed(3)}</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label">Global Cost ($)</span>
+                    <span style="color: #bdc3c7;">$0.00 (Free)</span>
+                </div>
+            `;
+            container.appendChild(pCard);
+        });
+    }
+    
+    const slipsText = (window.terrariumVersion === '1.1') ? ` <span style="font-size:0.6em; color:var(--text-secondary); font-weight:normal;">(Costs ${totalSlips} Slips/day)</span>` : '';
+    document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(2)}${slipsText}`;
     document.getElementById('results-container').style.display = 'block';
 }
 
