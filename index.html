@@ -15,8 +15,14 @@
     </header>
 
     <div class="glass-panel" id="collection-stats">
-        <h2>Your Collection</h2>
-        <div class="grid-2" style="margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0;">Your Collection</h2>
+            <select id="version-select" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.4rem 0.8rem; border-radius: 8px; font-family: 'Inter', sans-serif;">
+                <option value="1.0" selected>Version 1.0 (Current)</option>
+                <option value="1.1">Version 1.1 (Upcoming)</option>
+            </select>
+        </div>
+        <div class="grid-2">
             <div class="stat-box">
                 <div class="stat-value" id="stat-axies">0</div>
                 <div class="stat-label">Total Axies</div>

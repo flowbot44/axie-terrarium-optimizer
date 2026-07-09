@@ -127,7 +127,8 @@ function processAxies() {
         const base = COLLECTION_FLAME[collection] || 5;
         let evCount = axie.evolvedParts || 0;
         if (evCount > 5) evCount = 5;
-        const mult = EVOLVED_MULT[evCount];
+        const version = document.getElementById('version-select') ? document.getElementById('version-select').value : '1.0';
+        const mult = (version === '1.1') ? EVOLVED_MULT[evCount] : 1.0;
         const flame = base * mult;
         
         return {
@@ -186,6 +187,11 @@ function renderInputs() {
 }
 
 function optimize() {
+    processAxies();
+    const version = document.getElementById('version-select') ? document.getElementById('version-select').value : '1.0';
+    window.terrariumVersion = version;
+    const slipsMult = (version === '1.1') ? 1.10 : 1.0;
+
     const baxsPrice = parseFloat(document.getElementById('baxs-price').value) || 0;
     const luniumPrice = parseFloat(document.getElementById('lunium-price').value) || 0;
     localStorage.setItem('baxsPrice', baxsPrice);
@@ -222,7 +228,7 @@ function optimize() {
         return;
     }
     
-    let availableItems = [...gItems];
+    let availableItems = (version === '1.1') ? [...gItems] : [];
     availableItems.forEach(i => {
         i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005;
     });
@@ -263,10 +269,10 @@ function optimize() {
     });
     
     // 1. Assign accessories to the top Axies
-    const sortedAccessories = [...gAccessories].sort((a, b) => {
+    const sortedAccessories = (version === '1.1') ? [...gAccessories].sort((a, b) => {
         const rarities = { 'Mystic': 4, 'Epic': 3, 'Rare': 2, 'Common': 1 };
         return (rarities[b.rarity] || 0) - (rarities[a.rarity] || 0);
-    });
+    }) : [];
     
     let accAssignments = [];
     for (let i = 0; i < sortedAccessories.length && i < gAxies.length; i++) {
@@ -310,7 +316,7 @@ function optimize() {
         
         for (let j = 0; j < availablePlots.length; j++) {
             let plot = availablePlots[j];
-            let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * 1.10);
+            let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * slipsMult);
             let expectedBaxs = (finalFlame / plot.globalFlame) * plot.rewardPool;
             let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
             
@@ -341,7 +347,7 @@ function optimize() {
         if (bestPlot && bestProfit > 0) {
             bestPlot.axies = chunk.axies;
             bestPlot.baseFlame = chunk.baseFlame;
-            bestPlot.finalFlame = Math.floor(chunk.baseFlame * (1 + bestPlot.itemBoost) * 1.10);
+            bestPlot.finalFlame = Math.floor(chunk.baseFlame * (1 + bestPlot.itemBoost) * slipsMult);
             bestPlot.expectedBaxs = (bestPlot.finalFlame / bestPlot.globalFlame) * bestPlot.rewardPool;
             availablePlots.splice(bestPlotIndex, 1);
         } else {
@@ -351,7 +357,7 @@ function optimize() {
     }
     
     // 5. Re-assign items based on the actual base flame of the assigned Axie teams
-    availableItems = [...gItems];
+    availableItems = (version === '1.1') ? [...gItems] : [];
     availableItems.forEach(i => {
         i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005;
     });
@@ -388,7 +394,7 @@ function optimize() {
             }
             plot.itemBoost = boost;
             if (plot.axies.length > 0) {
-                plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost) * 1.10);
+                plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost) * slipsMult);
                 plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
             }
         });
@@ -499,6 +505,7 @@ function renderResults(plots, accAssignments) {
         card.innerHTML = `
             <div class="plot-summary" style="cursor: pointer;" onclick="toggleDetails(this)">
                 <div class="plot-title">${plot.env.label} Plot #${index + 1} <span style="font-size: 0.8em; opacity: 0.7;">(Click for details)</span></div>
+                ${window.terrariumVersion === '1.1' ? `
                 <div class="plot-detail">
                     <span class="label">Item Boost</span>
                     <span style="color: #2ecc71;">+${(plot.itemBoost * 100).toFixed(2)}%</span>
@@ -507,6 +514,7 @@ function renderResults(plots, accAssignments) {
                     <span class="label">Fortune Slips Buff</span>
                     <span style="color: #f1c40f;">+10% (-${slipsCost}/day)</span>
                 </div>
+                ` : ''}
                 <div class="plot-detail">
                     <span class="label">Working Axies</span>
                     <span>${plot.axies.length}</span>
@@ -537,12 +545,14 @@ function renderResults(plots, accAssignments) {
                 </div>
             </div>
             <div class="plot-expanded" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.1);">
+                ${window.terrariumVersion === '1.1' ? `
                 <div style="margin-bottom: 1rem;">
                     <strong>Land Items (${plot.items.length}/8)</strong>
                     <ul style="color: var(--text-secondary); margin-left: 1.2rem; font-size: 0.85rem; margin-top: 0.3rem;">
                         ${itemsHtml}
                     </ul>
                 </div>
+                ` : ''}
                 <div>
                     <strong>Assigned Axies (${plot.axies.length}/30)</strong>
                     <ul style="color: var(--text-secondary); margin-left: 1.2rem; font-size: 0.85rem; margin-top: 0.3rem; max-height: 150px; overflow-y: auto;">
@@ -608,7 +618,8 @@ function renderResults(plots, accAssignments) {
         });
     }
     
-    document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(2)} <span style="font-size:0.6em; color:var(--text-secondary); font-weight:normal;">(Costs ${totalSlips} Slips/day)</span>`;
+    const slipsText = (window.terrariumVersion === '1.1') ? ` <span style="font-size:0.6em; color:var(--text-secondary); font-weight:normal;">(Costs ${totalSlips} Slips/day)</span>` : '';
+    document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(2)}${slipsText}`;
     document.getElementById('results-container').style.display = 'block';
 }
 
