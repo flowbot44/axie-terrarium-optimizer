@@ -227,6 +227,9 @@ function optimize() {
         i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005;
     });
     
+    const TIER_ORDER = { luna: 6, genesis: 5, mystic: 4, arctic: 3, forest: 2, savannah: 1 };
+    userPlots.sort((a, b) => TIER_ORDER[b.env.key] - TIER_ORDER[a.env.key]);
+    
     userPlots.forEach(plot => {
         let envKey = plot.env.key;
         let envMult = ENV_MULT[envKey] || 1.0;
