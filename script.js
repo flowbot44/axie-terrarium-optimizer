@@ -350,7 +350,54 @@ function optimize() {
         }
     }
     
-    // Sort plots by final flame power descending
+    // 5. Re-assign items based on the actual base flame of the assigned Axie teams
+    availableItems = [...gItems];
+    availableItems.forEach(i => {
+        i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005;
+    });
+    
+    // Sort active plots by baseFlame descending, so strongest Axie teams get best items
+    let activePlots = userPlots.filter(p => p.axies.length > 0);
+    activePlots.sort((a, b) => b.baseFlame - a.baseFlame);
+    
+    let passivePlots = userPlots.filter(p => p.axies.length === 0);
+    
+    // Helper function to assign items to a sorted list of plots
+    const distributeItems = (plotList) => {
+        plotList.forEach(plot => {
+            plot.items = [];
+            let envKey = plot.env.key;
+            let envMult = ENV_MULT[envKey] || 1.0;
+            let isUniversal = (envKey === 'genesis' || envKey === 'luna');
+            
+            availableItems.sort((a, b) => {
+                const matchA = (isUniversal || (a.environment && a.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+                const matchB = (isUniversal || (b.environment && b.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+                return (b.baseBoost * matchB) - (a.baseBoost * matchA);
+            });
+            
+            let boost = 0;
+            for (let j = 0; j < 8; j++) {
+                if (availableItems.length > 0) {
+                    let item = availableItems.shift();
+                    plot.items.push(item);
+                    const match = (isUniversal || (item.environment && item.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+                    item.finalBoost = item.baseBoost * match;
+                    boost += item.finalBoost;
+                }
+            }
+            plot.itemBoost = boost;
+            if (plot.axies.length > 0) {
+                plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost) * 1.10);
+                plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
+            }
+        });
+    };
+    
+    distributeItems(activePlots);
+    distributeItems(passivePlots); // Give leftover items to passive plots
+    
+    // Sort all plots by final flame power descending for rendering
     userPlots.sort((a, b) => b.finalFlame - a.finalFlame);
     
     renderResults(userPlots, accAssignments);
