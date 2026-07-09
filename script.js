@@ -70,18 +70,18 @@ function init() {
 async function fetchAxsPrice() {
     try {
         const btn = document.querySelector('button[onclick="fetchAxsPrice()"]');
-        if (btn) btn.textContent = "Fetching...";
+        if (btn) btn.textContent = "↻ ...";
         const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=axie-infinity&vs_currencies=usd');
         const data = await res.json();
         const price = data['axie-infinity'].usd;
         document.getElementById('baxs-price').value = price;
         localStorage.setItem('baxsPrice', price);
-        if (btn) btn.textContent = "Fetch Live AXS Price";
+        if (btn) btn.textContent = "↻ Update";
     } catch(e) {
         console.error("Failed to fetch AXS price", e);
         const btn = document.querySelector('button[onclick="fetchAxsPrice()"]');
         if (btn) btn.textContent = "Failed!";
-        setTimeout(() => { if (btn) btn.textContent = "Fetch Live AXS Price"; }, 2000);
+        setTimeout(() => { if (btn) btn.textContent = "↻ Update"; }, 2000);
     }
 }
 
