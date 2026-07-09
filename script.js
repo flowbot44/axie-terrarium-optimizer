@@ -265,3 +265,120 @@ function renderResults(plots, accAssignments) {
 }
 
 window.onload = init;
+window.onload = init;
+
+// ================= LIVE FETCH LOGIC =================
+document.getElementById('btn-sync').addEventListener('click', async () => {
+    const address = document.getElementById('ronin-address').value.trim();
+    const apiKey = document.getElementById('api-key').value.trim();
+    const statusDiv = document.getElementById('sync-status');
+    
+    if (!address || !apiKey) {
+        alert("Please provide both Ronin Address and API Key.");
+        return;
+    }
+    
+    statusDiv.textContent = "Fetching Axies...";
+    
+    const URL = "https://graphql-gateway.axieinfinity.com/graphql";
+    const HEADERS = {
+        "Content-Type": "application/json",
+        "X-API-Key": apiKey
+    };
+    
+    async function fetchGraphQL(query, variables) {
+        const res = await fetch(URL, {
+            method: 'POST',
+            headers: HEADERS,
+            body: JSON.stringify({ query, variables })
+        });
+        const data = await res.json();
+        if (data.errors) throw new Error(data.errors[0].message);
+        return data.data;
+    }
+    
+    try {
+        let axies = [];
+        let offset = 0;
+        let totalAxies = null;
+        
+        const axieQuery = `query GetAxies($owner: String!, $from: Int!, $size: Int!) {
+          axies(owner: $owner, from: $from, size: $size) {
+            total
+            results {
+              id name stage class breedCount image title
+              parts { id name class type specialGenes }
+            }
+          }
+        }`;
+        
+        while (totalAxies === null || offset < totalAxies) {
+            statusDiv.textContent = `Fetching Axies (${offset}/${totalAxies || '?'})...`;
+            const data = await fetchGraphQL(axieQuery, { owner: address, from: offset, size: 50 });
+            totalAxies = data.axies.total;
+            
+            data.axies.results.forEach(axie => {
+                let evCount = 0;
+                if (axie.parts) {
+                    axie.parts.forEach(p => {
+                        if (p.id && (p.id.includes("level-2") || p.id.includes("level-3") || 
+                            p.id.includes("level-4") || p.id.includes("level-5"))) {
+                            evCount++;
+                        }
+                    });
+                }
+                axie.evolvedParts = Math.min(evCount, 5);
+            });
+            
+            axies = axies.concat(data.axies.results);
+            offset += 50;
+        }
+        
+        let items = [];
+        offset = 0;
+        let totalItems = null;
+        
+        const itemQuery = `query GetItems($owner: String!, $from: Int!, $size: Int!) {
+          items(owner: $owner, from: $from, size: $size) {
+            total
+            results { id name itemAlias rarity }
+          }
+        }`;
+        
+        while (totalItems === null || offset < totalItems) {
+            statusDiv.textContent = `Fetching Land Items (${offset}/${totalItems || '?'})...`;
+            const data = await fetchGraphQL(itemQuery, { owner: address, from: offset, size: 50 });
+            totalItems = data.items.total;
+            items = items.concat(data.items.results);
+            offset += 50;
+        }
+        
+        let accessories = [];
+        offset = 0;
+        let totalAcc = null;
+        
+        const accQuery = `query GetEquipments($owner: String!, $from: Int!, $size: Int!) {
+          equipments(owner: $owner, from: $from, size: $size) {
+            total
+            results { id name rarity alias }
+          }
+        }`;
+        
+        while (totalAcc === null || offset < totalAcc) {
+            statusDiv.textContent = `Fetching Accessories (${offset}/${totalAcc || '?'})...`;
+            const data = await fetchGraphQL(accQuery, { owner: address, from: offset, size: 32 });
+            totalAcc = data.equipments.total;
+            accessories = accessories.concat(data.equipments.results);
+            offset += 32;
+        }
+        
+        statusDiv.textContent = `Success! Loaded ${axies.length} Axies, ${items.length} Items, and ${accessories.length} Accessories.`;
+        
+        window.USER_DATA = { owner: address, axies, items, accessories };
+        init();
+        
+    } catch (err) {
+        console.error(err);
+        statusDiv.textContent = `Error: ${err.message}`;
+    }
+});
