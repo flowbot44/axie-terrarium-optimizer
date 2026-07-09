@@ -28,6 +28,7 @@ const EVOLVED_MULT = [1.0, 1.1, 1.2, 1.3, 1.45, 1.68]; // 0=1 part, 5=6 parts
 
 let gAxies = [];
 let gItems = [];
+let gAccessories = [];
 
 function init() {
     if (typeof USER_DATA === 'undefined') {
@@ -39,7 +40,8 @@ function init() {
     document.getElementById('stat-items').textContent = USER_DATA.items.length;
     
     processAxies();
-    gItems = USER_DATA.items;
+    gItems = USER_DATA.items || [];
+    gAccessories = USER_DATA.accessories || [];
     
     renderInputs();
     
@@ -176,17 +178,45 @@ function optimize() {
             plot.baseFlame += axie.flame;
         }
         plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost));
-        // bAXS = (Plot Flame / (Global Flame + Plot Flame - Previous Plot Flame?))
-        // Since Global Flame usually already includes your previous setup, we'll just use simple division
         plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
     });
     
-    renderResults(userPlots);
+    // 5. Assign Accessories (greedy)
+    const sortedAccessories = [...gAccessories].sort((a, b) => {
+        const rarities = { 'Mystic': 4, 'Epic': 3, 'Rare': 2, 'Common': 1 };
+        return (rarities[b.rarity] || 0) - (rarities[a.rarity] || 0);
+    });
+    
+    let accAssignments = [];
+    for (let i = 0; i < sortedAccessories.length && i < gAxies.length; i++) {
+        accAssignments.push({
+            accessory: sortedAccessories[i],
+            axie: gAxies[i]
+        });
+    }
+    
+    renderResults(userPlots, accAssignments);
 }
 
-function renderResults(plots) {
+function renderResults(plots, accAssignments) {
     const container = document.getElementById('plots-grid');
     container.innerHTML = '';
+    
+    // Accessory layout
+    if (accAssignments.length > 0) {
+        const accSection = document.createElement('div');
+        accSection.className = 'plot-card';
+        accSection.style.gridColumn = '1 / -1';
+        accSection.style.borderTopColor = 'var(--mystic)';
+        
+        let html = '<div class="plot-title">💎 Accessory Assignments</div><ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-bottom: 1rem;">';
+        accAssignments.forEach(a => {
+            html += \`<li>Equip <strong>\${a.accessory.name}</strong> (\${a.accessory.rarity}) to <strong>\${a.axie.name}</strong> (\${a.axie.flame} Base Flame)</li>\`;
+        });
+        html += '</ul>';
+        accSection.innerHTML = html;
+        container.appendChild(accSection);
+    }
     
     let totalBaxs = 0;
     
@@ -213,6 +243,9 @@ function renderResults(plots) {
             <div class="plot-detail">
                 <span class="label">Land Items</span>
                 <span>${plot.items.length} / 8</span>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                ${plot.items.length > 0 ? plot.items.map(i => `${i.name} (+${(i.boost*100)}%)`).join(', ') : 'None'}
             </div>
             <div class="plot-detail">
                 <span class="label">Item Boost</span>
