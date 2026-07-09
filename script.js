@@ -122,21 +122,21 @@ function processAxies() {
         
         if (axie.parts) {
             for (let p of axie.parts) {
-                if (p.specialGenes) {
-                    let sg = p.specialGenes.toLowerCase();
-                    let mapped = null;
-                    if (sg.includes('mystic')) mapped = 'mystic';
-                    else if (sg.includes('japan')) mapped = 'japanese';
-                    else if (sg.includes('xmas')) mapped = 'xmas';
-                    else if (sg.includes('summer')) mapped = 'summer';
-                    else if (sg.includes('nightmare')) mapped = 'nightmare';
-                    
-                    if (sg.includes('shiny')) mapped = 'shiny'; // Shiny overrides base if higher flame
-                    
-                    if (mapped) {
-                        if (collection === 'normal' || COLLECTION_FLAME[mapped] > COLLECTION_FLAME[collection]) {
-                            collection = mapped;
-                        }
+                let sg = p.specialGenes ? p.specialGenes.toLowerCase() : '';
+                let pname = p.name ? p.name.toLowerCase() : '';
+                let mapped = null;
+                
+                if (sg.includes('mystic')) mapped = 'mystic';
+                else if (sg.includes('japan')) mapped = 'japanese';
+                else if (sg.includes('xmas')) mapped = 'xmas';
+                else if (sg.includes('summer')) mapped = 'summer';
+                else if (sg.includes('nightmare')) mapped = 'nightmare';
+                
+                if (sg.includes('shiny') || pname.includes('shiny')) mapped = 'shiny'; // Shiny overrides base if higher flame
+                
+                if (mapped) {
+                    if (collection === 'normal' || COLLECTION_FLAME[mapped] > COLLECTION_FLAME[collection]) {
+                        collection = mapped;
                     }
                 }
             }
