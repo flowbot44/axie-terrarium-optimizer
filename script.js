@@ -298,25 +298,29 @@ function optimize() {
             let plot = availablePlots[j];
             let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * 1.10);
             let expectedBaxs = (finalFlame / plot.globalFlame) * plot.rewardPool;
+            let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
             
             let netProfit;
+            let passiveProfit;
             if (window.baxsPrice > 0) {
                 let baxsRevenue = expectedBaxs * window.baxsPrice;
                 let globalCons = plot.env.globalCons || 0;
                 let globalCost = globalCons * window.luniumPrice;
                 netProfit = baxsRevenue - globalCost;
+                passiveProfit = passiveBaxs * window.baxsPrice;
             } else {
                 netProfit = expectedBaxs; // Fallback if prices are 0
+                passiveProfit = passiveBaxs;
             }
             
-            if (netProfit > bestProfit) {
+            if (netProfit > bestProfit && netProfit > passiveProfit) {
                 bestProfit = netProfit;
                 bestPlot = plot;
                 bestPlotIndex = j;
             }
         }
         
-        // Only assign if it's profitable
+        // Only assign if it's profitable and better than passive
         if (bestPlot && bestProfit > 0) {
             bestPlot.axies = chunk.axies;
             bestPlot.baseFlame = chunk.baseFlame;
@@ -448,6 +452,60 @@ function renderResults(plots, accAssignments) {
         
         container.appendChild(card);
     });
+    
+    let passivePlots = plots.filter(p => p.axies.length === 0);
+    if (passivePlots.length > 0) {
+        const passiveHeader = document.createElement('div');
+        passiveHeader.style.gridColumn = '1 / -1';
+        passiveHeader.style.marginTop = '2rem';
+        passiveHeader.innerHTML = `
+            <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: var(--text-primary); font-size: 1.2rem;">Passive Plots (Unused)</h3>
+                <p style="margin: 0.2rem 0 0 0; color: var(--text-secondary); font-size: 0.9rem;">
+                    These plots are more profitable running passively on free Local Lunium. (150 Base Flame, 16.6% Uptime)
+                </p>
+            </div>
+        `;
+        container.appendChild(passiveHeader);
+        
+        let totalPassiveBaxs = 0;
+        passivePlots.forEach((plot, index) => {
+            let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
+            let passiveRevenue = passiveBaxs * (window.baxsPrice || 0);
+            totalPassiveBaxs += passiveBaxs;
+            totalBaxs += passiveBaxs;
+            
+            const pCard = document.createElement('div');
+            pCard.className = 'plot-card';
+            pCard.style.borderTopColor = plot.env.color;
+            pCard.style.opacity = '0.85';
+            
+            pCard.innerHTML = `
+                <div class="plot-title">${plot.env.label} Plot (Passive)</div>
+                <div class="plot-detail">
+                    <span class="label">Assumed FP</span>
+                    <span>150</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label">Uptime (Local Lunium)</span>
+                    <span>16.67% (1 Day On / 5 Off)</span>
+                </div>
+                <div class="plot-detail" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem; margin-top: 0.5rem;">
+                    <span class="label" style="color: #3498db;">Passive Reward</span>
+                    <span style="color: #3498db; font-weight: bold;">~${passiveBaxs.toFixed(3)} bAXS</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label">Earnings ($)</span>
+                    <span style="color: #2ecc71;">+$${passiveRevenue.toFixed(3)}</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label">Global Cost ($)</span>
+                    <span style="color: #bdc3c7;">$0.00 (Free)</span>
+                </div>
+            `;
+            container.appendChild(pCard);
+        });
+    }
     
     document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(2)} <span style="font-size:0.6em; color:var(--text-secondary); font-weight:normal;">(Costs ${totalSlips} Slips/day)</span>`;
     document.getElementById('results-container').style.display = 'block';
