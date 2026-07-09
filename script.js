@@ -248,26 +248,7 @@ function optimize() {
         plot.itemBoost = boost;
     });
     
-    let axieIndex = 0;
-    
-    while (axieIndex < gAxies.length) {
-        let bestPlot = null;
-        let bestMarginalBaxs = -1;
-        
-        for (let plot of userPlots) {
-            if (plot.axies.length >= 30) continue;
-            const marginalVal = (1 + plot.itemBoost) * 1.10 * (plot.rewardPool / plot.globalFlame); // Factor in 10% fortune buff
-            if (marginalVal > bestMarginalBaxs) {
-                bestMarginalBaxs = marginalVal;
-                bestPlot = plot;
-            }
-        }
-        
-        if (!bestPlot) break;
-        bestPlot.axies.push(gAxies[axieIndex]);
-        axieIndex++;
-    }
-    
+    // 1. Assign accessories to the top Axies
     const sortedAccessories = [...gAccessories].sort((a, b) => {
         const rarities = { 'Mystic': 4, 'Epic': 3, 'Rare': 2, 'Common': 1 };
         return (rarities[b.rarity] || 0) - (rarities[a.rarity] || 0);
@@ -281,25 +262,72 @@ function optimize() {
         });
     }
     
-    userPlots.forEach(plot => {
-        plot.baseFlame = 0;
-        for (let axie of plot.axies) {
-            let axieFlame = axie.flame;
-            // Add accessory boost if equipped to this axie
-            let eq = accAssignments.find(a => a.axie.id === axie.id);
-            if (eq) {
-                // Approximate matrix from Normal
-                if (eq.accessory.rarity === 'Common') axieFlame += 0.1;
-                else if (eq.accessory.rarity === 'Rare') axieFlame += 0.3;
-                else if (eq.accessory.rarity === 'Epic') axieFlame += 1.0;
-                else if (eq.accessory.rarity === 'Mystic') axieFlame += 3.0;
-            }
-            plot.baseFlame += axieFlame;
+    // 2. Compute effective flame for all Axies
+    let axiesWithFlame = gAxies.map(axie => {
+        let axieFlame = axie.flame;
+        let eq = accAssignments.find(a => a.axie.id === axie.id);
+        if (eq) {
+            if (eq.accessory.rarity === 'Common') axieFlame += 0.1;
+            else if (eq.accessory.rarity === 'Rare') axieFlame += 0.3;
+            else if (eq.accessory.rarity === 'Epic') axieFlame += 1.0;
+            else if (eq.accessory.rarity === 'Mystic') axieFlame += 3.0;
         }
-        // Plot Flame = Base * (1 + ItemBoost) * (1 + FortuneBuff)
-        plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost) * 1.10);
-        plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
+        return { ...axie, effectiveFlame: axieFlame };
     });
+    
+    // Sort Axies by effective flame descending
+    axiesWithFlame.sort((a, b) => b.effectiveFlame - a.effectiveFlame);
+    
+    // 3. Group Axies into chunks of 30
+    let chunks = [];
+    for (let i = 0; i < axiesWithFlame.length; i += 30) {
+        let chunkAxies = axiesWithFlame.slice(i, i + 30);
+        let chunkFlame = chunkAxies.reduce((sum, a) => sum + a.effectiveFlame, 0);
+        chunks.push({ axies: chunkAxies, baseFlame: chunkFlame });
+    }
+    
+    // 4. Assign chunks to the most profitable plot
+    let availablePlots = [...userPlots];
+    
+    for (let chunk of chunks) {
+        let bestPlot = null;
+        let bestPlotIndex = -1;
+        let bestProfit = -Infinity;
+        
+        for (let j = 0; j < availablePlots.length; j++) {
+            let plot = availablePlots[j];
+            let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * 1.10);
+            let expectedBaxs = (finalFlame / plot.globalFlame) * plot.rewardPool;
+            
+            let netProfit;
+            if (window.baxsPrice > 0) {
+                let baxsRevenue = expectedBaxs * window.baxsPrice;
+                let globalCons = plot.env.globalCons || 0;
+                let globalCost = globalCons * window.luniumPrice;
+                netProfit = baxsRevenue - globalCost;
+            } else {
+                netProfit = expectedBaxs; // Fallback if prices are 0
+            }
+            
+            if (netProfit > bestProfit) {
+                bestProfit = netProfit;
+                bestPlot = plot;
+                bestPlotIndex = j;
+            }
+        }
+        
+        // Only assign if it's profitable
+        if (bestPlot && bestProfit > 0) {
+            bestPlot.axies = chunk.axies;
+            bestPlot.baseFlame = chunk.baseFlame;
+            bestPlot.finalFlame = Math.floor(chunk.baseFlame * (1 + bestPlot.itemBoost) * 1.10);
+            bestPlot.expectedBaxs = (bestPlot.finalFlame / bestPlot.globalFlame) * bestPlot.rewardPool;
+            availablePlots.splice(bestPlotIndex, 1);
+        } else {
+            // No profitable plots left for remaining chunks
+            break;
+        }
+    }
     
     // Sort plots by final flame power descending
     userPlots.sort((a, b) => b.finalFlame - a.finalFlame);
@@ -339,6 +367,8 @@ function renderResults(plots, accAssignments) {
     let totalSlips = 0;
     
     plots.forEach((plot, index) => {
+        if (plot.axies.length === 0) return;
+        
         totalBaxs += plot.expectedBaxs;
         let slipsCost = FORTUNE_SLIPS[plot.env.key] || 0;
         totalSlips += slipsCost;
