@@ -322,6 +322,8 @@ function optimize() {
         let bestPlotIndex = -1;
         let bestProfit = -Infinity;
         
+        let eligiblePlots = [];
+        
         for (let j = 0; j < availablePlots.length; j++) {
             let plot = availablePlots[j];
             let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * slipsMult);
@@ -331,10 +333,12 @@ function optimize() {
             let netProfit;
             let passiveProfit;
             let threshold;
+            let globalCost = 0;
+            
             if (window.baxsPrice > 0) {
                 let baxsRevenue = expectedBaxs * window.baxsPrice;
                 let globalCons = plot.env.globalCons || 0;
-                let globalCost = globalCons * window.luniumPrice;
+                globalCost = globalCons * window.luniumPrice;
                 netProfit = baxsRevenue - globalCost;
                 passiveProfit = passiveBaxs * window.baxsPrice;
                 threshold = passiveProfit + (globalCost * 0.25); // Require margin of 1/4 of global cost
@@ -344,11 +348,31 @@ function optimize() {
                 threshold = passiveBaxs;
             }
             
-            if (netProfit > bestProfit && netProfit > threshold) {
-                bestProfit = netProfit;
-                bestPlot = plot;
-                bestPlotIndex = j;
+            if (netProfit > 0 && netProfit > threshold) {
+                eligiblePlots.push({
+                    index: j,
+                    plot: plot,
+                    netProfit: netProfit,
+                    globalCost: globalCost
+                });
             }
+        }
+        
+        if (eligiblePlots.length > 0) {
+            let maxProfit = Math.max(...eligiblePlots.map(p => p.netProfit));
+            let competitivePlots = eligiblePlots.filter(p => p.netProfit >= maxProfit - 0.005);
+            
+            // Sort by cost ascending, then by profit descending
+            competitivePlots.sort((a, b) => {
+                if (a.globalCost !== b.globalCost) {
+                    return a.globalCost - b.globalCost;
+                }
+                return b.netProfit - a.netProfit;
+            });
+            
+            bestPlot = competitivePlots[0].plot;
+            bestPlotIndex = competitivePlots[0].index;
+            bestProfit = competitivePlots[0].netProfit;
         }
         
         // Only assign if it's profitable and better than passive
