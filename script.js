@@ -109,8 +109,9 @@ function processAxies() {
             collection = 'meo';
         } else if (axie.title === 'Agamogenesis') {
             collection = 'agamo';
-        } else {
-            if (axie.parts) {
+        }
+        
+        if (axie.parts) {
                 for (let p of axie.parts) {
                     if (p.specialGenes) {
                         let mapped = SPECIAL_GENES_MAP[p.specialGenes.toLowerCase()];
@@ -309,7 +310,7 @@ function optimize() {
                 let globalCost = globalCons * window.luniumPrice;
                 netProfit = baxsRevenue - globalCost;
                 passiveProfit = passiveBaxs * window.baxsPrice;
-                threshold = passiveProfit + 0.05; // Require at least a 5 cent margin
+                threshold = passiveProfit + (globalCost * 0.25); // Require margin of 1/4 of global cost
             } else {
                 netProfit = expectedBaxs; // Fallback if prices are 0
                 passiveProfit = passiveBaxs;
