@@ -1,10 +1,11 @@
+
 const ENVIRONMENTS = [
-    { key: 'savannah', label: 'Savannah', color: 'var(--savannah)', defaultFlame: 5000000, rewardPool: 14000 },
-    { key: 'forest', label: 'Forest', color: 'var(--forest)', defaultFlame: 12000000, rewardPool: 28000 },
-    { key: 'arctic', label: 'Arctic', color: 'var(--arctic)', defaultFlame: 15000000, rewardPool: 40000 },
-    { key: 'mystic', label: 'Mystic', color: 'var(--mystic)', defaultFlame: 25000000, rewardPool: 65000 },
-    { key: 'genesis', label: 'Genesis', color: 'var(--genesis)', defaultFlame: 50000000, rewardPool: 150000 },
-    { key: 'luna', label: "Luna's Landing", color: 'var(--luna)', defaultFlame: 80000000, rewardPool: 250000 },
+    { key: 'savannah', label: 'Savannah', color: 'var(--savannah)', defaultPlots: 20, defaultFlame: 5000000, rewardPool: 14000 },
+    { key: 'forest', label: 'Forest', color: 'var(--forest)', defaultPlots: 2, defaultFlame: 12000000, rewardPool: 28000 },
+    { key: 'arctic', label: 'Arctic', color: 'var(--arctic)', defaultPlots: 8, defaultFlame: 15000000, rewardPool: 40000 },
+    { key: 'mystic', label: 'Mystic', color: 'var(--mystic)', defaultPlots: 8, defaultFlame: 25000000, rewardPool: 65000 },
+    { key: 'genesis', label: 'Genesis', color: 'var(--genesis)', defaultPlots: 0, defaultFlame: 50000000, rewardPool: 150000 },
+    { key: 'luna', label: "Luna's Landing", color: 'var(--luna)', defaultPlots: 0, defaultFlame: 80000000, rewardPool: 250000 },
 ];
 
 const COLLECTION_FLAME = {
@@ -19,12 +20,20 @@ const SPECIAL_GENES_MAP = {
     'mystic': 'mystic', 'origin': 'origin', 'meo': 'meo', 'agamo': 'agamo', 'agamogenesis': 'agamo'
 };
 
-const COLLECTION_PRIORITY = {
-    mystic: 100, origin: 90, shiny: 80, xmas: 70, meo: 60,
-    japanese: 50, nightmare: 40, summer: 30, normal: 0
+const EVOLVED_MULT = [1.0, 1.1, 1.2, 1.3, 1.45, 1.68];
+
+const ITEM_MULT = {
+    savannah: { 's': 2.0, 'f': 0.5, 'a': 0.3, 'm': 1.0, 'default': 1.0 },
+    forest:   { 's': 0.5, 'f': 2.0, 'a': 0.4, 'm': 1.2, 'default': 1.0 },
+    arctic:   { 's': 0.3, 'f': 0.4, 'a': 2.0, 'm': 1.5, 'default': 1.0 },
+    mystic:   { 's': 1.0, 'f': 1.2, 'a': 1.5, 'm': 3.0, 'default': 1.0 },
+    genesis:  { 's': 1.0, 'f': 1.0, 'a': 1.0, 'm': 1.0, 'default': 1.0 },
+    luna:     { 's': 1.0, 'f': 1.0, 'a': 1.0, 'm': 1.0, 'default': 1.0 }
 };
 
-const EVOLVED_MULT = [1.0, 1.1, 1.2, 1.3, 1.45, 1.68]; // 0=1 part, 5=6 parts
+const RARITY_BOOST = { 'Common': 0.0005, 'Rare': 0.0010, 'Epic': 0.0075, 'Mystic': 0.0150 };
+
+const FORTUNE_SLIPS = { savannah: 3, forest: 8, arctic: 22, mystic: 48, genesis: 960, luna: 2880 };
 
 let gAxies = [];
 let gItems = [];
@@ -48,43 +57,49 @@ function init() {
     document.getElementById('btn-optimize').addEventListener('click', optimize);
 }
 
-function detectCollection(parts, title, name) {
-    let found = [];
-    for (const p of parts) {
-        const gene = (p.specialGenes || '').toLowerCase().trim();
-        if (!gene) continue;
-        const mapped = SPECIAL_GENES_MAP[gene];
-        if (mapped) found.push(mapped);
-    }
-    if (found.length > 0) {
-        found.sort((a, b) => (COLLECTION_PRIORITY[b] || 0) - (COLLECTION_PRIORITY[a] || 0));
-        return found[0];
-    }
-    const t = (title || '').trim().toLowerCase();
-    const n = (name || '').trim().toLowerCase();
-    if (t === 'origin') return 'origin';
-    if (t === 'meo corp ii') return 'meo';
-    if (t === 'agamo genesis') return 'agamo';
-    if (n.includes('origin')) return 'origin';
-    return 'normal';
-}
-
 function processAxies() {
     gAxies = USER_DATA.axies.map(axie => {
-        const collection = detectCollection(axie.parts || [], axie.title, axie.name);
-        const evoParts = axie.evolvedParts || 0;
+        let collection = 'normal';
+        let isMystic = false;
+        
+        if (axie.title === 'Mystic') {
+            collection = 'mystic';
+            isMystic = true;
+        } else if (axie.title === 'Origin') {
+            collection = 'origin';
+        } else if (axie.title === 'MEO Corp') {
+            collection = 'meo';
+        } else if (axie.title === 'Agamogenesis') {
+            collection = 'agamo';
+        } else {
+            if (axie.parts) {
+                for (let p of axie.parts) {
+                    if (p.specialGenes) {
+                        let mapped = SPECIAL_GENES_MAP[p.specialGenes.toLowerCase()];
+                        if (mapped) {
+                            if (collection === 'normal' || COLLECTION_FLAME[mapped] > COLLECTION_FLAME[collection]) {
+                                collection = mapped;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         
         const base = COLLECTION_FLAME[collection] || 5;
-        const idx = Math.min(Math.max(evoParts - 1, 0), 5);
-        const flame = Math.round(base * (evoParts > 0 ? EVOLVED_MULT[idx] : 1.0));
+        let evCount = axie.evolvedParts || 0;
+        if (evCount > 5) evCount = 5;
+        const mult = EVOLVED_MULT[evCount];
+        const flame = base * mult;
         
         return {
-            id: axie.id,
-            name: axie.name,
-            flame: flame
+            ...axie,
+            collection,
+            flame,
+            axClass: axie.class || 'Normal'
         };
     });
-    // Sort axies by flame descending
+    
     gAxies.sort((a, b) => b.flame - a.flame);
 }
 
@@ -94,41 +109,49 @@ function renderInputs() {
     
     ENVIRONMENTS.forEach(env => {
         const row = document.createElement('div');
-        row.className = 'input-row';
-        row.style.borderLeft = `4px solid ${env.color}`;
-        row.style.paddingLeft = '1rem';
+        row.className = 'env-row';
+        row.style.borderLeftColor = env.color;
+        
+        let savedPlots = localStorage.getItem(`plots-${env.key}`);
+        let savedFlame = localStorage.getItem(`global-${env.key}`);
+        
+        const initialPlots = savedPlots !== null ? savedPlots : (env.defaultPlots || 0);
+        const initialFlame = savedFlame !== null ? savedFlame : env.defaultFlame;
         
         row.innerHTML = `
-            <div class="env-label">
-                ${env.label}
-            </div>
+            <div class="env-label">${env.label}</div>
             <div class="input-group">
                 <label>Plots Owned</label>
-                <input type="number" min="0" value="0" id="plots-${env.key}">
+                <input type="number" min="0" value="${initialPlots}" id="plots-${env.key}">
             </div>
             <div class="input-group">
                 <label>Global Total Flame</label>
-                <input type="number" min="1" value="${env.defaultFlame}" id="global-${env.key}">
+                <input type="number" min="1" value="${initialFlame}" id="global-${env.key}">
             </div>
         `;
         container.appendChild(row);
+        
+        // Add listeners to save automatically
+        const pInput = document.getElementById(`plots-${env.key}`);
+        const fInput = document.getElementById(`global-${env.key}`);
+        pInput.addEventListener('input', () => localStorage.setItem(`plots-${env.key}`, pInput.value));
+        fInput.addEventListener('input', () => localStorage.setItem(`global-${env.key}`, fInput.value));
     });
 }
 
 function optimize() {
-    // 1. Gather Inputs
     const userPlots = [];
     ENVIRONMENTS.forEach(env => {
-        const count = parseInt(document.getElementById(`plots-${env.key}`).value) || 0;
-        const globalFlame = parseInt(document.getElementById(`global-${env.key}`).value) || env.defaultFlame;
+        const plotsStr = document.getElementById(`plots-${env.key}`).value;
+        const flameStr = document.getElementById(`global-${env.key}`).value;
+        const plotsCount = parseInt(plotsStr) || 0;
+        const globalFlame = parseInt(flameStr) || env.defaultFlame;
         
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i < plotsCount; i++) {
             userPlots.push({
-                envKey: env.key,
-                label: env.label,
-                color: env.color,
+                env,
+                globalFlame,
                 rewardPool: env.rewardPool,
-                globalFlame: globalFlame,
                 items: [],
                 axies: [],
                 itemBoost: 0,
@@ -140,48 +163,56 @@ function optimize() {
     });
     
     if (userPlots.length === 0) {
-        alert("Please enter at least 1 plot.");
+        alert("You have no plots configured.");
         return;
     }
     
-    // 2. Assign Land Items greedily to maximize (1 + itemBoost) * (rewardPool / globalFlame)
-    // Actually, land items only fit specific environments (or 'any').
-    // Let's just assign highest boost items to each plot of that environment.
-    let availableItems = [...gItems].sort((a, b) => b.boost - a.boost);
+    let availableItems = [...gItems];
+    availableItems.forEach(i => {
+        i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005;
+        i.prefix = i.itemAlias ? i.itemAlias.charAt(0).toLowerCase() : 'u';
+    });
     
     userPlots.forEach(plot => {
-        let itemsForPlot = [];
-        // First try to fill with environment specific or 'any' items
-        for (let i = 0; i < availableItems.length && itemsForPlot.length < 8; i++) {
-            const item = availableItems[i];
-            if (item.environment === plot.envKey || item.environment === 'any') {
-                itemsForPlot.push(item);
-                plot.itemBoost += item.boost;
-                availableItems.splice(i, 1);
-                i--; // adjust index after removal
+        let envKey = plot.env.key;
+        availableItems.sort((a, b) => {
+            const multA = ITEM_MULT[envKey][a.prefix] || ITEM_MULT[envKey]['default'];
+            const multB = ITEM_MULT[envKey][b.prefix] || ITEM_MULT[envKey]['default'];
+            return (b.baseBoost * multB) - (a.baseBoost * multA);
+        });
+        
+        const itemsToTake = Math.min(8, availableItems.length);
+        plot.items = availableItems.splice(0, itemsToTake);
+        
+        let boost = 0;
+        plot.items.forEach(i => {
+            const mult = ITEM_MULT[envKey][i.prefix] || ITEM_MULT[envKey]['default'];
+            i.finalBoost = i.baseBoost * mult;
+            boost += i.finalBoost;
+        });
+        plot.itemBoost = boost;
+    });
+    
+    let axieIndex = 0;
+    
+    while (axieIndex < gAxies.length) {
+        let bestPlot = null;
+        let bestMarginalBaxs = -1;
+        
+        for (let plot of userPlots) {
+            if (plot.axies.length >= 30) continue;
+            const marginalVal = (1 + plot.itemBoost) * 1.10 * (plot.rewardPool / plot.globalFlame); // Factor in 10% fortune buff
+            if (marginalVal > bestMarginalBaxs) {
+                bestMarginalBaxs = marginalVal;
+                bestPlot = plot;
             }
         }
-        plot.items = itemsForPlot;
-        // Multiplier = (1 + itemBoost) * (rewardPool / globalFlame)
-        plot.multiplier = (1 + plot.itemBoost) * (plot.rewardPool / plot.globalFlame);
-    });
+        
+        if (!bestPlot) break;
+        bestPlot.axies.push(gAxies[axieIndex]);
+        axieIndex++;
+    }
     
-    // 3. Sort plots by multiplier descending to assign Axies
-    userPlots.sort((a, b) => b.multiplier - a.multiplier);
-    
-    // 4. Assign Axies
-    let axieIdx = 0;
-    userPlots.forEach(plot => {
-        while (plot.axies.length < 30 && axieIdx < gAxies.length) {
-            const axie = gAxies[axieIdx++];
-            plot.axies.push(axie);
-            plot.baseFlame += axie.flame;
-        }
-        plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost));
-        plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
-    });
-    
-    // 5. Assign Accessories (greedy)
     const sortedAccessories = [...gAccessories].sort((a, b) => {
         const rarities = { 'Mystic': 4, 'Epic': 3, 'Rare': 2, 'Common': 1 };
         return (rarities[b.rarity] || 0) - (rarities[a.rarity] || 0);
@@ -195,15 +226,43 @@ function optimize() {
         });
     }
     
+    userPlots.forEach(plot => {
+        plot.baseFlame = 0;
+        for (let axie of plot.axies) {
+            let axieFlame = axie.flame;
+            // Add accessory boost if equipped to this axie
+            let eq = accAssignments.find(a => a.axie.id === axie.id);
+            if (eq) {
+                // Approximate matrix from Normal
+                if (eq.accessory.rarity === 'Common') axieFlame += 0.1;
+                else if (eq.accessory.rarity === 'Rare') axieFlame += 0.3;
+                else if (eq.accessory.rarity === 'Epic') axieFlame += 1.0;
+                else if (eq.accessory.rarity === 'Mystic') axieFlame += 3.0;
+            }
+            plot.baseFlame += axieFlame;
+        }
+        // Plot Flame = Base * (1 + ItemBoost) * (1 + FortuneBuff)
+        plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost) * 1.10);
+        plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
+    });
+    
     renderResults(userPlots, accAssignments);
+}
+
+function toggleDetails(element) {
+    const details = element.nextElementSibling;
+    if (details.style.display === 'none' || details.style.display === '') {
+        details.style.display = 'block';
+    } else {
+        details.style.display = 'none';
+    }
 }
 
 function renderResults(plots, accAssignments) {
     const container = document.getElementById('plots-grid');
     container.innerHTML = '';
     
-    // Accessory layout
-    if (accAssignments.length > 0) {
+    if (accAssignments && accAssignments.length > 0) {
         const accSection = document.createElement('div');
         accSection.className = 'plot-card';
         accSection.style.gridColumn = '1 / -1';
@@ -219,177 +278,68 @@ function renderResults(plots, accAssignments) {
     }
     
     let totalBaxs = 0;
+    let totalSlips = 0;
     
     plots.forEach((plot, index) => {
         totalBaxs += plot.expectedBaxs;
+        let slipsCost = FORTUNE_SLIPS[plot.env.key] || 0;
+        totalSlips += slipsCost;
         
         const card = document.createElement('div');
         card.className = 'plot-card';
-        card.style.borderTopColor = plot.color;
+        card.style.borderTopColor = plot.env.color;
+        
+        let itemsHtml = plot.items.map(i => `<li>${i.name} (+${(i.finalBoost*100).toFixed(2)}%)</li>`).join('');
+        if (!itemsHtml) itemsHtml = "<li>None</li>";
+        
+        // Show just the top 5 axies to keep it clean, or all of them in a scrollable list
+        let axiesHtml = plot.axies.map(a => `<li>${a.name} (${a.flame.toFixed(1)} Flame)</li>`).join('');
         
         card.innerHTML = `
-            <div class="plot-title">
-                <span>${plot.label} Plot #${index + 1}</span>
-                <span class="baxs-value">+${plot.expectedBaxs.toFixed(2)} bAXS</span>
+            <div class="plot-summary" style="cursor: pointer;" onclick="toggleDetails(this)">
+                <div class="plot-title">${plot.env.label} Plot #${index + 1} <span style="font-size: 0.8em; opacity: 0.7;">(Click for details)</span></div>
+                <div class="plot-detail">
+                    <span class="label">Item Boost</span>
+                    <span style="color: #2ecc71;">+${(plot.itemBoost * 100).toFixed(2)}%</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label">Fortune Slips Buff</span>
+                    <span style="color: #f1c40f;">+10% (-${slipsCost}/day)</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label">Working Axies</span>
+                    <span>${plot.axies.length}</span>
+                </div>
+                <div class="plot-detail" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem; margin-top: 0.5rem;">
+                    <span class="label" style="color: var(--text-primary); font-weight: 600;">Final Plot Flame</span>
+                    <span style="color: #f39c12; font-weight: 800;">${plot.finalFlame.toLocaleString()}</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label" style="color: #3498db;">Expected Reward</span>
+                    <span style="color: #3498db; font-weight: 800;">~${plot.expectedBaxs.toFixed(2)} bAXS</span>
+                </div>
             </div>
-            <div class="plot-detail">
-                <span class="label">Assigned Axies</span>
-                <span>${plot.axies.length} / 30</span>
-            </div>
-            <div class="plot-detail">
-                <span class="label">Base Flame</span>
-                <span>${plot.baseFlame.toLocaleString()}</span>
-            </div>
-            <div class="plot-detail">
-                <span class="label">Land Items</span>
-                <span>${plot.items.length} / 8</span>
-            </div>
-            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
-                ${plot.items.length > 0 ? plot.items.map(i => `${i.name} (+${(i.boost*100)}%)`).join(', ') : 'None'}
-            </div>
-            <div class="plot-detail">
-                <span class="label">Item Boost</span>
-                <span style="color: #2ecc71;">+${(plot.itemBoost * 100).toFixed(0)}%</span>
-            </div>
-            <div class="plot-detail" style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem;">
-                <span class="label">Final Plot Flame</span>
-                <span style="font-weight: bold; color: #fbbf24;">${plot.finalFlame.toLocaleString()}</span>
+            <div class="plot-expanded" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.1);">
+                <div style="margin-bottom: 1rem;">
+                    <strong>Land Items (${plot.items.length}/8)</strong>
+                    <ul style="color: var(--text-secondary); margin-left: 1.2rem; font-size: 0.85rem; margin-top: 0.3rem;">
+                        ${itemsHtml}
+                    </ul>
+                </div>
+                <div>
+                    <strong>Assigned Axies (${plot.axies.length}/30)</strong>
+                    <ul style="color: var(--text-secondary); margin-left: 1.2rem; font-size: 0.85rem; margin-top: 0.3rem; max-height: 150px; overflow-y: auto;">
+                        ${axiesHtml}
+                    </ul>
+                </div>
             </div>
         `;
+        
         container.appendChild(card);
     });
     
-    document.getElementById('total-baxs-val').textContent = totalBaxs.toFixed(2);
+    document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(2)} <span style="font-size:0.6em; color:var(--text-secondary); font-weight:normal;">(Costs ${totalSlips} Slips/day)</span>`;
     document.getElementById('results-container').style.display = 'block';
-    document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
 }
 
-// Try to load API key from local server (.env) if running locally
-fetch('/env.json').then(res => res.json()).then(data => {
-    if (data.SKYMAVIS_API_KEY) {
-        document.getElementById('api-key').value = data.SKYMAVIS_API_KEY;
-        // Hide the API key input box so the user doesn't see it when running locally
-        document.getElementById('api-key').parentElement.style.display = 'none';
-    }
-}).catch(err => {
-    // Ignore errors, this just means they are on GitHub Pages or standard static server
-});
-
-// Ensure init is called
 window.onload = init;
-
-// ================= LIVE FETCH LOGIC =================
-document.getElementById('btn-sync').addEventListener('click', async () => {
-    const address = document.getElementById('ronin-address').value.trim();
-    const apiKey = document.getElementById('api-key').value.trim();
-    const statusDiv = document.getElementById('sync-status');
-    
-    if (!address || !apiKey) {
-        alert("Please provide both Ronin Address and API Key.");
-        return;
-    }
-    
-    statusDiv.textContent = "Fetching Axies...";
-    
-    const URL = "https://graphql-gateway.axieinfinity.com/graphql";
-    const HEADERS = {
-        "Content-Type": "application/json",
-        "X-API-Key": apiKey
-    };
-    
-    async function fetchGraphQL(query, variables) {
-        const res = await fetch(URL, {
-            method: 'POST',
-            headers: HEADERS,
-            body: JSON.stringify({ query, variables })
-        });
-        const data = await res.json();
-        if (data.errors) throw new Error(data.errors[0].message);
-        return data.data;
-    }
-    
-    try {
-        let axies = [];
-        let offset = 0;
-        let totalAxies = null;
-        
-        const axieQuery = `query GetAxies($owner: String!, $from: Int!, $size: Int!) {
-          axies(owner: $owner, from: $from, size: $size) {
-            total
-            results {
-              id name stage class breedCount image title
-              parts { id name class type specialGenes }
-            }
-          }
-        }`;
-        
-        while (totalAxies === null || offset < totalAxies) {
-            statusDiv.textContent = `Fetching Axies (${offset}/${totalAxies || '?'})...`;
-            const data = await fetchGraphQL(axieQuery, { owner: address, from: offset, size: 50 });
-            totalAxies = data.axies.total;
-            
-            data.axies.results.forEach(axie => {
-                let evCount = 0;
-                if (axie.parts) {
-                    axie.parts.forEach(p => {
-                        if (p.id && (p.id.includes("level-2") || p.id.includes("level-3") || 
-                            p.id.includes("level-4") || p.id.includes("level-5"))) {
-                            evCount++;
-                        }
-                    });
-                }
-                axie.evolvedParts = Math.min(evCount, 5);
-            });
-            
-            axies = axies.concat(data.axies.results);
-            offset += 50;
-        }
-        
-        let items = [];
-        offset = 0;
-        let totalItems = null;
-        
-        const itemQuery = `query GetItems($owner: String!, $from: Int!, $size: Int!) {
-          items(owner: $owner, from: $from, size: $size) {
-            total
-            results { id name itemAlias rarity }
-          }
-        }`;
-        
-        while (totalItems === null || offset < totalItems) {
-            statusDiv.textContent = `Fetching Land Items (${offset}/${totalItems || '?'})...`;
-            const data = await fetchGraphQL(itemQuery, { owner: address, from: offset, size: 50 });
-            totalItems = data.items.total;
-            items = items.concat(data.items.results);
-            offset += 50;
-        }
-        
-        let accessories = [];
-        offset = 0;
-        let totalAcc = null;
-        
-        const accQuery = `query GetEquipments($owner: String!, $from: Int!, $size: Int!) {
-          equipments(owner: $owner, from: $from, size: $size) {
-            total
-            results { id name rarity alias }
-          }
-        }`;
-        
-        while (totalAcc === null || offset < totalAcc) {
-            statusDiv.textContent = `Fetching Accessories (${offset}/${totalAcc || '?'})...`;
-            const data = await fetchGraphQL(accQuery, { owner: address, from: offset, size: 32 });
-            totalAcc = data.equipments.total;
-            accessories = accessories.concat(data.equipments.results);
-            offset += 32;
-        }
-        
-        statusDiv.textContent = `Success! Loaded ${axies.length} Axies, ${items.length} Items, and ${accessories.length} Accessories.`;
-        
-        window.USER_DATA = { owner: address, axies, items, accessories };
-        init();
-        
-    } catch (err) {
-        console.error(err);
-        statusDiv.textContent = `Error: ${err.message}`;
-    }
-});
