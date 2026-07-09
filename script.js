@@ -102,27 +102,35 @@ function processAxies() {
         
         if (axie.title === 'Mystic') {
             collection = 'mystic';
-            isMystic = true;
         } else if (axie.title === 'Origin') {
             collection = 'origin';
-        } else if (axie.title === 'MEO Corp') {
+        } else if (axie.title && axie.title.includes('MEO Corp')) {
             collection = 'meo';
         } else if (axie.title === 'Agamogenesis') {
             collection = 'agamo';
         }
         
         if (axie.parts) {
-                for (let p of axie.parts) {
-                    if (p.specialGenes) {
-                        let mapped = SPECIAL_GENES_MAP[p.specialGenes.toLowerCase()];
-                        if (mapped) {
-                            if (collection === 'normal' || COLLECTION_FLAME[mapped] > COLLECTION_FLAME[collection]) {
-                                collection = mapped;
-                            }
+            for (let p of axie.parts) {
+                if (p.specialGenes) {
+                    let sg = p.specialGenes.toLowerCase();
+                    let mapped = null;
+                    if (sg.includes('mystic')) mapped = 'mystic';
+                    else if (sg.includes('japan')) mapped = 'japanese';
+                    else if (sg.includes('xmas')) mapped = 'xmas';
+                    else if (sg.includes('summer')) mapped = 'summer';
+                    else if (sg.includes('nightmare')) mapped = 'nightmare';
+                    
+                    if (sg.includes('shiny')) mapped = 'shiny'; // Shiny overrides base if higher flame
+                    
+                    if (mapped) {
+                        if (collection === 'normal' || COLLECTION_FLAME[mapped] > COLLECTION_FLAME[collection]) {
+                            collection = mapped;
                         }
                     }
                 }
             }
+        }
         
         const base = COLLECTION_FLAME[collection] || 5;
         let evCount = axie.evolvedParts || 0;
