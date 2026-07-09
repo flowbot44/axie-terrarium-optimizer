@@ -394,7 +394,45 @@ function optimize() {
         });
     };
     
-    distributeItems(activePlots);
+    let stable = false;
+    while (!stable) {
+        // Reset available items for redistribution
+        availableItems = [...gItems];
+        availableItems.forEach(i => i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005);
+        
+        distributeItems(activePlots);
+        
+        stable = true;
+        for (let i = activePlots.length - 1; i >= 0; i--) {
+            let plot = activePlots[i];
+            let globalCons = plot.env.globalCons || 0;
+            let globalCost = globalCons * window.luniumPrice;
+            let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
+            
+            let netProfit;
+            let threshold;
+            if (window.baxsPrice > 0) {
+                netProfit = (plot.expectedBaxs * window.baxsPrice) - globalCost;
+                let passiveProfit = passiveBaxs * window.baxsPrice;
+                threshold = passiveProfit + (globalCost * 0.25);
+            } else {
+                netProfit = plot.expectedBaxs;
+                threshold = passiveBaxs;
+            }
+            
+            if (netProfit <= threshold) {
+                plot.axies = [];
+                plot.baseFlame = 0;
+                plot.finalFlame = 0;
+                plot.expectedBaxs = 0;
+                plot.items = [];
+                plot.itemBoost = 0;
+                passivePlots.push(plot);
+                activePlots.splice(i, 1);
+                stable = false; // Need to redistribute items among remaining plots
+            }
+        }
+    }
     distributeItems(passivePlots); // Give leftover items to passive plots
     
     // Sort all plots by final flame power descending for rendering
