@@ -1,11 +1,11 @@
 
 const ENVIRONMENTS = [
-    { key: 'savannah', label: 'Savannah', color: 'var(--savannah)', defaultPlots: 20, defaultFlame: 5000000, rewardPool: 14000 },
-    { key: 'forest', label: 'Forest', color: 'var(--forest)', defaultPlots: 2, defaultFlame: 12000000, rewardPool: 28000 },
-    { key: 'arctic', label: 'Arctic', color: 'var(--arctic)', defaultPlots: 8, defaultFlame: 15000000, rewardPool: 40000 },
-    { key: 'mystic', label: 'Mystic', color: 'var(--mystic)', defaultPlots: 8, defaultFlame: 25000000, rewardPool: 65000 },
-    { key: 'genesis', label: 'Genesis', color: 'var(--genesis)', defaultPlots: 0, defaultFlame: 50000000, rewardPool: 150000 },
-    { key: 'luna', label: "Luna's Landing", color: 'var(--luna)', defaultPlots: 0, defaultFlame: 80000000, rewardPool: 250000 },
+    { key: 'savannah', label: 'Savannah', color: 'var(--savannah)', defaultPlots: 20, defaultFlame: 5000000, rewardPool: 7.59 },
+    { key: 'forest', label: 'Forest', color: 'var(--forest)', defaultPlots: 2, defaultFlame: 12000000, rewardPool: 24.11 },
+    { key: 'arctic', label: 'Arctic', color: 'var(--arctic)', defaultPlots: 8, defaultFlame: 15000000, rewardPool: 54.02 },
+    { key: 'mystic', label: 'Mystic', color: 'var(--mystic)', defaultPlots: 8, defaultFlame: 25000000, rewardPool: 66.67 },
+    { key: 'genesis', label: 'Genesis', color: 'var(--genesis)', defaultPlots: 0, defaultFlame: 50000000, rewardPool: 41.96 },
+    { key: 'luna', label: "Luna's Landing", color: 'var(--luna)', defaultPlots: 0, defaultFlame: 80000000, rewardPool: 13.99 },
 ];
 
 const COLLECTION_FLAME = {
@@ -134,7 +134,7 @@ function renderInputs() {
             <div class="env-label" style="color: ${env.color};">${env.label}</div>
             <input type="number" min="0" value="${initialPlots}" id="plots-${env.key}" class="grid-input" title="Plots Owned">
             <input type="number" min="1" value="${initialFlame}" id="global-${env.key}" class="grid-input" title="Global Total Flame">
-            <input type="number" min="0" value="${initialPool}" id="pool-${env.key}" class="grid-input" title="Reward Pool">
+            <input type="number" min="0" step="0.01" value="${initialPool}" id="pool-${env.key}" class="grid-input" title="Reward Pool">
         `;
         tbody.appendChild(row);
         
@@ -155,7 +155,7 @@ function optimize() {
         const poolStr = document.getElementById(`pool-${env.key}`).value;
         const plotsCount = parseInt(plotsStr) || 0;
         const globalFlame = parseInt(flameStr) || env.defaultFlame;
-        const dynamicPool = parseInt(poolStr) || env.rewardPool;
+        const dynamicPool = parseFloat(poolStr) || env.rewardPool;
         
         for (let i = 0; i < plotsCount; i++) {
             userPlots.push({
