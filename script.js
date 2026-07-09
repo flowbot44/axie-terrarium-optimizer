@@ -264,7 +264,16 @@ function renderResults(plots, accAssignments) {
     document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
 }
 
-window.onload = init;
+// Try to load API key from local server (.env) if running locally
+fetch('/env.json').then(res => res.json()).then(data => {
+    if (data.SKYMAVIS_API_KEY) {
+        document.getElementById('api-key').value = data.SKYMAVIS_API_KEY;
+    }
+}).catch(err => {
+    // Ignore errors, this just means they are on GitHub Pages or standard static server
+});
+
+// Ensure init is called
 window.onload = init;
 
 // ================= LIVE FETCH LOGIC =================
