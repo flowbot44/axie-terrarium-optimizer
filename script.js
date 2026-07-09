@@ -99,7 +99,14 @@ function updateLuniumPrice() {
 }
 
 function processAxies() {
-    gAxies = USER_DATA.axies.map(axie => {
+    let seenIds = new Set();
+    let uniqueAxies = USER_DATA.axies.filter(a => {
+        if (seenIds.has(a.id)) return false;
+        seenIds.add(a.id);
+        return true;
+    });
+
+    gAxies = uniqueAxies.map(axie => {
         let collection = 'normal';
         let isMystic = false;
         
