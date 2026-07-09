@@ -43,7 +43,7 @@
         
         <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
             <div style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">Global Economy ($)</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
                 <div class="input-group">
                     <label style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                         <span>bAXS Price ($)</span>
@@ -60,6 +60,12 @@
                         </label>
                     </label>
                     <input type="number" id="lunium-price" value="0.00002963" step="0.00000001" readonly style="background: rgba(0,0,0,0.2); cursor: not-allowed; color: var(--text-secondary);">
+                </div>
+                <div class="input-group">
+                    <label style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span>Tiebreaker Margin ($)</span>
+                    </label>
+                    <input type="number" id="tiebreaker-margin" value="0" step="0.001" onchange="optimize()">
                 </div>
             </div>
         </div>
