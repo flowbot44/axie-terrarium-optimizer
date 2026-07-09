@@ -54,13 +54,45 @@ function init() {
     
     renderInputs();
     
-    // Load economy prices
+    // Load economy settings
     const savedBaxs = localStorage.getItem('baxsPrice');
     if (savedBaxs) document.getElementById('baxs-price').value = savedBaxs;
-    const savedLunium = localStorage.getItem('luniumPrice');
-    if (savedLunium) document.getElementById('lunium-price').value = savedLunium;
+    
+    const savedSale = localStorage.getItem('luniumSale');
+    if (savedSale !== null) {
+        document.getElementById('lunium-sale').checked = (savedSale === 'true');
+    }
+    updateLuniumPrice();
     
     document.getElementById('btn-optimize').addEventListener('click', optimize);
+}
+
+async function fetchAxsPrice() {
+    try {
+        const btn = document.querySelector('button[onclick="fetchAxsPrice()"]');
+        if (btn) btn.textContent = "Fetching...";
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=axie-infinity&vs_currencies=usd');
+        const data = await res.json();
+        const price = data['axie-infinity'].usd;
+        document.getElementById('baxs-price').value = price;
+        localStorage.setItem('baxsPrice', price);
+        if (btn) btn.textContent = "Fetch Live AXS Price";
+    } catch(e) {
+        console.error("Failed to fetch AXS price", e);
+        const btn = document.querySelector('button[onclick="fetchAxsPrice()"]');
+        if (btn) btn.textContent = "Failed!";
+        setTimeout(() => { if (btn) btn.textContent = "Fetch Live AXS Price"; }, 2000);
+    }
+}
+
+function updateLuniumPrice() {
+    const isSale = document.getElementById('lunium-sale').checked;
+    localStorage.setItem('luniumSale', isSale);
+    // Sale: 3,375,000 for $99.99 (50% bonus on 2,250,000)
+    // Regular: 2,250,000 for $99.99
+    const luniumPerPack = isSale ? 3375000 : 2250000;
+    const pricePerLunium = 99.99 / luniumPerPack;
+    document.getElementById('lunium-price').value = pricePerLunium.toFixed(8);
 }
 
 function processAxies() {
