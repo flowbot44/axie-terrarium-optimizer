@@ -256,6 +256,9 @@ function optimize() {
         plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
     });
     
+    // Sort plots by final flame power descending
+    userPlots.sort((a, b) => b.finalFlame - a.finalFlame);
+    
     renderResults(userPlots, accAssignments);
 }
 
