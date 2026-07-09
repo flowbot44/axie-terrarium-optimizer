@@ -105,11 +105,20 @@ function processAxies() {
 
 function renderInputs() {
     const container = document.getElementById('env-inputs');
-    container.innerHTML = '';
+    container.innerHTML = `
+        <div class="env-grid-header">
+            <div>Environment</div>
+            <div>Plots Owned</div>
+            <div>Global Total Flame</div>
+        </div>
+        <div id="env-grid-body"></div>
+    `;
+    
+    const tbody = document.getElementById('env-grid-body');
     
     ENVIRONMENTS.forEach(env => {
         const row = document.createElement('div');
-        row.className = 'env-row';
+        row.className = 'env-grid-row';
         row.style.borderLeftColor = env.color;
         
         let savedPlots = localStorage.getItem(`plots-${env.key}`);
@@ -119,19 +128,12 @@ function renderInputs() {
         const initialFlame = savedFlame !== null ? savedFlame : env.defaultFlame;
         
         row.innerHTML = `
-            <div class="env-label">${env.label}</div>
-            <div class="input-group">
-                <label>Plots Owned</label>
-                <input type="number" min="0" value="${initialPlots}" id="plots-${env.key}">
-            </div>
-            <div class="input-group">
-                <label>Global Total Flame</label>
-                <input type="number" min="1" value="${initialFlame}" id="global-${env.key}">
-            </div>
+            <div class="env-label" style="color: ${env.color};">${env.label}</div>
+            <input type="number" min="0" value="${initialPlots}" id="plots-${env.key}" class="grid-input">
+            <input type="number" min="1" value="${initialFlame}" id="global-${env.key}" class="grid-input">
         `;
-        container.appendChild(row);
+        tbody.appendChild(row);
         
-        // Add listeners to save automatically
         const pInput = document.getElementById(`plots-${env.key}`);
         const fInput = document.getElementById(`global-${env.key}`);
         pInput.addEventListener('input', () => localStorage.setItem(`plots-${env.key}`, pInput.value));
