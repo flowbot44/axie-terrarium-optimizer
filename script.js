@@ -110,6 +110,7 @@ function renderInputs() {
             <div>Environment</div>
             <div>Plots Owned</div>
             <div>Global Total Flame</div>
+            <div>Reward Pool (bAXS)</div>
         </div>
         <div id="env-grid-body"></div>
     `;
@@ -123,21 +124,26 @@ function renderInputs() {
         
         let savedPlots = localStorage.getItem(`plots-${env.key}`);
         let savedFlame = localStorage.getItem(`global-${env.key}`);
+        let savedPool = localStorage.getItem(`pool-${env.key}`);
         
         const initialPlots = savedPlots !== null ? savedPlots : (env.defaultPlots || 0);
         const initialFlame = savedFlame !== null ? savedFlame : env.defaultFlame;
+        const initialPool = savedPool !== null ? savedPool : env.rewardPool;
         
         row.innerHTML = `
             <div class="env-label" style="color: ${env.color};">${env.label}</div>
-            <input type="number" min="0" value="${initialPlots}" id="plots-${env.key}" class="grid-input">
-            <input type="number" min="1" value="${initialFlame}" id="global-${env.key}" class="grid-input">
+            <input type="number" min="0" value="${initialPlots}" id="plots-${env.key}" class="grid-input" title="Plots Owned">
+            <input type="number" min="1" value="${initialFlame}" id="global-${env.key}" class="grid-input" title="Global Total Flame">
+            <input type="number" min="0" value="${initialPool}" id="pool-${env.key}" class="grid-input" title="Reward Pool">
         `;
         tbody.appendChild(row);
         
         const pInput = document.getElementById(`plots-${env.key}`);
         const fInput = document.getElementById(`global-${env.key}`);
+        const rInput = document.getElementById(`pool-${env.key}`);
         pInput.addEventListener('input', () => localStorage.setItem(`plots-${env.key}`, pInput.value));
         fInput.addEventListener('input', () => localStorage.setItem(`global-${env.key}`, fInput.value));
+        rInput.addEventListener('input', () => localStorage.setItem(`pool-${env.key}`, rInput.value));
     });
 }
 
@@ -146,14 +152,16 @@ function optimize() {
     ENVIRONMENTS.forEach(env => {
         const plotsStr = document.getElementById(`plots-${env.key}`).value;
         const flameStr = document.getElementById(`global-${env.key}`).value;
+        const poolStr = document.getElementById(`pool-${env.key}`).value;
         const plotsCount = parseInt(plotsStr) || 0;
         const globalFlame = parseInt(flameStr) || env.defaultFlame;
+        const dynamicPool = parseInt(poolStr) || env.rewardPool;
         
         for (let i = 0; i < plotsCount; i++) {
             userPlots.push({
                 env,
                 globalFlame,
-                rewardPool: env.rewardPool,
+                rewardPool: dynamicPool,
                 items: [],
                 axies: [],
                 itemBoost: 0,
