@@ -403,7 +403,7 @@ function optimize() {
     let stable = false;
     while (!stable) {
         // Reset available items for redistribution
-        availableItems = [...gItems];
+        availableItems = (version === '1.1') ? [...gItems] : [];
         availableItems.forEach(i => i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005);
         
         distributeItems(activePlots);
