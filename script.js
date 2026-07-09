@@ -22,13 +22,13 @@ const SPECIAL_GENES_MAP = {
 
 const EVOLVED_MULT = [1.0, 1.1, 1.2, 1.3, 1.45, 1.68];
 
-const ITEM_MULT = {
-    savannah: { 's': 1.2, 'default': 1.0 },
-    forest:   { 'f': 1.2, 'default': 1.0 },
-    arctic:   { 'a': 1.2, 'default': 1.0 },
-    mystic:   { 'm': 1.5, 'default': 1.0 },
-    genesis:  { 's': 1.2, 'f': 1.2, 'a': 1.2, 'm': 1.2, 'default': 1.2 },
-    luna:     { 's': 1.5, 'f': 1.5, 'a': 1.5, 'm': 1.5, 'default': 1.5 }
+const ENV_MULT = {
+    savannah: 1.2,
+    forest: 1.2,
+    arctic: 1.2,
+    mystic: 1.5,
+    genesis: 1.2,
+    luna: 1.5
 };
 
 const RARITY_BOOST = { 'Common': 0.0005, 'Rare': 0.0010, 'Epic': 0.0075, 'Mystic': 0.0150 };
@@ -225,24 +225,35 @@ function optimize() {
     let availableItems = [...gItems];
     availableItems.forEach(i => {
         i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005;
-        i.prefix = i.itemAlias ? i.itemAlias.charAt(0).toLowerCase() : 'u';
     });
     
     userPlots.forEach(plot => {
         let envKey = plot.env.key;
+        let envMult = ENV_MULT[envKey] || 1.0;
+        
+        // Genesis and Luna match all items
+        let isUniversal = (envKey === 'genesis' || envKey === 'luna');
+        
         availableItems.sort((a, b) => {
-            const multA = ITEM_MULT[envKey][a.prefix] || ITEM_MULT[envKey]['default'];
-            const multB = ITEM_MULT[envKey][b.prefix] || ITEM_MULT[envKey]['default'];
-            return (b.baseBoost * multB) - (a.baseBoost * multA);
+            const matchA = (isUniversal || (a.environment && a.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+            const matchB = (isUniversal || (b.environment && b.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+            const finalA = a.baseBoost * matchA;
+            const finalB = b.baseBoost * matchB;
+            return finalB - finalA;
         });
         
-        const itemsToTake = Math.min(8, availableItems.length);
-        plot.items = availableItems.splice(0, itemsToTake);
-        
         let boost = 0;
+        plot.items = [];
+        for (let j = 0; j < 8; j++) {
+            if (availableItems.length > 0) {
+                let item = availableItems.shift();
+                plot.items.push(item);
+            }
+        }
+        
         plot.items.forEach(i => {
-            const mult = ITEM_MULT[envKey][i.prefix] || ITEM_MULT[envKey]['default'];
-            i.finalBoost = i.baseBoost * mult;
+            const match = (isUniversal || (i.environment && i.environment.toLowerCase() === envKey)) ? envMult : 1.0;
+            i.finalBoost = i.baseBoost * match;
             boost += i.finalBoost;
         });
         plot.itemBoost = boost;
