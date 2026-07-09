@@ -1,11 +1,11 @@
 
 const ENVIRONMENTS = [
-    { key: 'savannah', label: 'Savannah', color: 'var(--savannah)', defaultPlots: 20, defaultFlame: 5000000, rewardPool: 7.59 },
-    { key: 'forest', label: 'Forest', color: 'var(--forest)', defaultPlots: 2, defaultFlame: 12000000, rewardPool: 24.11 },
-    { key: 'arctic', label: 'Arctic', color: 'var(--arctic)', defaultPlots: 8, defaultFlame: 15000000, rewardPool: 54.02 },
-    { key: 'mystic', label: 'Mystic', color: 'var(--mystic)', defaultPlots: 8, defaultFlame: 25000000, rewardPool: 66.67 },
-    { key: 'genesis', label: 'Genesis', color: 'var(--genesis)', defaultPlots: 0, defaultFlame: 50000000, rewardPool: 41.96 },
-    { key: 'luna', label: "Luna's Landing", color: 'var(--luna)', defaultPlots: 0, defaultFlame: 80000000, rewardPool: 13.99 },
+    { key: 'savannah', label: 'Savannah', color: 'var(--savannah)', defaultPlots: 20, defaultFlame: 5000000, rewardPool: 7.59, globalCons: 25, localCons: 30 },
+    { key: 'forest', label: 'Forest', color: 'var(--forest)', defaultPlots: 2, defaultFlame: 12000000, rewardPool: 24.11, globalCons: 75, localCons: 90 },
+    { key: 'arctic', label: 'Arctic', color: 'var(--arctic)', defaultPlots: 8, defaultFlame: 15000000, rewardPool: 54.02, globalCons: 225, localCons: 270 },
+    { key: 'mystic', label: 'Mystic', color: 'var(--mystic)', defaultPlots: 8, defaultFlame: 25000000, rewardPool: 66.67, globalCons: 500, localCons: 600 },
+    { key: 'genesis', label: 'Genesis', color: 'var(--genesis)', defaultPlots: 0, defaultFlame: 50000000, rewardPool: 41.96, globalCons: 10000, localCons: 12000 },
+    { key: 'luna', label: "Luna's Landing", color: 'var(--luna)', defaultPlots: 0, defaultFlame: 80000000, rewardPool: 13.99, globalCons: 30000, localCons: 36000 },
 ];
 
 const COLLECTION_FLAME = {
@@ -53,6 +53,12 @@ function init() {
     gAccessories = USER_DATA.accessories || [];
     
     renderInputs();
+    
+    // Load economy prices
+    const savedBaxs = localStorage.getItem('baxsPrice');
+    if (savedBaxs) document.getElementById('baxs-price').value = savedBaxs;
+    const savedLunium = localStorage.getItem('luniumPrice');
+    if (savedLunium) document.getElementById('lunium-price').value = savedLunium;
     
     document.getElementById('btn-optimize').addEventListener('click', optimize);
 }
@@ -148,6 +154,13 @@ function renderInputs() {
 }
 
 function optimize() {
+    const baxsPrice = parseFloat(document.getElementById('baxs-price').value) || 0;
+    const luniumPrice = parseFloat(document.getElementById('lunium-price').value) || 0;
+    localStorage.setItem('baxsPrice', baxsPrice);
+    localStorage.setItem('luniumPrice', luniumPrice);
+    window.baxsPrice = baxsPrice;
+    window.luniumPrice = luniumPrice;
+    
     const userPlots = [];
     ENVIRONMENTS.forEach(env => {
         const plotsStr = document.getElementById(`plots-${env.key}`).value;
@@ -308,6 +321,13 @@ function renderResults(plots, accAssignments) {
         // Show just the top 5 axies to keep it clean, or all of them in a scrollable list
         let axiesHtml = plot.axies.map(a => `<li>${a.name} (${a.flame.toFixed(1)} Flame)</li>`).join('');
         
+        let globalCons = plot.env.globalCons || 0;
+        let localCons = plot.env.localCons || 0;
+        let baxsRevenue = plot.expectedBaxs * (window.baxsPrice || 0);
+        let globalCost = globalCons * (window.luniumPrice || 0);
+        let netGlobal = baxsRevenue - globalCost;
+        let profitColor = netGlobal < 0 ? '#e74c3c' : (netGlobal < 0.05 ? '#f39c12' : '#2ecc71');
+        
         card.innerHTML = `
             <div class="plot-summary" style="cursor: pointer;" onclick="toggleDetails(this)">
                 <div class="plot-title">${plot.env.label} Plot #${index + 1} <span style="font-size: 0.8em; opacity: 0.7;">(Click for details)</span></div>
@@ -330,6 +350,22 @@ function renderResults(plots, accAssignments) {
                 <div class="plot-detail">
                     <span class="label" style="color: #3498db;">Expected Reward</span>
                     <span style="color: #3498db; font-weight: 800;">~${plot.expectedBaxs.toFixed(2)} bAXS</span>
+                </div>
+                <div class="plot-detail" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem; margin-top: 0.5rem;">
+                    <span class="label">Earnings ($)</span>
+                    <span style="color: #2ecc71;">+$${baxsRevenue.toFixed(3)}</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label">Global Lunium Cost ($)</span>
+                    <span style="color: #e74c3c;">-$${globalCost.toFixed(3)} (${globalCons}/Tick)</span>
+                </div>
+                <div class="plot-detail" style="margin-bottom: 0.5rem;">
+                    <span class="label">Global Net Profit ($)</span>
+                    <span style="color: ${profitColor}; font-weight: bold;">$${netGlobal.toFixed(3)}</span>
+                </div>
+                <div class="plot-detail">
+                    <span class="label" style="font-size: 0.75em; color: var(--text-secondary);">Local Lunium Cons.</span>
+                    <span style="font-size: 0.75em; color: var(--text-secondary);">${localCons}/Tick (Free Limit)</span>
                 </div>
             </div>
             <div class="plot-expanded" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.1);">
