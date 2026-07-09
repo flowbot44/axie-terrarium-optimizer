@@ -360,7 +360,7 @@ function optimize() {
         
         if (eligiblePlots.length > 0) {
             let maxProfit = Math.max(...eligiblePlots.map(p => p.netProfit));
-            let competitivePlots = eligiblePlots.filter(p => p.netProfit >= maxProfit - 0.005);
+            let competitivePlots = eligiblePlots.filter(p => p.netProfit >= maxProfit - 0.001);
             
             // Sort by cost ascending, then by profit descending
             competitivePlots.sort((a, b) => {
