@@ -302,18 +302,21 @@ function optimize() {
             
             let netProfit;
             let passiveProfit;
+            let threshold;
             if (window.baxsPrice > 0) {
                 let baxsRevenue = expectedBaxs * window.baxsPrice;
                 let globalCons = plot.env.globalCons || 0;
                 let globalCost = globalCons * window.luniumPrice;
                 netProfit = baxsRevenue - globalCost;
                 passiveProfit = passiveBaxs * window.baxsPrice;
+                threshold = passiveProfit + 0.05; // Require at least a 5 cent margin
             } else {
                 netProfit = expectedBaxs; // Fallback if prices are 0
                 passiveProfit = passiveBaxs;
+                threshold = passiveBaxs;
             }
             
-            if (netProfit > bestProfit && netProfit > passiveProfit) {
+            if (netProfit > bestProfit && netProfit > threshold) {
                 bestProfit = netProfit;
                 bestPlot = plot;
                 bestPlotIndex = j;
@@ -473,7 +476,6 @@ function renderResults(plots, accAssignments) {
             let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
             let passiveRevenue = passiveBaxs * (window.baxsPrice || 0);
             totalPassiveBaxs += passiveBaxs;
-            totalBaxs += passiveBaxs;
             
             const pCard = document.createElement('div');
             pCard.className = 'plot-card';
