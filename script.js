@@ -211,7 +211,7 @@ function renderResults(plots, accAssignments) {
         
         let html = '<div class="plot-title">💎 Accessory Assignments</div><ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-bottom: 1rem;">';
         accAssignments.forEach(a => {
-            html += \`<li>Equip <strong>\${a.accessory.name}</strong> (\${a.accessory.rarity}) to <strong>\${a.axie.name}</strong> (\${a.axie.flame} Base Flame)</li>\`;
+            html += `<li>Equip <strong>${a.accessory.name}</strong> (${a.accessory.rarity}) to <strong>${a.axie.name}</strong> (${a.axie.flame} Base Flame)</li>`;
         });
         html += '</ul>';
         accSection.innerHTML = html;
@@ -268,6 +268,8 @@ function renderResults(plots, accAssignments) {
 fetch('/env.json').then(res => res.json()).then(data => {
     if (data.SKYMAVIS_API_KEY) {
         document.getElementById('api-key').value = data.SKYMAVIS_API_KEY;
+        // Hide the API key input box so the user doesn't see it when running locally
+        document.getElementById('api-key').parentElement.style.display = 'none';
     }
 }).catch(err => {
     // Ignore errors, this just means they are on GitHub Pages or standard static server
