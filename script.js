@@ -23,12 +23,12 @@ const SPECIAL_GENES_MAP = {
 const EVOLVED_MULT = [1.0, 1.1, 1.2, 1.3, 1.45, 1.68];
 
 const ITEM_MULT = {
-    savannah: { 's': 2.0, 'f': 0.5, 'a': 0.3, 'm': 1.0, 'default': 1.0 },
-    forest:   { 's': 0.5, 'f': 2.0, 'a': 0.4, 'm': 1.2, 'default': 1.0 },
-    arctic:   { 's': 0.3, 'f': 0.4, 'a': 2.0, 'm': 1.5, 'default': 1.0 },
-    mystic:   { 's': 1.0, 'f': 1.2, 'a': 1.5, 'm': 3.0, 'default': 1.0 },
-    genesis:  { 's': 1.0, 'f': 1.0, 'a': 1.0, 'm': 1.0, 'default': 1.0 },
-    luna:     { 's': 1.0, 'f': 1.0, 'a': 1.0, 'm': 1.0, 'default': 1.0 }
+    savannah: { 's': 1.2, 'default': 1.0 },
+    forest:   { 'f': 1.2, 'default': 1.0 },
+    arctic:   { 'a': 1.2, 'default': 1.0 },
+    mystic:   { 'm': 1.5, 'default': 1.0 },
+    genesis:  { 's': 1.2, 'f': 1.2, 'a': 1.2, 'm': 1.2, 'default': 1.2 },
+    luna:     { 's': 1.5, 'f': 1.5, 'a': 1.5, 'm': 1.5, 'default': 1.5 }
 };
 
 const RARITY_BOOST = { 'Common': 0.0005, 'Rare': 0.0010, 'Epic': 0.0075, 'Mystic': 0.0150 };
