@@ -123,7 +123,6 @@ function processAxies() {
                     }
                 }
             }
-        }
         
         const base = COLLECTION_FLAME[collection] || 5;
         let evCount = axie.evolvedParts || 0;
