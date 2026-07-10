@@ -54,16 +54,17 @@ function init() {
     
     renderInputs();
     
-    // Load economy settings
-    const savedBaxs = localStorage.getItem('baxsPrice');
-    if (savedBaxs) document.getElementById('baxs-price').value = savedBaxs;
-    
-    const savedMargin = localStorage.getItem('tiebreakerMargin');
-    if (savedMargin) document.getElementById('tiebreaker-margin').value = savedMargin;
-    
-    const savedSale = localStorage.getItem('luniumSale');
-    if (savedSale !== null) {
-        document.getElementById('lunium-sale').checked = (savedSale === 'true');
+    if (localStorage.getItem('baxsPrice')) {
+        document.getElementById('baxs-price').value = localStorage.getItem('baxsPrice');
+    }
+    if (localStorage.getItem('luniumSale') !== null) {
+        document.getElementById('lunium-sale').checked = localStorage.getItem('luniumSale') === 'true';
+    }
+    if (localStorage.getItem('tiebreakerMargin')) {
+        document.getElementById('tiebreaker-margin').value = localStorage.getItem('tiebreakerMargin');
+    }
+    if (localStorage.getItem('minProfitMargin')) {
+        document.getElementById('min-profit-margin').value = localStorage.getItem('minProfitMargin');
     }
     updateLuniumPrice();
     
@@ -167,7 +168,6 @@ function renderInputs() {
             <div>Environment</div>
             <div>Plots Owned</div>
             <div>Global Total Flame</div>
-            <div>Reward Pool (bAXS)</div>
         </div>
         <div id="env-grid-body"></div>
     `;
@@ -175,32 +175,33 @@ function renderInputs() {
     const tbody = document.getElementById('env-grid-body');
     
     ENVIRONMENTS.forEach(env => {
+        const savedPlots = localStorage.getItem(`plots-${env.key}`);
+        const savedFlame = localStorage.getItem(`global-${env.key}`);
+        
+        const initialPlots = savedPlots !== null ? savedPlots : env.defaultPlots;
+        const initialFlame = savedFlame !== null ? savedFlame : env.defaultFlame;
+        
         const row = document.createElement('div');
         row.className = 'env-grid-row';
         row.style.borderLeftColor = env.color;
-        
-        let savedPlots = localStorage.getItem(`plots-${env.key}`);
-        let savedFlame = localStorage.getItem(`global-${env.key}`);
-        let savedPool = localStorage.getItem(`pool-${env.key}`);
-        
-        const initialPlots = savedPlots !== null ? savedPlots : (env.defaultPlots || 0);
-        const initialFlame = savedFlame !== null ? savedFlame : env.defaultFlame;
-        const initialPool = savedPool !== null ? savedPool : env.rewardPool;
         
         row.innerHTML = `
             <div class="env-label" style="color: ${env.color};">${env.label}</div>
             <input type="number" min="0" value="${initialPlots}" id="plots-${env.key}" class="grid-input" title="Plots Owned">
             <input type="number" min="1" value="${initialFlame}" id="global-${env.key}" class="grid-input" title="Global Total Flame">
-            <input type="number" min="0" step="0.01" value="${initialPool}" id="pool-${env.key}" class="grid-input" title="Reward Pool">
         `;
         tbody.appendChild(row);
         
         const pInput = document.getElementById(`plots-${env.key}`);
         const fInput = document.getElementById(`global-${env.key}`);
-        const rInput = document.getElementById(`pool-${env.key}`);
-        pInput.addEventListener('input', () => localStorage.setItem(`plots-${env.key}`, pInput.value));
-        fInput.addEventListener('input', () => localStorage.setItem(`global-${env.key}`, fInput.value));
-        rInput.addEventListener('input', () => localStorage.setItem(`pool-${env.key}`, rInput.value));
+        pInput.addEventListener('change', () => {
+            localStorage.setItem(`plots-${env.key}`, pInput.value);
+            optimize();
+        });
+        fInput.addEventListener('change', () => {
+            localStorage.setItem(`global-${env.key}`, fInput.value);
+            optimize();
+        });
     });
 }
 
@@ -210,24 +211,32 @@ function optimize() {
     window.terrariumVersion = version;
     const slipsMult = (version === '1.1') ? 1.10 : 1.0;
 
-    const baxsPrice = parseFloat(document.getElementById('baxs-price').value) || 0;
-    const luniumPrice = parseFloat(document.getElementById('lunium-price').value) || 0;
-    const tiebreakerMargin = parseFloat(document.getElementById('tiebreaker-margin').value) || 0;
+    const baxsPriceStr = document.getElementById('baxs-price').value;
+    const luniumPriceStr = document.getElementById('lunium-price').value;
+    const tiebreakerMarginStr = document.getElementById('tiebreaker-margin').value;
+    const minProfitMarginStr = document.getElementById('min-profit-margin').value;
+    
+    const baxsPrice = parseFloat(baxsPriceStr) || 0;
+    const luniumPrice = parseFloat(luniumPriceStr) || 0;
+    const tiebreakerMargin = parseFloat(tiebreakerMarginStr) || 0;
+    const minProfitMargin = parseFloat(minProfitMarginStr) || 0;
+    
     localStorage.setItem('baxsPrice', baxsPrice);
-    localStorage.setItem('luniumPrice', luniumPrice);
+    localStorage.setItem('luniumSale', document.getElementById('lunium-sale').checked);
     localStorage.setItem('tiebreakerMargin', tiebreakerMargin);
+    localStorage.setItem('minProfitMargin', minProfitMargin);
     window.baxsPrice = baxsPrice;
     window.luniumPrice = luniumPrice;
     window.tiebreakerMargin = tiebreakerMargin;
+    window.minProfitMargin = minProfitMargin;
     
     const userPlots = [];
     ENVIRONMENTS.forEach(env => {
         const plotsStr = document.getElementById(`plots-${env.key}`).value;
         const flameStr = document.getElementById(`global-${env.key}`).value;
-        const poolStr = document.getElementById(`pool-${env.key}`).value;
         const plotsCount = parseInt(plotsStr) || 0;
         const globalFlame = parseInt(flameStr) || env.defaultFlame;
-        const dynamicPool = parseFloat(poolStr) || env.rewardPool;
+        const dynamicPool = env.rewardPool;
         
         for (let i = 0; i < plotsCount; i++) {
             userPlots.push({
@@ -354,7 +363,7 @@ function optimize() {
                 globalCost = globalCons * window.luniumPrice;
                 netProfit = baxsRevenue - globalCost;
                 passiveProfit = passiveBaxs * window.baxsPrice;
-                threshold = passiveProfit + (globalCost * 0.25); // Require margin of 1/4 of global cost
+                threshold = passiveProfit + (globalCost * (window.minProfitMargin / 100)); // Require dynamic margin of global cost
             } else {
                 netProfit = expectedBaxs; // Fallback if prices are 0
                 passiveProfit = passiveBaxs;
@@ -465,7 +474,7 @@ function optimize() {
             if (window.baxsPrice > 0) {
                 netProfit = (plot.expectedBaxs * window.baxsPrice) - globalCost;
                 let passiveProfit = passiveBaxs * window.baxsPrice;
-                threshold = passiveProfit + (globalCost * 0.25);
+                threshold = passiveProfit + (globalCost * (window.minProfitMargin / 100));
             } else {
                 netProfit = plot.expectedBaxs;
                 threshold = passiveBaxs;

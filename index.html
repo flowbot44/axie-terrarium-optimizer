@@ -35,7 +35,13 @@
     </div>
 
     <div class="glass-panel">
-        <h2 style="margin-bottom: 1.5rem;">Global Environment State</h2>
+        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center;">
+            Global Environment State
+            <div class="tooltip" onclick="void(0)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span class="tooltiptext">Higher tier plots (like Genesis/Mystic) have higher base Lunium costs and different environment multipliers. The optimizer automatically calculates which plot is mathematically best based on your total flame and the daily reward pool for each environment.</span>
+            </div>
+        </h2>
         <p style="color: var(--text-secondary); margin-bottom: 2rem;">
             Enter your plots, the global total flame, and the dynamic daily reward pool for each environment to optimize your bAXS output.
         </p>
@@ -43,7 +49,7 @@
         
         <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
             <div style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">Global Economy ($)</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem;">
                 <div class="input-group">
                     <label style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                         <span>bAXS Price ($)</span>
@@ -63,9 +69,27 @@
                 </div>
                 <div class="input-group">
                     <label style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <span>Tiebreaker Margin ($)</span>
+                        <span style="display: flex; align-items: center;">
+                            Profitability Margin ($)
+                            <div class="tooltip" onclick="void(0)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:4px"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                <span class="tooltiptext">If the expected daily profit difference between placing your Axies on two different plots is less than this margin, the optimizer will automatically assign them to the plot that costs less Global Lunium.</span>
+                            </div>
+                        </span>
                     </label>
                     <input type="number" id="tiebreaker-margin" value="0" step="0.001" onchange="optimize()">
+                </div>
+                <div class="input-group">
+                    <label style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span style="display: flex; align-items: center;">
+                            Min Profit Margin (%)
+                            <div class="tooltip" onclick="void(0)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:4px"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                <span class="tooltiptext">If the net profit (bAXS Revenue minus Global Lunium Cost) is less than this percentage of the global lunium cost, the plot is considered unprofitable and will run on passive Local Lunium instead.</span>
+                            </div>
+                        </span>
+                    </label>
+                    <input type="number" id="min-profit-margin" value="25" step="1" onchange="optimize()">
                 </div>
             </div>
         </div>
