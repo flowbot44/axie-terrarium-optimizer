@@ -41,13 +41,16 @@ def fetch_page(query, variables):
         time.sleep(2)
     return None
 
-def fetch_all(query, data_key, fields_callback=None, page_size=PAGE_SIZE):
+def fetch_all(query, data_key, fields_callback=None, page_size=PAGE_SIZE, extra_vars=None):
     all_results = []
     total = None
     offset = 0
     while total is None or offset < total:
         print(f"  Fetching {data_key} offset={offset}...", end=" ", flush=True)
-        result = fetch_page(query, {"owner": RONIN, "from": offset, "size": page_size})
+        vars = {"owner": RONIN, "from": offset, "size": page_size}
+        if extra_vars:
+            vars.update(extra_vars)
+        result = fetch_page(query, vars)
         if result is None or "errors" in result:
             print(f"FAILED: {result.get('errors', 'Unknown error')}")
             break
@@ -66,8 +69,8 @@ def fetch_all(query, data_key, fields_callback=None, page_size=PAGE_SIZE):
         time.sleep(0.5)
     return all_results
 
-AXIE_QUERY = """query GetAxies($owner: String, $from: Int, $size: Int) {
-  axies(owner: $owner, from: $from, size: $size) {
+AXIE_QUERY = """query GetAxies($owner: String, $from: Int, $size: Int, $sort: SortBy) {
+  axies(owner: $owner, from: $from, size: $size, sort: $sort) {
     total
     results {
       id name stage class breedCount image title
@@ -126,7 +129,7 @@ def process_axies(page):
 
 print("=== Fetching User Data ===")
 print("Fetching Axies...")
-axies = fetch_all(AXIE_QUERY, "axies", process_axies)
+axies = fetch_all(AXIE_QUERY, "axies", process_axies, extra_vars={"sort": "IdAsc"})
 
 print("\nFetching Land Items...")
 items = fetch_all(ITEMS_QUERY, "items", process_items)

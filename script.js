@@ -58,6 +58,9 @@ function init() {
     const savedBaxs = localStorage.getItem('baxsPrice');
     if (savedBaxs) document.getElementById('baxs-price').value = savedBaxs;
     
+    const savedMargin = localStorage.getItem('tiebreakerMargin');
+    if (savedMargin) document.getElementById('tiebreaker-margin').value = savedMargin;
+    
     const savedSale = localStorage.getItem('luniumSale');
     if (savedSale !== null) {
         document.getElementById('lunium-sale').checked = (savedSale === 'true');
@@ -96,7 +99,14 @@ function updateLuniumPrice() {
 }
 
 function processAxies() {
-    gAxies = USER_DATA.axies.map(axie => {
+    let seenIds = new Set();
+    let uniqueAxies = USER_DATA.axies.filter(a => {
+        if (seenIds.has(a.id)) return false;
+        seenIds.add(a.id);
+        return true;
+    });
+
+    gAxies = uniqueAxies.map(axie => {
         let collection = 'normal';
         let isMystic = false;
         
@@ -112,21 +122,21 @@ function processAxies() {
         
         if (axie.parts) {
             for (let p of axie.parts) {
-                if (p.specialGenes) {
-                    let sg = p.specialGenes.toLowerCase();
-                    let mapped = null;
-                    if (sg.includes('mystic')) mapped = 'mystic';
-                    else if (sg.includes('japan')) mapped = 'japanese';
-                    else if (sg.includes('xmas')) mapped = 'xmas';
-                    else if (sg.includes('summer')) mapped = 'summer';
-                    else if (sg.includes('nightmare')) mapped = 'nightmare';
-                    
-                    if (sg.includes('shiny')) mapped = 'shiny'; // Shiny overrides base if higher flame
-                    
-                    if (mapped) {
-                        if (collection === 'normal' || COLLECTION_FLAME[mapped] > COLLECTION_FLAME[collection]) {
-                            collection = mapped;
-                        }
+                let sg = p.specialGenes ? p.specialGenes.toLowerCase() : '';
+                let pname = p.name ? p.name.toLowerCase() : '';
+                let mapped = null;
+                
+                if (sg.includes('mystic')) mapped = 'mystic';
+                else if (sg.includes('japan')) mapped = 'japanese';
+                else if (sg.includes('xmas')) mapped = 'xmas';
+                else if (sg.includes('summer')) mapped = 'summer';
+                else if (sg.includes('nightmare')) mapped = 'nightmare';
+                
+                if (sg.includes('shiny') || pname.includes('shiny')) mapped = 'shiny'; // Shiny overrides base if higher flame
+                
+                if (mapped) {
+                    if (collection === 'normal' || COLLECTION_FLAME[mapped] > COLLECTION_FLAME[collection]) {
+                        collection = mapped;
                     }
                 }
             }
@@ -202,10 +212,13 @@ function optimize() {
 
     const baxsPrice = parseFloat(document.getElementById('baxs-price').value) || 0;
     const luniumPrice = parseFloat(document.getElementById('lunium-price').value) || 0;
+    const tiebreakerMargin = parseFloat(document.getElementById('tiebreaker-margin').value) || 0;
     localStorage.setItem('baxsPrice', baxsPrice);
     localStorage.setItem('luniumPrice', luniumPrice);
+    localStorage.setItem('tiebreakerMargin', tiebreakerMargin);
     window.baxsPrice = baxsPrice;
     window.luniumPrice = luniumPrice;
+    window.tiebreakerMargin = tiebreakerMargin;
     
     const userPlots = [];
     ENVIRONMENTS.forEach(env => {
@@ -360,7 +373,7 @@ function optimize() {
         
         if (eligiblePlots.length > 0) {
             let maxProfit = Math.max(...eligiblePlots.map(p => p.netProfit));
-            let competitivePlots = eligiblePlots.filter(p => p.netProfit >= maxProfit - 0.001);
+            let competitivePlots = eligiblePlots.filter(p => p.netProfit >= maxProfit - window.tiebreakerMargin);
             
             // Sort by cost ascending, then by profit descending
             competitivePlots.sort((a, b) => {
