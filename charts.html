@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axie Terrarium – Info Matrix</title>
+    <link rel="stylesheet" href="charts-style.css">
+</head>
+<body>
+<div class="container">
+    <nav style="display: flex; gap: 1rem; padding: 1rem 0; margin-bottom: 1rem; border-bottom: 1px solid #ddd;">
+        <a href="index.html" style="color: #666; text-decoration: none;">Optimizer</a>
+        <a href="charts.html" style="color: #2c3e50; font-weight: 600; text-decoration: none;">Info Matrix</a>
+    </nav>
+    <h1>Axie Terrarium V1.1 — Info Matrix</h1>
+    <p class="site-intro">Data from the <a href="https://blog.axieinfinity.com/p/terrariums-update-sneak-peek" target="_blank">V1.1 sneak peek</a>, <a href="https://blog.axieinfinity.com/p/terrariums-v1-is-live" target="_blank">V1 launch</a>, and official in‑game infographics.</p>
+
+    <!-- ===== COLLECTIBLE AXIE UTILITY BREAKDOWN ===== -->
+    <section class="matrix-section">
+        <h2>Collectible Axie Utility — Base Atia's Flame</h2>
+        <p class="subtitle">Each Axie collection contributes a different base Flame value. Higher-rarity collections burn brighter.</p>
+        <div class="table-wrap">
+            <table class="matrix-table collector-table">
+                <thead>
+                    <tr>
+                        <th>Collection</th>
+                        <th>Atia's Flame</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Normal</td><td>5</td></tr>
+                    <tr><td>Summer</td><td>20</td></tr>
+                    <tr><td>Nightmare</td><td>40</td></tr>
+                    <tr><td>Japanese</td><td>60</td></tr>
+                    <tr><td>Shiny</td><td>200</td></tr>
+                    <tr><td>Xmas</td><td>200</td></tr>
+                    <tr><td>Meo</td><td>200</td></tr>
+                    <tr><td>Origin</td><td>400</td></tr>
+                    <tr><td>Mystic</td><td>1,000</td></tr>
+                    <tr class="highlight-row"><td>Agamo Genesis</td><td>2,000</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="cap"><strong>Utility:</strong> Higher Flame → more bAXS per tick. Collectible Axies also let you earn Fortune Slips by praying to Atia daily.</p>
+    </section>
+
+    <!-- ===== EVOLVED PARTS ===== -->
+    <section class="matrix-section">
+        <h2>Evolved Part Count Multiplier</h2>
+        <div class="table-wrap">
+            <table class="matrix-table">
+                <thead>
+                    <tr><th>Evolved Parts</th><th>Multiplier</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>1.0</td></tr>
+                    <tr><td>2</td><td>1.1</td></tr>
+                    <tr><td>3</td><td>1.2</td></tr>
+                    <tr><td>4</td><td>1.3</td></tr>
+                    <tr><td>5</td><td>1.45</td></tr>
+                    <tr><td>6</td><td>1.68</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <h2>Atia's Flame Boost Based on Evolved Part</h2>
+        <div class="table-wrap">
+            <table class="matrix-table" style="font-size: 0.9em; min-width: 600px;">
+                <thead>
+                    <tr><th>Axie Collection</th><th>Agamo</th><th>Mystic</th><th>Origin</th><th>MEO</th><th>Xmas</th><th>Shiny</th><th>Japanese</th><th>Nightmare</th><th>Summer</th><th>Normal</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>AgamoGenesis</td><td>40</td><td>-</td><td>-</td><td>-</td><td>-</td><td>24</td><td>20</td><td>16</td><td>-</td><td>8</td></tr>
+                    <tr><td>Mystic</td><td>-</td><td>30</td><td>-</td><td>-</td><td>-</td><td>20</td><td>-</td><td>14</td><td>-</td><td>6</td></tr>
+                    <tr><td>Origin</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>18</td><td>-</td><td>12</td><td>-</td><td>6</td></tr>
+                    <tr><td>MEO</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>15</td><td>-</td><td>10</td><td>-</td><td>5</td></tr>
+                    <tr><td>Xmas</td><td>-</td><td>-</td><td>-</td><td>-</td><td>10</td><td>10</td><td>-</td><td>8</td><td>-</td><td>4</td></tr>
+                    <tr><td>Shiny</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>10</td><td>8</td><td>8</td><td>6</td><td>4</td></tr>
+                    <tr><td>Japanese</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>8</td><td>6</td><td>-</td><td>3</td></tr>
+                    <tr><td>Nightmare</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>6</td><td>4</td><td>3</td></tr>
+                    <tr><td>Summer</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>4</td><td>2</td></tr>
+                    <tr><td>Normal</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>2</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="cap">Total Evolved Part Boost = (Sum of top N Evolved Part Flames) × Evolved Part Count Multiplier</p>
+    </section>
+
+    <!-- ===== FORTUNE SLIPS ===== -->
+    <section class="matrix-section">
+        <h2>Fortune Slips Cost by Land Type</h2>
+        <div class="table-wrap">
+            <table class="matrix-table">
+                <thead>
+                    <tr><th>Land Type</th><th>Slips Needed</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Savannah</td><td>3</td></tr>
+                    <tr><td>Forest</td><td>8</td></tr>
+                    <tr><td>Arctic</td><td>22</td></tr>
+                    <tr><td>Mystic</td><td>48</td></tr>
+                    <tr class="highlight-row"><td>Genesis</td><td>960</td></tr>
+                    <tr class="highlight-row"><td>Luna's Landing</td><td>2 880</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="cap">24 h, 10 % Atia's Flame buff. Earn slips daily by holding any collectible Axie and praying to Atia.</p>
+    </section>
+
+    <!-- ===== LAND ITEMS ===== -->
+    <section class="matrix-section">
+        <h2>Land Items — Rarity Boost</h2>
+        <div class="table-wrap">
+            <table class="matrix-table">
+                <thead>
+                    <tr><th>Rarity</th><th>Flame Boost</th><th>AXP Boost</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Common</td><td>0.05 %</td><td>1 %</td></tr>
+                    <tr><td>Rare</td><td>0.10 %</td><td>1 %</td></tr>
+                    <tr><td>Epic</td><td>0.75 %</td><td>1 %</td></tr>
+                    <tr><td>Mystic</td><td>1.5 %</td><td>4 %</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="cap">Up to <strong>8 land items</strong> per plot. Matching item type to plot biome adds the multiplier below.</p>
+    </section>
+
+    <!-- ===== LAND ENVIRONMENT MATCHING MULTIPLIER ===== -->
+    <section class="matrix-section">
+        <h2>Land Environment Matching Multiplier</h2>
+        <p class="subtitle">When a land item's type matches the plot's biome, the item's boost gets a multiplier. Non-matching items receive their base boost without any penalty.</p>
+        <div class="table-wrap">
+            <table class="matrix-table">
+                <thead>
+                    <tr><th>Plot Environment</th><th>Environment Multiplier</th><th>Trigger Conditions</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Savannah</td><td>1.2</td><td>Only Savannah items</td></tr>
+                    <tr><td>Forest</td><td>1.2</td><td>Only Forest items</td></tr>
+                    <tr><td>Arctic</td><td>1.2</td><td>Only Arctic items</td></tr>
+                    <tr><td>Mystic</td><td>1.5</td><td>Only Mystic items</td></tr>
+                    <tr class="highlight-row"><td>Genesis</td><td>1.2</td><td>Items of all environments</td></tr>
+                    <tr class="highlight-row"><td>Luna's Landing</td><td>1.5</td><td>Items of all environments</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="cap">Formula: % Land Item Boost = (Total % Boost of Matching Items × Environment Multiplier) + Total % Boost of Remaining Items</p>
+    </section>
+
+    <!-- ===== ACCESSORIES ===== -->
+    <section class="matrix-section">
+        <h2>Accessories — Flame Boost Matrix</h2>
+        <p class="subtitle">Scales with <strong>Axie Rarity</strong> × <strong>Accessory Rarity</strong>. Max 5 per Axie.</p>
+        <div class="table-wrap">
+            <table class="matrix-table">
+                <thead>
+                    <tr><th>Axie \ Accessory</th><th>Common</th><th>Rare</th><th>Epic</th><th>Mystic</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Normal</td><td>0.1</td><td>0.3</td><td>1.0</td><td>3.0</td></tr>
+                    <tr><td>Rare</td><td>0.2</td><td>0.5</td><td>1.5</td><td>4.0</td></tr>
+                    <tr><td>Epic</td><td>0.5</td><td>1.0</td><td>2.5</td><td>5.5</td></tr>
+                    <tr><td>Mystic</td><td>1.0</td><td>2.0</td><td>4.5</td><td class="cell-gold">9.0</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="cap">Mystic + Mystic = 9 Flame (gold highlight). Mining → Flame boost; Resting → AXP boost.</p>
+    </section>
+
+    <!-- ===== LAND UTILITY ===== -->
+    <section class="matrix-section">
+        <h2>Land Utility Breakdown (Full Stats)</h2>
+        <div class="table-wrap">
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Land Tier</th>
+                        <th>bAXS/Month</th>
+                        <th>bAXS/Tick</th>
+                        <th>Local Lunium Limit</th>
+                        <th>Local Lunium Cons/Tick</th>
+                        <th>Local Lunium Rec/Tick</th>
+                        <th>Global Lunium Cons/Tick</th>
+                        <th>Base AXP/Tick</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Free</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                    <tr><td>Savannah</td><td>5,464</td><td>7.59</td><td>720</td><td>30</td><td>6</td><td>25</td><td>100</td></tr>
+                    <tr><td>Forest</td><td>17,357</td><td>24.11</td><td>2,160</td><td>90</td><td>18</td><td>75</td><td>150</td></tr>
+                    <tr><td>Arctic</td><td>38,893</td><td>54.02</td><td>6,480</td><td>270</td><td>54</td><td>225</td><td>200</td></tr>
+                    <tr><td>Mystic</td><td>48,000</td><td>66.67</td><td>14,400</td><td>600</td><td>120</td><td>500</td><td>250</td></tr>
+                    <tr><td>Genesis</td><td>30,214</td><td>41.96</td><td>288,000</td><td>12,000</td><td>2,400</td><td>10,000</td><td>300</td></tr>
+                    <tr><td>Luna's Landing</td><td>10,071</td><td>13.99</td><td>864,000</td><td>36,000</td><td>7,200</td><td>30,000</td><td>350</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="cap">All plots allow up to 30 Working Axies and 8 Land Items (except Free lands which allow 10 Axies and 0 Items).</p>
+    </section>
+
+    <!-- ===== FLAME FORMULA ===== -->
+    <section class="matrix-section">
+        <h2>New Flame Power Formula</h2>
+        <div class="formula-box">
+            <p><strong>Individual Axies' Flame</strong> = Base Atia's Flame + Evolved Part Boost + Accessory Boost</p>
+            <p><strong>Your Plot's Flame</strong> = ⌊ Total of ALL Working Axies' Flame</p>
+            <p class="indent">  × ( 1 + Land Item % Boost × Environment Multiplier )</p>
+            <p class="indent">  × ( 1 + Fortune Slips Buff ) ⌋</p>
+            <p><strong>bAXS per tick</strong> = ( Your Plot's Flame ÷ Total Flame of all mining plots in your category ) × Total bAXS pool for that category</p>
+        </div>
+        <p class="cap">All three components stack multiplicatively on the plot level.</p>
+    </section>
+
+    <footer class="footer">
+        <p>Data from <a href="https://blog.axieinfinity.com/p/terrariums-update-sneak-peek" target="_blank">V1.1 sneak peek</a> · <a href="https://blog.axieinfinity.com/p/terrariums-v1-is-live" target="_blank">V1 launch</a> · Official in‑game infographic · Not affiliated with Sky Mavis or Axie Infinity</p>
+        <p>
+            <a href="https://flowbot44.github.io/axie-terrarium-optimizer/" target="_blank">🧮 Terrarium Optimizer</a> ·
+            <a href="https://axieinfinity.com" target="_blank">Axie Infinity</a> ·
+            <a href="https://app.axieinfinity.com/profile/inventory/axies/" target="_blank">Axie Inventory</a> ·
+            <a href="https://app.axieinfinity.com/profile/lands" target="_blank">My Land</a> ·
+            <a href="https://marketplace.axieinfinity.com/items" target="_blank">Land Items</a> ·
+            <a href="https://marketplace.axieinfinity.com/accessories" target="_blank">Accessories</a>
+        </p>
+    </footer>
+</div>
+</body>
+</html>

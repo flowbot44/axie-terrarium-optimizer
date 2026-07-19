@@ -20,7 +20,7 @@ const SPECIAL_GENES_MAP = {
     'mystic': 'mystic', 'origin': 'origin', 'meo': 'meo', 'agamo': 'agamo', 'agamogenesis': 'agamo'
 };
 
-const EVOLVED_MULT = [1.0, 1.1, 1.2, 1.3, 1.45, 1.68];
+const EVOLVED_MULT = [1.0, 1.0252, 1.0504, 1.0756, 1.1008, 1.1260, 1.1512];
 
 const ENV_MULT = {
     savannah: 1.2,
@@ -107,36 +107,52 @@ function processAxies() {
         return true;
     });
 
+    const EVOLVED_MULT = [0, 1.0, 1.1, 1.2, 1.3, 1.45, 1.68];
+    
+    const PART_FLAME_MATRIX = {
+        "agamo": { "agamo": 40, "shiny": 24, "japanese": 20, "nightmare": 16, "normal": 8 },
+        "mystic": { "mystic": 30, "shiny": 20, "nightmare": 14, "normal": 6 },
+        "origin": { "shiny": 18, "nightmare": 12, "normal": 6 },
+        "meo": { "shiny": 15, "nightmare": 10, "normal": 5 },
+        "xmas": { "xmas": 10, "shiny": 10, "nightmare": 8, "normal": 4 },
+        "shiny": { "shiny": 10, "japanese": 8, "nightmare": 8, "summer": 6, "normal": 4 },
+        "japanese": { "japanese": 8, "nightmare": 6, "normal": 3 },
+        "nightmare": { "nightmare": 6, "summer": 4, "normal": 3 },
+        "summer": { "summer": 4, "normal": 2 },
+        "normal": { "normal": 2 }
+    };
+
     gAxies = uniqueAxies.map(axie => {
         let collection = 'normal';
-        let isMystic = false;
-        
-        if (axie.title === 'Mystic') {
-            collection = 'mystic';
-        } else if (axie.title === 'Origin') {
+        if (axie.title === 'Origin') {
             collection = 'origin';
-        } else if (axie.title && axie.title.includes('MEO Corp')) {
+        } else if (axie.title === 'MEO Corp' || axie.title === 'MEO Corp II') {
             collection = 'meo';
         } else if (axie.title === 'Agamogenesis') {
             collection = 'agamo';
         }
         
+        let partCollections = [];
+
         if (axie.parts) {
             for (let p of axie.parts) {
                 let sg = p.specialGenes ? p.specialGenes.toLowerCase() : '';
                 let pname = p.name ? p.name.toLowerCase() : '';
-                let mapped = null;
+                let mapped = 'normal';
                 
                 if (sg.includes('mystic')) mapped = 'mystic';
                 else if (sg.includes('japan')) mapped = 'japanese';
                 else if (sg.includes('xmas')) mapped = 'xmas';
                 else if (sg.includes('summer')) mapped = 'summer';
                 else if (sg.includes('nightmare')) mapped = 'nightmare';
+                else if (sg.includes('agamogenesis')) mapped = 'agamo';
                 
-                if (sg.includes('shiny') || pname.includes('shiny')) mapped = 'shiny'; // Shiny overrides base if higher flame
+                if (sg.includes('shiny') || pname.includes('shiny')) mapped = 'shiny'; 
                 
-                if (mapped) {
-                    if (collection === 'normal' || COLLECTION_FLAME[mapped] > COLLECTION_FLAME[collection]) {
+                partCollections.push(mapped);
+
+                if (mapped !== 'normal') {
+                    if (collection === 'normal' || (COLLECTION_FLAME[mapped] && COLLECTION_FLAME[collection] && COLLECTION_FLAME[mapped] > COLLECTION_FLAME[collection])) {
                         collection = mapped;
                     }
                 }
@@ -145,10 +161,25 @@ function processAxies() {
         
         const base = COLLECTION_FLAME[collection] || 5;
         let evCount = axie.evolvedParts || 0;
-        if (evCount > 5) evCount = 5;
-        const version = document.getElementById('version-select') ? document.getElementById('version-select').value : '1.0';
-        const mult = (version === '1.1') ? EVOLVED_MULT[evCount] : 1.0;
-        const flame = base * mult;
+        if (evCount > 6) evCount = 6;
+
+        let partFlames = [];
+        for (let pCol of partCollections) {
+            let row = PART_FLAME_MATRIX[collection] || PART_FLAME_MATRIX["normal"];
+            let val = row[pCol];
+            if (val === undefined) val = row["normal"] || 2;
+            partFlames.push(val);
+        }
+        
+        partFlames.sort((a, b) => b - a);
+        let boostSum = 0;
+        for (let i = 0; i < evCount; i++) {
+            if (i < partFlames.length) boostSum += partFlames[i];
+        }
+
+        const mult = EVOLVED_MULT[evCount] || 0;
+        const evolvedBoost = boostSum * mult;
+        const flame = base + evolvedBoost;
         
         return {
             ...axie,
@@ -168,6 +199,7 @@ function renderInputs() {
             <div>Environment</div>
             <div>Plots Owned</div>
             <div>Global Total Flame</div>
+            <div>Break-Even FP</div>
         </div>
         <div id="env-grid-body"></div>
     `;
@@ -189,6 +221,7 @@ function renderInputs() {
             <div class="env-label" style="color: ${env.color};">${env.label}</div>
             <input type="number" min="0" value="${initialPlots}" id="plots-${env.key}" class="grid-input" title="Plots Owned">
             <input type="number" min="1" value="${initialFlame}" id="global-${env.key}" class="grid-input" title="Global Total Flame">
+            <div id="breakeven-${env.key}" style="font-size: 0.85em; opacity: 0.8; text-align: center; padding-top: 0.4rem; white-space: nowrap;" title="Flame Power required for this plot to exactly cover its Global Lunium cost.">BE: -- FP</div>
         `;
         tbody.appendChild(row);
         
@@ -207,7 +240,7 @@ function renderInputs() {
 
 function optimize() {
     processAxies();
-    const version = document.getElementById('version-select') ? document.getElementById('version-select').value : '1.0';
+    const version = document.getElementById('version-select') ? document.getElementById('version-select').value : '1.0-evo';
     window.terrariumVersion = version;
     const slipsMult = (version === '1.1') ? 1.10 : 1.0;
 
@@ -237,6 +270,19 @@ function optimize() {
         const plotsCount = parseInt(plotsStr) || 0;
         const globalFlame = parseInt(flameStr) || env.defaultFlame;
         const dynamicPool = env.rewardPool;
+        
+        let breakevenDisplay = 'BE: -- FP';
+        if (baxsPrice > 0) {
+            const breakevenFlame = (env.globalCons * luniumPrice * globalFlame) / (dynamicPool * baxsPrice);
+            if (breakevenFlame >= 1000000) {
+                breakevenDisplay = 'BE: ' + (breakevenFlame / 1000000).toFixed(2) + 'M FP';
+            } else if (breakevenFlame >= 1000) {
+                breakevenDisplay = 'BE: ' + (breakevenFlame / 1000).toFixed(1) + 'k FP';
+            } else {
+                breakevenDisplay = 'BE: ' + Math.round(breakevenFlame).toString() + ' FP';
+            }
+        }
+        document.getElementById(`breakeven-${env.key}`).innerText = breakevenDisplay;
         
         for (let i = 0; i < plotsCount; i++) {
             userPlots.push({
@@ -579,7 +625,7 @@ function renderResults(plots, accAssignments) {
                 </div>
                 <div class="plot-detail">
                     <span class="label" style="color: #3498db;">Expected Reward</span>
-                    <span style="color: #3498db; font-weight: 800;">~${plot.expectedBaxs.toFixed(2)} bAXS</span>
+                    <span style="color: #3498db; font-weight: 800;">~${plot.expectedBaxs.toFixed(4)} bAXS</span>
                 </div>
                 <div class="plot-detail" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem; margin-top: 0.5rem;">
                     <span class="label">Earnings ($)</span>
@@ -673,7 +719,7 @@ function renderResults(plots, accAssignments) {
     }
     
     const slipsText = (window.terrariumVersion === '1.1') ? ` <span style="font-size:0.6em; color:var(--text-secondary); font-weight:normal;">(Costs ${totalSlips} Slips/day)</span>` : '';
-    document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(2)}${slipsText}`;
+    document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(4)}${slipsText}`;
     document.getElementById('results-container').style.display = 'block';
 }
 
