@@ -344,6 +344,26 @@ button:active {
     min-width: 650px;
 }
 
+.env-grid-header.with-estate,
+.env-grid-row.with-estate {
+    grid-template-columns: 1fr 0.7fr 1.0fr 0.85fr 0.95fr;
+    min-width: 780px;
+}
+
+.estate-hint {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+}
+
+.estate-hint code {
+    background: rgba(255,255,255,0.08);
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    color: #e056fd;
+}
+
 .config-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
