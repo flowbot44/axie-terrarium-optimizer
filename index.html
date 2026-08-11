@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Axie Terrarium Optimizer</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 <div class="container">
@@ -15,15 +15,15 @@
     </nav>
     <header>
         <h1>Terrarium Optimizer</h1>
-        <p class="subtitle">Maximize your bAXS rewards across your land plots.</p>
+        <p class="subtitle">Maximize your bAXS rewards across your land plots. V1.1 default · V1.2 ready (live Aug 19).</p>
     </header>
 
     <div class="glass-panel" id="collection-stats">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
             <h2 style="margin: 0;">Your Collection</h2>
-            <select id="version-select" onchange="optimize()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.4rem 0.8rem; border-radius: 8px; font-family: 'Inter', sans-serif;">
-                <option value="1.0-evo" selected>Version 1.0-evo (Current)</option>
-                <option value="1.1">Version 1.1 (Upcoming)</option>
+            <select id="version-select" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.4rem 0.8rem; border-radius: 8px; font-family: 'Inter', sans-serif;">
+                <option value="1.1" selected>Version 1.1 (Current / Default)</option>
+                <option value="1.2">Version 1.2 (Aug 19 — Estates + evo buff)</option>
             </select>
         </div>
         <div class="grid-2">
@@ -110,7 +110,7 @@
     </div>
 </div>
 
-<script src="user_data.js?v=2"></script>
-<script src="script.js?v=2"></script>
+<script src="user_data.js?v=3"></script>
+<script src="script.js?v=3"></script>
 </body>
 </html>

@@ -20,7 +20,8 @@ const SPECIAL_GENES_MAP = {
     'mystic': 'mystic', 'origin': 'origin', 'meo': 'meo', 'agamo': 'agamo', 'agamogenesis': 'agamo'
 };
 
-const EVOLVED_MULT = [1.0, 1.0252, 1.0504, 1.0756, 1.1008, 1.1260, 1.1512];
+// Unused legacy constant kept for reference (v1.0-era linear mult)
+const EVOLVED_MULT_LEGACY = [1.0, 1.0252, 1.0504, 1.0756, 1.1008, 1.1260, 1.1512];
 
 const ENV_MULT = {
     savannah: 1.2,
@@ -35,6 +36,82 @@ const RARITY_BOOST = { 'Common': 0.0005, 'Rare': 0.0010, 'Epic': 0.0075, 'Mystic
 
 const FORTUNE_SLIPS = { savannah: 3, forest: 8, arctic: 22, mystic: 48, genesis: 960, luna: 2880 };
 
+// --- Versioned flame tables (V1.1 current / V1.2 Aug 19 2026) ---
+// Index = evolved part count (0..6). 0 parts => no evolved boost.
+const EVOLVED_MULT_BY_VERSION = {
+    '1.1': [0, 1.0, 1.1, 1.2, 1.3, 1.45, 1.68],
+    '1.2': [0, 1.0, 1.1, 1.3, 1.6, 2.0, 2.8]
+};
+
+// Atia's Flame boost per evolved collectible part (row = axie collection, col = part collection)
+const PART_FLAME_BY_VERSION = {
+    '1.1': {
+        agamo:     { agamo: 40, shiny: 24, japanese: 20, nightmare: 16, normal: 8 },
+        mystic:    { mystic: 30, shiny: 20, nightmare: 14, normal: 6 },
+        origin:    { shiny: 18, nightmare: 12, normal: 6 },
+        meo:       { shiny: 15, nightmare: 10, normal: 5 },
+        xmas:      { xmas: 10, shiny: 10, nightmare: 8, normal: 4 },
+        shiny:     { shiny: 10, japanese: 8, nightmare: 8, summer: 6, normal: 4 },
+        japanese:  { japanese: 8, nightmare: 6, normal: 3 },
+        nightmare: { nightmare: 6, summer: 4, normal: 3 },
+        summer:    { summer: 4, normal: 2 },
+        normal:    { normal: 2 }
+    },
+    '1.2': {
+        // From official V1.2 infographic
+        agamo:     { agamo: 800, shiny: 60, japanese: 40, nightmare: 30, normal: 20 },
+        mystic:    { mystic: 150, shiny: 30, nightmare: 20, normal: 12 },
+        origin:    { shiny: 20, nightmare: 12, normal: 8 },
+        meo:       { shiny: 12, nightmare: 8, normal: 5 },
+        xmas:      { xmas: 20, shiny: 12, japanese: 10, nightmare: 8, normal: 5 },
+        shiny:     { shiny: 20, japanese: 10, nightmare: 8, summer: 6, normal: 5 },
+        japanese:  { japanese: 9, nightmare: 6, normal: 3 },
+        nightmare: { nightmare: 6, summer: 4, normal: 3 },
+        summer:    { summer: 4, normal: 2 },
+        normal:    { normal: 2 }
+    }
+};
+
+// Estate boost (V1.2): Estate Boost % = 1% * Estate Size * Estate Multiplier
+// Applies to ONE plot per estate (highest plot flame), auto-selected.
+const ESTATE_MULTIPLIER_TIERS = [
+    { min: 2, max: 3, mult: 1.00 },
+    { min: 4, max: 5, mult: 1.02 },
+    { min: 6, max: 9, mult: 1.05 },
+    { min: 10, max: 19, mult: 1.08 },
+    { min: 20, max: 59, mult: 1.12 },
+    { min: 60, max: 139, mult: 1.16 },
+    { min: 140, max: Infinity, mult: 1.20 }
+];
+
+function getEstateMultiplier(size) {
+    if (!size || size < 2) return 0;
+    for (const t of ESTATE_MULTIPLIER_TIERS) {
+        if (size >= t.min && size <= t.max) return t.mult;
+    }
+    return 0;
+}
+
+function calcEstateBoostPct(size) {
+    const mult = getEstateMultiplier(size);
+    if (!mult) return 0;
+    return 0.01 * size * mult; // e.g. 6 plots => 0.01*6*1.05 = 0.063 (6.3%)
+}
+
+function currentVersion() {
+    const el = document.getElementById('version-select');
+    return (el && el.value) || '1.1';
+}
+
+function usesV11Features(version) {
+    // Land items, accessories, fortune slips exist in 1.1+
+    return version === '1.1' || version === '1.2';
+}
+
+function usesEstates(version) {
+    return version === '1.2';
+}
+
 let gAxies = [];
 let gItems = [];
 let gAccessories = [];
@@ -48,10 +125,20 @@ function init() {
     document.getElementById('stat-axies').textContent = USER_DATA.axies.length;
     document.getElementById('stat-items').textContent = USER_DATA.items.length;
     
-    processAxies();
     gItems = USER_DATA.items || [];
     gAccessories = USER_DATA.accessories || [];
-    
+
+    const versionSelectEarly = document.getElementById('version-select');
+    if (versionSelectEarly) {
+        const savedVersion = localStorage.getItem('terrariumVersion');
+        if (savedVersion === '1.1' || savedVersion === '1.2') {
+            versionSelectEarly.value = savedVersion;
+        } else {
+            versionSelectEarly.value = '1.1';
+        }
+    }
+
+    processAxies();
     renderInputs();
     
     if (localStorage.getItem('baxsPrice')) {
@@ -67,6 +154,11 @@ function init() {
         document.getElementById('min-profit-margin').value = localStorage.getItem('minProfitMargin');
     }
     updateLuniumPrice();
+
+    const versionSelect = document.getElementById('version-select');
+    if (versionSelect) {
+        versionSelect.onchange = onVersionChange;
+    }
     
     document.getElementById('btn-optimize').addEventListener('click', optimize);
 }
@@ -107,20 +199,9 @@ function processAxies() {
         return true;
     });
 
-    const EVOLVED_MULT = [0, 1.0, 1.1, 1.2, 1.3, 1.45, 1.68];
-    
-    const PART_FLAME_MATRIX = {
-        "agamo": { "agamo": 40, "shiny": 24, "japanese": 20, "nightmare": 16, "normal": 8 },
-        "mystic": { "mystic": 30, "shiny": 20, "nightmare": 14, "normal": 6 },
-        "origin": { "shiny": 18, "nightmare": 12, "normal": 6 },
-        "meo": { "shiny": 15, "nightmare": 10, "normal": 5 },
-        "xmas": { "xmas": 10, "shiny": 10, "nightmare": 8, "normal": 4 },
-        "shiny": { "shiny": 10, "japanese": 8, "nightmare": 8, "summer": 6, "normal": 4 },
-        "japanese": { "japanese": 8, "nightmare": 6, "normal": 3 },
-        "nightmare": { "nightmare": 6, "summer": 4, "normal": 3 },
-        "summer": { "summer": 4, "normal": 2 },
-        "normal": { "normal": 2 }
-    };
+    const version = currentVersion();
+    const EVOLVED_MULT = EVOLVED_MULT_BY_VERSION[version] || EVOLVED_MULT_BY_VERSION['1.1'];
+    const PART_FLAME_MATRIX = PART_FLAME_BY_VERSION[version] || PART_FLAME_BY_VERSION['1.1'];
 
     gAxies = uniqueAxies.map(axie => {
         let collection = 'normal';
@@ -194,14 +275,19 @@ function processAxies() {
 
 function renderInputs() {
     const container = document.getElementById('env-inputs');
+    const version = currentVersion();
+    const showEstate = usesEstates(version);
+
     container.innerHTML = `
-        <div class="env-grid-header">
+        <div class="env-grid-header${showEstate ? ' with-estate' : ''}">
             <div>Environment</div>
             <div>Plots Owned</div>
             <div>Global Total Flame</div>
+            ${showEstate ? '<div>Largest Estate</div>' : ''}
             <div>Break-Even FP</div>
         </div>
         <div id="env-grid-body"></div>
+        ${showEstate ? `<p class="estate-hint">V1.2 Estates: enter the size of your largest connected group of plots per environment (same env, adjacent H/V, activated). Estate boost auto-applies to the highest-flame plot in that env. Formula: <code>1% × size × multiplier</code>.</p>` : ''}
     `;
     
     const tbody = document.getElementById('env-grid-body');
@@ -209,18 +295,22 @@ function renderInputs() {
     ENVIRONMENTS.forEach(env => {
         const savedPlots = localStorage.getItem(`plots-${env.key}`);
         const savedFlame = localStorage.getItem(`global-${env.key}`);
+        const savedEstate = localStorage.getItem(`estate-${env.key}`);
         
         const initialPlots = savedPlots !== null ? savedPlots : env.defaultPlots;
         const initialFlame = savedFlame !== null ? savedFlame : env.defaultFlame;
+        // Default estate size = plots owned (assume fully connected); user can lower it
+        const initialEstate = savedEstate !== null ? savedEstate : initialPlots;
         
         const row = document.createElement('div');
-        row.className = 'env-grid-row';
+        row.className = 'env-grid-row' + (showEstate ? ' with-estate' : '');
         row.style.borderLeftColor = env.color;
         
         row.innerHTML = `
             <div class="env-label" style="color: ${env.color};">${env.label}</div>
             <input type="number" min="0" value="${initialPlots}" id="plots-${env.key}" class="grid-input" title="Plots Owned">
             <input type="number" min="1" value="${initialFlame}" id="global-${env.key}" class="grid-input" title="Global Total Flame">
+            ${showEstate ? `<input type="number" min="0" value="${initialEstate}" id="estate-${env.key}" class="grid-input" title="Largest connected Estate size (min 2 for boost)">` : ''}
             <div id="breakeven-${env.key}" style="font-size: 0.85em; opacity: 0.8; text-align: center; padding-top: 0.4rem; white-space: nowrap;" title="Flame Power required for this plot to exactly cover its Global Lunium cost.">BE: -- FP</div>
         `;
         tbody.appendChild(row);
@@ -229,20 +319,39 @@ function renderInputs() {
         const fInput = document.getElementById(`global-${env.key}`);
         pInput.addEventListener('change', () => {
             localStorage.setItem(`plots-${env.key}`, pInput.value);
+            // If estate wasn't manually set lower, keep it in sync when increasing plots
+            const eInput = document.getElementById(`estate-${env.key}`);
+            if (eInput && savedEstate === null) {
+                eInput.value = pInput.value;
+            }
             optimize();
         });
         fInput.addEventListener('change', () => {
             localStorage.setItem(`global-${env.key}`, fInput.value);
             optimize();
         });
+        if (showEstate) {
+            const eInput = document.getElementById(`estate-${env.key}`);
+            eInput.addEventListener('change', () => {
+                localStorage.setItem(`estate-${env.key}`, eInput.value);
+                optimize();
+            });
+        }
     });
+}
+
+function onVersionChange() {
+    const version = currentVersion();
+    localStorage.setItem('terrariumVersion', version);
+    renderInputs();
+    optimize();
 }
 
 function optimize() {
     processAxies();
-    const version = document.getElementById('version-select') ? document.getElementById('version-select').value : '1.0-evo';
+    const version = currentVersion();
     window.terrariumVersion = version;
-    const slipsMult = (version === '1.1') ? 1.10 : 1.0;
+    const slipsMult = usesV11Features(version) ? 1.10 : 1.0;
 
     const baxsPriceStr = document.getElementById('baxs-price').value;
     const luniumPriceStr = document.getElementById('lunium-price').value;
@@ -264,12 +373,19 @@ function optimize() {
     window.minProfitMargin = minProfitMargin;
     
     const userPlots = [];
+    const estateSizeByEnv = {};
     ENVIRONMENTS.forEach(env => {
         const plotsStr = document.getElementById(`plots-${env.key}`).value;
         const flameStr = document.getElementById(`global-${env.key}`).value;
         const plotsCount = parseInt(plotsStr) || 0;
         const globalFlame = parseInt(flameStr) || env.defaultFlame;
         const dynamicPool = env.rewardPool;
+        const estateEl = document.getElementById(`estate-${env.key}`);
+        let estateSize = estateEl ? (parseInt(estateEl.value) || 0) : 0;
+        // Cap estate size at plots owned
+        if (estateSize > plotsCount) estateSize = plotsCount;
+        estateSizeByEnv[env.key] = usesEstates(version) ? estateSize : 0;
+        const estateBoostPct = calcEstateBoostPct(estateSizeByEnv[env.key]);
         
         let breakevenDisplay = 'BE: -- FP';
         if (baxsPrice > 0) {
@@ -294,9 +410,15 @@ function optimize() {
                 itemBoost: 0,
                 baseFlame: 0,
                 finalFlame: 0,
-                expectedBaxs: 0
+                expectedBaxs: 0,
+                estateSize: estateSizeByEnv[env.key],
+                estateBoostPct: 0, // applied later to strongest plot only
+                estateBoostApplied: false
             });
         }
+        // stash for UI
+        env._estateBoostPct = estateBoostPct;
+        env._estateSize = estateSizeByEnv[env.key];
     });
     
     if (userPlots.length === 0) {
@@ -304,7 +426,7 @@ function optimize() {
         return;
     }
     
-    let availableItems = (version === '1.1') ? [...gItems] : [];
+    let availableItems = usesV11Features(version) ? [...gItems] : [];
     availableItems.forEach(i => {
         i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005;
     });
@@ -345,7 +467,7 @@ function optimize() {
     });
     
     // 1. Assign accessories to the top Axies
-    const sortedAccessories = (version === '1.1') ? [...gAccessories].sort((a, b) => {
+    const sortedAccessories = usesV11Features(version) ? [...gAccessories].sort((a, b) => {
         const rarities = { 'Mystic': 4, 'Epic': 3, 'Rare': 2, 'Common': 1 };
         return (rarities[b.rarity] || 0) - (rarities[a.rarity] || 0);
     }) : [];
@@ -457,7 +579,7 @@ function optimize() {
     }
     
     // 5. Re-assign items based on the actual base flame of the assigned Axie teams
-    availableItems = (version === '1.1') ? [...gItems] : [];
+    availableItems = usesV11Features(version) ? [...gItems] : [];
     availableItems.forEach(i => {
         i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005;
     });
@@ -503,7 +625,7 @@ function optimize() {
     let stable = false;
     while (!stable) {
         // Reset available items for redistribution
-        availableItems = (version === '1.1') ? [...gItems] : [];
+        availableItems = usesV11Features(version) ? [...gItems] : [];
         availableItems.forEach(i => i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005);
         
         distributeItems(activePlots);
@@ -541,10 +663,34 @@ function optimize() {
     }
     distributeItems(passivePlots); // Give leftover items to passive plots
     
+    // V1.2 Estates: apply Estate Boost to the single highest-flame plot per environment
+    if (usesEstates(version)) {
+        const byEnv = {};
+        userPlots.forEach(p => {
+            if (!byEnv[p.env.key]) byEnv[p.env.key] = [];
+            byEnv[p.env.key].push(p);
+        });
+        Object.keys(byEnv).forEach(key => {
+            const size = estateSizeByEnv[key] || 0;
+            const boostPct = calcEstateBoostPct(size);
+            if (boostPct <= 0) return;
+            // Prefer active (working) plots; if none, skip
+            const candidates = byEnv[key].filter(p => p.axies && p.axies.length > 0);
+            if (!candidates.length) return;
+            candidates.sort((a, b) => b.finalFlame - a.finalFlame);
+            const top = candidates[0];
+            top.estateBoostPct = boostPct;
+            top.estateBoostApplied = true;
+            top.estateSize = size;
+            top.finalFlame = Math.floor(top.finalFlame * (1 + boostPct));
+            top.expectedBaxs = (top.finalFlame / top.globalFlame) * top.rewardPool;
+        });
+    }
+
     // Sort all plots by final flame power descending for rendering
     userPlots.sort((a, b) => b.finalFlame - a.finalFlame);
     
-    renderResults(userPlots, accAssignments);
+    renderResults(userPlots, accAssignments, availableItems);
 }
 
 function toggleDetails(element) {
@@ -556,7 +702,7 @@ function toggleDetails(element) {
     }
 }
 
-function renderResults(plots, accAssignments) {
+function renderResults(plots, accAssignments, availableItems = []) {
     const container = document.getElementById('plots-grid');
     container.innerHTML = '';
     
@@ -605,7 +751,7 @@ function renderResults(plots, accAssignments) {
         card.innerHTML = `
             <div class="plot-summary" style="cursor: pointer;" onclick="toggleDetails(this)">
                 <div class="plot-title">${plot.env.label} Plot #${index + 1} <span style="font-size: 0.8em; opacity: 0.7;">(Click for details)</span></div>
-                ${window.terrariumVersion === '1.1' ? `
+                ${usesV11Features(window.terrariumVersion) ? `
                 <div class="plot-detail">
                     <span class="label">Item Boost</span>
                     <span style="color: #2ecc71;">+${(plot.itemBoost * 100).toFixed(2)}%</span>
@@ -615,6 +761,11 @@ function renderResults(plots, accAssignments) {
                     <span style="color: #f1c40f;">+10% (-${slipsCost}/day)</span>
                 </div>
                 ` : ''}
+                ${plot.estateBoostApplied ? `
+                <div class="plot-detail">
+                    <span class="label">Estate Boost</span>
+                    <span style="color: #e056fd;">+${(plot.estateBoostPct * 100).toFixed(2)}% <span style="opacity:0.7;font-size:0.85em;">(size ${plot.estateSize})</span></span>
+                </div>` : ''}
                 <div class="plot-detail">
                     <span class="label">Working Axies</span>
                     <span>${plot.axies.length}</span>
@@ -645,7 +796,7 @@ function renderResults(plots, accAssignments) {
                 </div>
             </div>
             <div class="plot-expanded" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.1);">
-                ${window.terrariumVersion === '1.1' ? `
+                ${usesV11Features(window.terrariumVersion) ? `
                 <div style="margin-bottom: 1rem;">
                     <strong>Land Items (${plot.items.length}/8)</strong>
                     <ul style="color: var(--text-secondary); margin-left: 1.2rem; font-size: 0.85rem; margin-top: 0.3rem;">
@@ -718,7 +869,33 @@ function renderResults(plots, accAssignments) {
         });
     }
     
-    const slipsText = (window.terrariumVersion === '1.1') ? ` <span style="font-size:0.6em; color:var(--text-secondary); font-weight:normal;">(Costs ${totalSlips} Slips/day)</span>` : '';
+    if (availableItems && availableItems.length > 0) {
+        const unusedHeader = document.createElement('div');
+        unusedHeader.style.gridColumn = '1 / -1';
+        unusedHeader.style.marginTop = '2rem';
+        
+        const itemCounts = {};
+        availableItems.forEach(i => {
+            itemCounts[i.name] = (itemCounts[i.name] || 0) + 1;
+        });
+        
+        let unusedHtml = `
+            <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: var(--text-primary); font-size: 1.2rem;">Unused Items (${availableItems.length} Total)</h3>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.9em; color: var(--text-secondary);">
+        `;
+        
+        for (const [name, count] of Object.entries(itemCounts)) {
+            unusedHtml += `<span style="background: rgba(255,255,255,0.05); padding: 5px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">${name} x${count}</span>`;
+        }
+        
+        unusedHtml += `</div>`;
+        unusedHeader.innerHTML = unusedHtml;
+        container.appendChild(unusedHeader);
+    }
+    
+    const slipsText = (usesV11Features(window.terrariumVersion)) ? ` <span style="font-size:0.6em; color:var(--text-secondary); font-weight:normal;">(Costs ${totalSlips} Slips/day)</span>` : '';
     document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(4)}${slipsText}`;
     document.getElementById('results-container').style.display = 'block';
 }
