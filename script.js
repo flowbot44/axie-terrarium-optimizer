@@ -426,45 +426,25 @@ function optimize() {
         return;
     }
     
-    let availableItems = usesV11Features(version) ? [...gItems] : [];
-    availableItems.forEach(i => {
-        i.baseBoost = RARITY_BOOST[i.rarity] || 0.0005;
-    });
-    
-    const TIER_ORDER = { luna: 6, genesis: 5, mystic: 4, arctic: 3, forest: 2, savannah: 1 };
-    userPlots.sort((a, b) => TIER_ORDER[b.env.key] - TIER_ORDER[a.env.key]);
-    
+    // NOTE: Do NOT pre-seed land items onto higher-tier plots before assignment.
+    // That biased teams onto Mystic even when Arctic was more profitable (esp. with
+    // large V1.2 estates). Items are distributed after teams are placed (step 5).
     userPlots.forEach(plot => {
-        let envKey = plot.env.key;
-        let envMult = ENV_MULT[envKey] || 1.0;
-        
-        // Genesis and Luna match all items
-        let isUniversal = (envKey === 'genesis' || envKey === 'luna');
-        
-        availableItems.sort((a, b) => {
-            const matchA = (isUniversal || (a.environment && a.environment.toLowerCase() === envKey)) ? envMult : 1.0;
-            const matchB = (isUniversal || (b.environment && b.environment.toLowerCase() === envKey)) ? envMult : 1.0;
-            const finalA = a.baseBoost * matchA;
-            const finalB = b.baseBoost * matchB;
-            return finalB - finalA;
-        });
-        
-        let boost = 0;
         plot.items = [];
-        for (let j = 0; j < 8; j++) {
-            if (availableItems.length > 0) {
-                let item = availableItems.shift();
-                plot.items.push(item);
-            }
-        }
-        
-        plot.items.forEach(i => {
-            const match = (isUniversal || (i.environment && i.environment.toLowerCase() === envKey)) ? envMult : 1.0;
-            i.finalBoost = i.baseBoost * match;
-            boost += i.finalBoost;
-        });
-        plot.itemBoost = boost;
+        plot.itemBoost = 0;
     });
+
+    // Track which envs still have an unused Estate boost (applies to first/strongest team only)
+    const estateUsedByEnv = {};
+    ENVIRONMENTS.forEach(env => { estateUsedByEnv[env.key] = false; });
+
+    function estateMultForPlot(plot) {
+        if (!usesEstates(version)) return 1.0;
+        const key = plot.env.key;
+        if (estateUsedByEnv[key]) return 1.0;
+        const pct = calcEstateBoostPct(estateSizeByEnv[key] || 0);
+        return pct > 0 ? (1 + pct) : 1.0;
+    }
     
     // 1. Assign accessories to the top Axies
     const sortedAccessories = usesV11Features(version) ? [...gAccessories].sort((a, b) => {
@@ -516,7 +496,10 @@ function optimize() {
         
         for (let j = 0; j < availablePlots.length; j++) {
             let plot = availablePlots[j];
-            let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * slipsMult);
+            // Include V1.2 estate boost in scoring when this env hasn't used it yet
+            // (strongest chunk is assigned first, so first team on an env gets the estate)
+            const eMult = estateMultForPlot(plot);
+            let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * slipsMult * eMult);
             let expectedBaxs = (finalFlame / plot.globalFlame) * plot.rewardPool;
             let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
             
@@ -543,7 +526,10 @@ function optimize() {
                     index: j,
                     plot: plot,
                     netProfit: netProfit,
-                    globalCost: globalCost
+                    globalCost: globalCost,
+                    expectedBaxs: expectedBaxs,
+                    finalFlame: finalFlame,
+                    estateMult: eMult
                 });
             }
         }
@@ -552,25 +538,36 @@ function optimize() {
             let maxProfit = Math.max(...eligiblePlots.map(p => p.netProfit));
             let competitivePlots = eligiblePlots.filter(p => p.netProfit >= maxProfit - window.tiebreakerMargin);
             
-            // Sort by cost ascending, then by profit descending
+            // Prefer higher net profit; only use lower lunium cost as a true tie-break
+            // (within profitability margin). Previously cost-first could hide better plots.
             competitivePlots.sort((a, b) => {
+                if (b.netProfit !== a.netProfit) {
+                    return b.netProfit - a.netProfit;
+                }
                 if (a.globalCost !== b.globalCost) {
                     return a.globalCost - b.globalCost;
                 }
-                return b.netProfit - a.netProfit;
+                return b.expectedBaxs - a.expectedBaxs;
             });
             
             bestPlot = competitivePlots[0].plot;
             bestPlotIndex = competitivePlots[0].index;
             bestProfit = competitivePlots[0].netProfit;
+            bestPlot._assignFinalFlame = competitivePlots[0].finalFlame;
+            bestPlot._assignEstateMult = competitivePlots[0].estateMult;
         }
         
         // Only assign if it's profitable and better than passive
         if (bestPlot && bestProfit > 0) {
             bestPlot.axies = chunk.axies;
             bestPlot.baseFlame = chunk.baseFlame;
+            // Provisional flame (items added in step 5; estate re-applied at end)
             bestPlot.finalFlame = Math.floor(chunk.baseFlame * (1 + bestPlot.itemBoost) * slipsMult);
             bestPlot.expectedBaxs = (bestPlot.finalFlame / bestPlot.globalFlame) * bestPlot.rewardPool;
+            // Consume estate for this env — strongest team takes it
+            if (usesEstates(version) && (bestPlot._assignEstateMult || 1) > 1) {
+                estateUsedByEnv[bestPlot.env.key] = true;
+            }
             availablePlots.splice(bestPlotIndex, 1);
         } else {
             // No profitable plots left for remaining chunks
