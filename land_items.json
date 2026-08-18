@@ -1600,9 +1600,9 @@
       "rarity": "Epic",
       "tokenId": "71459297053397077327308667560671324406161",
       "itemId": 401,
-      "type": "any",
+      "type": "arctic",
       "boost": 0.75,
-      "environment": "any"
+      "environment": "arctic"
     },
     {
       "name": "Statue of Silvergale",

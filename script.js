@@ -98,9 +98,19 @@ function calcEstateBoostPct(size) {
     return 0.01 * size * mult; // e.g. 6 plots => 0.01*6*1.05 = 0.063 (6.3%)
 }
 
+// Cloud rotation (manager site): when a plot runs out of Lunium, its axies
+// move to another plot in the list that is still burning. Cycle is 1 day
+// burn + 5 days recharge. Manager misses 1 hour to activate, then runs 24h.
+const ROTATION_RING_SIZE = 6;
+const ROTATION_BURN_HOURS = 24;
+const ROTATION_ACTIVATE_GAP_HOURS = 1;
+const ROTATION_CYCLE_HOURS = ROTATION_BURN_HOURS + ROTATION_ACTIVATE_GAP_HOURS; // 25
+const ROTATION_UPTIME = ROTATION_BURN_HOURS / ROTATION_CYCLE_HOURS; // 0.96
+const SOLO_LOCAL_UPTIME = 1 / 6;
+const BASIC_TEAM_FLAME = 150; // 30 normal axies × 5 flame
+
 function currentVersion() {
-    const el = document.getElementById('version-select');
-    return (el && el.value) || '1.1';
+    return '1.2';
 }
 
 function usesV11Features(version) {
@@ -128,15 +138,7 @@ function init() {
     gItems = USER_DATA.items || [];
     gAccessories = USER_DATA.accessories || [];
 
-    const versionSelectEarly = document.getElementById('version-select');
-    if (versionSelectEarly) {
-        const savedVersion = localStorage.getItem('terrariumVersion');
-        if (savedVersion === '1.1' || savedVersion === '1.2') {
-            versionSelectEarly.value = savedVersion;
-        } else {
-            versionSelectEarly.value = '1.1';
-        }
-    }
+    localStorage.setItem('terrariumVersion', '1.2');
 
     processAxies();
     renderInputs();
@@ -155,11 +157,6 @@ function init() {
     }
     updateLuniumPrice();
 
-    const versionSelect = document.getElementById('version-select');
-    if (versionSelect) {
-        versionSelect.onchange = onVersionChange;
-    }
-    
     document.getElementById('btn-optimize').addEventListener('click', optimize);
 }
 
@@ -341,10 +338,157 @@ function renderInputs() {
 }
 
 function onVersionChange() {
-    const version = currentVersion();
-    localStorage.setItem('terrariumVersion', version);
+    localStorage.setItem('terrariumVersion', '1.2');
     renderInputs();
     optimize();
+}
+
+function rotationUptime(plotCount) {
+    if (!plotCount || plotCount <= 0) return 0;
+    if (plotCount >= ROTATION_RING_SIZE) return ROTATION_UPTIME;
+    // N hops of 24h, then wait until the first plot finishes 5-day recharge + 1h activate.
+    return (plotCount * ROTATION_BURN_HOURS) / (ROTATION_BURN_HOURS + 120 + ROTATION_ACTIVATE_GAP_HOURS);
+}
+
+function expectedRotatedBaxs(flame, globalFlame, rewardPool, uptime) {
+    if (!globalFlame || globalFlame <= 0) return 0;
+    return (flame / globalFlame) * rewardPool * uptime;
+}
+
+function chunkTeams(axies, size) {
+    const teams = [];
+    for (let i = 0; i < axies.length; i += size) {
+        const group = axies.slice(i, i + size);
+        teams.push({
+            axies: group,
+            flame: group.reduce((s, a) => s + (a.effectiveFlame || a.flame || 0), 0)
+        });
+    }
+    return teams;
+}
+
+function evaluateCloudRotation(userPlots, axiesWithFlame) {
+    const assignedIds = new Set();
+    userPlots.forEach(p => (p.axies || []).forEach(a => assignedIds.add(String(a.id))));
+    const leftoverAxies = (axiesWithFlame || []).filter(a => !assignedIds.has(String(a.id)));
+    leftoverAxies.sort((a, b) => (b.effectiveFlame || 0) - (a.effectiveFlame || 0));
+    const leftoverTeams = chunkTeams(leftoverAxies, 30);
+
+    const envRows = ENVIRONMENTS.map(env => {
+        const plots = userPlots.filter(p => p.env.key === env.key);
+        const idlePlots = plots.filter(p => (!p.axies || p.axies.length === 0) && !p.isRotationSlave);
+        const activePlots = plots.filter(p => p.axies && p.axies.length > 0);
+        const plotCount = idlePlots.length;
+        const globalFlame = (plots[0] && plots[0].globalFlame) || env.defaultFlame;
+        const rewardPool = (plots[0] && plots[0].rewardPool) || env.rewardPool;
+        const rings = Math.floor(plotCount / ROTATION_RING_SIZE);
+        const remainder = plotCount % ROTATION_RING_SIZE;
+        return {
+            env,
+            totalPlots: plots.length,
+            activePlots: activePlots.length,
+            idlePlots: plotCount,
+            globalFlame,
+            rewardPool,
+            rings,
+            remainder
+        };
+    }).filter(r => r.totalPlots > 0);
+
+    // Allocate leftover teams per env: first fill full 6-plot rings, then remainder.
+    const teams = leftoverTeams.map(t => ({ ...t, used: false }));
+    const takeTeam = () => {
+        const t = teams.find(x => !x.used);
+        if (!t) return null;
+        t.used = true;
+        return t;
+    };
+
+    envRows.forEach(row => {
+        row.rotateGroups = [];
+        for (let i = 0; i < row.rings; i++) {
+            const team = takeTeam();
+            const flame = team ? team.flame : BASIC_TEAM_FLAME;
+            const staffed = !!team;
+            const uptime = ROTATION_UPTIME;
+            const baxs = expectedRotatedBaxs(flame, row.globalFlame, row.rewardPool, uptime);
+            row.rotateGroups.push({
+                plots: ROTATION_RING_SIZE,
+                kind: 'full-ring',
+                staffed,
+                flame,
+                uptime,
+                baxs
+            });
+        }
+        if (row.remainder > 0) {
+            const team = takeTeam();
+            const flame = team ? team.flame : BASIC_TEAM_FLAME;
+            const staffed = !!team;
+            const uptime = rotationUptime(row.remainder);
+            const baxs = expectedRotatedBaxs(flame, row.globalFlame, row.rewardPool, uptime);
+            row.rotateGroups.push({
+                plots: row.remainder,
+                kind: row.remainder === 1 ? 'solo' : 'partial-ring',
+                staffed,
+                flame,
+                uptime,
+                baxs
+            });
+        }
+
+        // Fully-staffed solo (one parked team per idle plot) vs rotation using 1 team per ring.
+        const soloFlame = BASIC_TEAM_FLAME;
+        row.soloIfFullyStaffed = {
+            teams: row.idlePlots,
+            uptime: SOLO_LOCAL_UPTIME,
+            baxs: row.idlePlots * expectedRotatedBaxs(soloFlame, row.globalFlame, row.rewardPool, SOLO_LOCAL_UPTIME)
+        };
+        row.rotateIfUsingBasics = {
+            teams: row.rings + (row.remainder > 0 ? 1 : 0),
+            baxs: 0
+        };
+        // Recalc rotate-with-basics independently of leftover staffing (decision math).
+        for (let i = 0; i < row.rings; i++) {
+            row.rotateIfUsingBasics.baxs += expectedRotatedBaxs(soloFlame, row.globalFlame, row.rewardPool, ROTATION_UPTIME);
+        }
+        if (row.remainder > 0) {
+            row.rotateIfUsingBasics.baxs += expectedRotatedBaxs(soloFlame, row.globalFlame, row.rewardPool, rotationUptime(row.remainder));
+        }
+
+        // If every idle plot already has a parked basic team, solo wins because
+        // 6 parked teams at 16.7% beat 1 rotated team at 96% (1.0 vs 0.96 team-days).
+        // Rotation wins when you cannot staff every plot.
+        row.canStaffEveryIdle = leftoverTeams.length >= row.idlePlots;
+        if (row.idlePlots === 0) {
+            row.verdict = 'none';
+            row.verdictLabel = 'No idle plots';
+            row.reason = 'All plots in this environment already have a profitable working team.';
+        } else if (row.idlePlots < 2) {
+            row.verdict = 'solo';
+            row.verdictLabel = 'Keep parked / solo';
+            row.reason = 'Need at least 2 plots to rotate. One plot stays 1 day on / 5 days recharge (16.7% uptime, plus the 1h activate gap if you hop).';
+        } else if (leftoverTeams.length >= row.idlePlots) {
+            row.verdict = 'solo';
+            row.verdictLabel = 'Do not rotate — park a team on each plot';
+            row.reason = `You have enough leftover teams (${leftoverTeams.length}) to staff all ${row.idlePlots} idle ${row.env.label} plots. Six parked teams at 16.7% beat one 6-plot ring at 96% (1.00 vs 0.96 team-days). Cloud rotate is for plots that would otherwise sit empty.`;
+        } else {
+            row.verdict = 'rotate';
+            row.verdictLabel = 'Cloud-rotate in 6-plot rings';
+            const cover = row.rings * ROTATION_RING_SIZE;
+            row.reason = `Only ${leftoverTeams.length} leftover team(s) for ${row.idlePlots} idle plots. A 6-plot ring keeps one team burning ~96% of the time (24h on, 1h activate gap) instead of 16.7% parked. ${row.rings} full ring(s) cover ${cover} plots.`;
+        }
+        row.leftoverTeams = leftoverTeams.length;
+    });
+
+    const savannah = envRows.find(r => r.env.key === 'savannah') || null;
+    return {
+        leftoverAxies: leftoverAxies.length,
+        leftoverTeams: leftoverTeams.length,
+        leftoverFlame: leftoverTeams.reduce((s, t) => s + t.flame, 0),
+        envRows,
+        savannah
+    };
 }
 
 function optimize() {
@@ -484,29 +628,22 @@ function optimize() {
         chunks.push({ axies: chunkAxies, baseFlame: chunkFlame });
     }
     
-    // 4. Assign chunks to the most profitable plot
+    // 4. Assign chunks to the most profitable option (Global vs Rotation)
     let availablePlots = [...userPlots];
     
     for (let chunk of chunks) {
-        let bestPlot = null;
-        let bestPlotIndex = -1;
-        let bestProfit = -Infinity;
+        let bestOption = null;
+        let eligibleOptions = [];
         
-        let eligiblePlots = [];
-        
+        // --- A. Evaluate Individual Global Plots ---
         for (let j = 0; j < availablePlots.length; j++) {
             let plot = availablePlots[j];
-            // Include V1.2 estate boost in scoring when this env hasn't used it yet
-            // (strongest chunk is assigned first, so first team on an env gets the estate)
             const eMult = estateMultForPlot(plot);
             let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * slipsMult * eMult);
             let expectedBaxs = (finalFlame / plot.globalFlame) * plot.rewardPool;
             let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
             
-            let netProfit;
-            let passiveProfit;
-            let threshold;
-            let globalCost = 0;
+            let netProfit, passiveProfit, threshold, globalCost = 0;
             
             if (window.baxsPrice > 0) {
                 let baxsRevenue = expectedBaxs * window.baxsPrice;
@@ -514,18 +651,20 @@ function optimize() {
                 globalCost = globalCons * window.luniumPrice;
                 netProfit = baxsRevenue - globalCost;
                 passiveProfit = passiveBaxs * window.baxsPrice;
-                threshold = passiveProfit + (globalCost * (window.minProfitMargin / 100)); // Require dynamic margin of global cost
+                threshold = passiveProfit + (globalCost * (window.minProfitMargin / 100));
             } else {
-                netProfit = expectedBaxs; // Fallback if prices are 0
+                netProfit = expectedBaxs;
                 passiveProfit = passiveBaxs;
                 threshold = passiveBaxs;
             }
             
             if (netProfit > 0 && netProfit > threshold) {
-                eligiblePlots.push({
+                eligibleOptions.push({
+                    type: 'global',
                     index: j,
                     plot: plot,
                     netProfit: netProfit,
+                    marginalProfit: netProfit - passiveProfit,
                     globalCost: globalCost,
                     expectedBaxs: expectedBaxs,
                     finalFlame: finalFlame,
@@ -533,44 +672,119 @@ function optimize() {
                 });
             }
         }
-        
-        if (eligiblePlots.length > 0) {
-            let maxProfit = Math.max(...eligiblePlots.map(p => p.netProfit));
-            let competitivePlots = eligiblePlots.filter(p => p.netProfit >= maxProfit - window.tiebreakerMargin);
+
+        // --- B. Evaluate Mixed Virtual Rotation Ring (Top 6 plots, local lunium) ---
+        if (availablePlots.length >= 6) {
+            let sortedForRotation = availablePlots.map((plot, idx) => {
+                const eMult = estateMultForPlot(plot);
+                let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * slipsMult * eMult);
+                let baxsFactor = (1 / plot.globalFlame) * plot.rewardPool * (1/6);
+                let expectedBaxs = finalFlame * baxsFactor * 0.96;
+                let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
+                
+                let baxsRevenue = expectedBaxs * (window.baxsPrice || 1);
+                let passiveProfit = passiveBaxs * (window.baxsPrice || 1);
+                
+                return {
+                    plotIndex: idx,
+                    plot: plot,
+                    expectedBaxs: expectedBaxs,
+                    baxsFactor: baxsFactor,
+                    passiveBaxs: passiveBaxs,
+                    baxsRevenue: baxsRevenue,
+                    passiveProfit: passiveProfit,
+                    marginalProfit: baxsRevenue - passiveProfit,
+                    finalFlame: finalFlame,
+                    estateMult: eMult
+                };
+            });
             
-            // Prefer higher net profit; only use lower lunium cost as a true tie-break
-            // (within profitability margin). Previously cost-first could hide better plots.
-            competitivePlots.sort((a, b) => {
-                if (b.netProfit !== a.netProfit) {
-                    return b.netProfit - a.netProfit;
-                }
-                if (a.globalCost !== b.globalCost) {
-                    return a.globalCost - b.globalCost;
-                }
+            // Sort by marginal profit descending
+            sortedForRotation.sort((a, b) => b.marginalProfit - a.marginalProfit);
+            
+            // Take top 6
+            let top6 = sortedForRotation.slice(0, 6);
+            let sumNetProfit = top6.reduce((sum, item) => sum + item.baxsRevenue, 0); // 0 global cost
+            let sumPassiveProfit = top6.reduce((sum, item) => sum + item.passiveProfit, 0);
+            let sumExpectedBaxs = top6.reduce((sum, item) => sum + item.expectedBaxs, 0);
+            let sumBaxsFactor = top6.reduce((sum, item) => sum + item.baxsFactor, 0);
+            
+            // the threshold is just beating the passive profit
+            if (sumNetProfit > 0 && sumNetProfit > sumPassiveProfit) {
+                eligibleOptions.push({
+                    type: 'rotation_mixed',
+                    indices: top6.map(item => item.plotIndex),
+                    netProfit: sumNetProfit,
+                    marginalProfit: sumNetProfit - sumPassiveProfit,
+                    globalCost: 0,
+                    expectedBaxs: sumExpectedBaxs,
+                    sumBaxsFactor: sumBaxsFactor,
+                    finalFlame: top6[0].finalFlame, // Just for display
+                    estateMult: top6[0].estateMult // Just for display
+                });
+            }
+        }
+        
+        if (eligibleOptions.length > 0) {
+            let maxMarginal = Math.max(...eligibleOptions.map(o => o.marginalProfit));
+            let competitive = eligibleOptions.filter(o => o.marginalProfit >= maxMarginal - window.tiebreakerMargin);
+            
+            competitive.sort((a, b) => {
+                if (b.marginalProfit !== a.marginalProfit) return b.marginalProfit - a.marginalProfit;
+                if (a.globalCost !== b.globalCost) return a.globalCost - b.globalCost;
                 return b.expectedBaxs - a.expectedBaxs;
             });
             
-            bestPlot = competitivePlots[0].plot;
-            bestPlotIndex = competitivePlots[0].index;
-            bestProfit = competitivePlots[0].netProfit;
-            bestPlot._assignFinalFlame = competitivePlots[0].finalFlame;
-            bestPlot._assignEstateMult = competitivePlots[0].estateMult;
+            bestOption = competitive[0];
         }
         
-        // Only assign if it's profitable and better than passive
-        if (bestPlot && bestProfit > 0) {
-            bestPlot.axies = chunk.axies;
-            bestPlot.baseFlame = chunk.baseFlame;
-            // Provisional flame (items added in step 5; estate re-applied at end)
-            bestPlot.finalFlame = Math.floor(chunk.baseFlame * (1 + bestPlot.itemBoost) * slipsMult);
-            bestPlot.expectedBaxs = (bestPlot.finalFlame / bestPlot.globalFlame) * bestPlot.rewardPool;
-            // Consume estate for this env — strongest team takes it
-            if (usesEstates(version) && (bestPlot._assignEstateMult || 1) > 1) {
-                estateUsedByEnv[bestPlot.env.key] = true;
+        if (bestOption && bestOption.marginalProfit > 0) {
+            if (bestOption.type === 'global') {
+                let bestPlot = bestOption.plot;
+                bestPlot.axies = chunk.axies;
+                bestPlot.baseFlame = chunk.baseFlame;
+                bestPlot.finalFlame = Math.floor(chunk.baseFlame * (1 + bestPlot.itemBoost) * slipsMult);
+                bestPlot.expectedBaxs = (bestPlot.finalFlame / bestPlot.globalFlame) * bestPlot.rewardPool;
+                
+                if (usesEstates(version) && (bestOption.estateMult || 1) > 1) {
+                    estateUsedByEnv[bestPlot.env.key] = true;
+                }
+                availablePlots.splice(bestOption.index, 1);
+            } else if (bestOption.type === 'rotation_mixed') {
+                let sortedIndices = [...bestOption.indices].sort((a, b) => b - a);
+                
+                // Calculate composition BEFORE splicing, since splicing changes array indices
+                let envCounts = {};
+                bestOption.indices.forEach(idx => {
+                    let label = availablePlots[idx].env.label;
+                    envCounts[label] = (envCounts[label] || 0) + 1;
+                });
+                let ringComposition = Object.entries(envCounts).map(([label, count]) => `${count} ${label}`).join(', ');
+                
+                let masterPlot = null;
+                sortedIndices.forEach((idx, i) => {
+                    let p = availablePlots.splice(idx, 1)[0];
+                    if (i === 0) { // arbitrary master plot represents the whole ring
+                        masterPlot = p;
+                        masterPlot.axies = chunk.axies;
+                        masterPlot.baseFlame = chunk.baseFlame;
+                        masterPlot.finalFlame = bestOption.finalFlame;
+                        masterPlot.expectedBaxs = bestOption.expectedBaxs;
+                        masterPlot.isRotationMaster = true;
+                        masterPlot._renderGlobalCons = 0; // zero out global cost for this specific plot rendering
+                        masterPlot._rotationComposition = ringComposition;
+                        masterPlot._rotationBaxsFactor = bestOption.sumBaxsFactor;
+                    } else {
+                        p.axies = []; 
+                        p.isRotationSlave = true;
+                    }
+                });
+                if (usesEstates(version) && (bestOption.estateMult || 1) > 1) {
+                    estateUsedByEnv[masterPlot.env.key] = true;
+                }
             }
-            availablePlots.splice(bestPlotIndex, 1);
         } else {
-            // No profitable plots left for remaining chunks
+            // No profitable options left for remaining chunks
             break;
         }
     }
@@ -585,7 +799,7 @@ function optimize() {
     let activePlots = userPlots.filter(p => p.axies.length > 0);
     activePlots.sort((a, b) => b.baseFlame - a.baseFlame);
     
-    let passivePlots = userPlots.filter(p => p.axies.length === 0);
+    let passivePlots = userPlots.filter(p => p.axies.length === 0 && !p.isRotationSlave);
     
     // Helper function to assign items to a sorted list of plots
     const distributeItems = (plotList) => {
@@ -614,7 +828,11 @@ function optimize() {
             plot.itemBoost = boost;
             if (plot.axies.length > 0) {
                 plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost) * slipsMult);
-                plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
+                if (plot.isRotationMaster) {
+                    plot.expectedBaxs = plot.finalFlame * plot._rotationBaxsFactor * 0.96;
+                } else {
+                    plot.expectedBaxs = (plot.finalFlame / plot.globalFlame) * plot.rewardPool;
+                }
             }
         });
     };
@@ -680,13 +898,20 @@ function optimize() {
             top.estateBoostApplied = true;
             top.estateSize = size;
             top.finalFlame = Math.floor(top.finalFlame * (1 + boostPct));
-            top.expectedBaxs = (top.finalFlame / top.globalFlame) * top.rewardPool;
+            if (top.isRotationMaster) {
+                top.expectedBaxs = top.finalFlame * top._rotationBaxsFactor * 0.96;
+            } else {
+                top.expectedBaxs = (top.finalFlame / top.globalFlame) * top.rewardPool;
+            }
         });
     }
 
     // Sort all plots by final flame power descending for rendering
     userPlots.sort((a, b) => b.finalFlame - a.finalFlame);
     
+    const rotationData = evaluateCloudRotation(userPlots, axiesWithFlame);
+    renderRotationResults(rotationData);
+
     renderResults(userPlots, accAssignments, availableItems);
 }
 
@@ -725,6 +950,7 @@ function renderResults(plots, accAssignments, availableItems = []) {
         if (plot.axies.length === 0) return;
         
         totalBaxs += plot.expectedBaxs;
+        
         let slipsCost = FORTUNE_SLIPS[plot.env.key] || 0;
         totalSlips += slipsCost;
         
@@ -738,16 +964,21 @@ function renderResults(plots, accAssignments, availableItems = []) {
         // Show just the top 5 axies to keep it clean, or all of them in a scrollable list
         let axiesHtml = plot.axies.map(a => `<li>${a.name} (${a.flame.toFixed(1)} Flame)</li>`).join('');
         
-        let globalCons = plot.env.globalCons || 0;
+        let globalCons = plot._renderGlobalCons !== undefined ? plot._renderGlobalCons : (plot.env.globalCons || 0);
         let localCons = plot.env.localCons || 0;
+        
         let baxsRevenue = plot.expectedBaxs * (window.baxsPrice || 0);
         let globalCost = globalCons * (window.luniumPrice || 0);
         let netGlobal = baxsRevenue - globalCost;
         let profitColor = netGlobal < 0 ? '#e74c3c' : (netGlobal < 0.05 ? '#f39c12' : '#2ecc71');
         
+        let titleHtml = plot.isRotationMaster ? 
+            `Cloud Rotation (${plot._rotationComposition || '6 Plots'}) <span style="font-size: 0.8em; opacity: 0.7;">(96% uptime)</span>` : 
+            `${plot.env.label} Plot #${index + 1} <span style="font-size: 0.8em; opacity: 0.7;">(Click for details)</span>`;
+
         card.innerHTML = `
             <div class="plot-summary" style="cursor: pointer;" onclick="toggleDetails(this)">
-                <div class="plot-title">${plot.env.label} Plot #${index + 1} <span style="font-size: 0.8em; opacity: 0.7;">(Click for details)</span></div>
+                <div class="plot-title">${titleHtml}</div>
                 ${usesV11Features(window.terrariumVersion) ? `
                 <div class="plot-detail">
                     <span class="label">Item Boost</span>
@@ -773,7 +1004,7 @@ function renderResults(plots, accAssignments, availableItems = []) {
                 </div>
                 <div class="plot-detail">
                     <span class="label" style="color: #3498db;">Expected Reward</span>
-                    <span style="color: #3498db; font-weight: 800;">~${plot.expectedBaxs.toFixed(4)} bAXS</span>
+                    <span style="color: #3498db; font-weight: 800;">~${plot.expectedBaxs.toFixed(4)} bAXS/tick</span>
                 </div>
                 <div class="plot-detail" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem; margin-top: 0.5rem;">
                     <span class="label">Earnings ($)</span>
@@ -781,10 +1012,12 @@ function renderResults(plots, accAssignments, availableItems = []) {
                 </div>
                 <div class="plot-detail">
                     <span class="label">Global Lunium Cost ($)</span>
-                    <span style="color: #e74c3c;">-$${globalCost.toFixed(3)} (${globalCons}/Tick)</span>
+                    <span style="color: ${plot.isRotationMaster ? '#2ecc71' : '#e74c3c'};">
+                        ${plot.isRotationMaster ? 'Free (Local Lunium)' : `-$${globalCost.toFixed(3)} (${globalCons}/Tick)`}
+                    </span>
                 </div>
                 <div class="plot-detail" style="margin-bottom: 0.5rem;">
-                    <span class="label">Global Net Profit ($)</span>
+                    <span class="label">Net Profit ($)</span>
                     <span style="color: ${profitColor}; font-weight: bold;">$${netGlobal.toFixed(3)}</span>
                 </div>
                 <div class="plot-detail">
@@ -813,7 +1046,7 @@ function renderResults(plots, accAssignments, availableItems = []) {
         container.appendChild(card);
     });
     
-    let passivePlots = plots.filter(p => p.axies.length === 0);
+    let passivePlots = plots.filter(p => p.axies.length === 0 && !p.isRotationSlave);
     if (passivePlots.length > 0) {
         const passiveHeader = document.createElement('div');
         passiveHeader.style.gridColumn = '1 / -1';
@@ -833,6 +1066,7 @@ function renderResults(plots, accAssignments, availableItems = []) {
             let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
             let passiveRevenue = passiveBaxs * (window.baxsPrice || 0);
             totalPassiveBaxs += passiveBaxs;
+            totalBaxs += passiveBaxs; // ADDED to fix the bug where passive baxs wasn't in the total
             
             const pCard = document.createElement('div');
             pCard.className = 'plot-card';
@@ -851,7 +1085,7 @@ function renderResults(plots, accAssignments, availableItems = []) {
                 </div>
                 <div class="plot-detail" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.5rem; margin-top: 0.5rem;">
                     <span class="label" style="color: #3498db;">Passive Reward</span>
-                    <span style="color: #3498db; font-weight: bold;">~${passiveBaxs.toFixed(3)} bAXS</span>
+                    <span style="color: #3498db; font-weight: bold;">~${passiveBaxs.toFixed(4)} bAXS/tick</span>
                 </div>
                 <div class="plot-detail">
                     <span class="label">Earnings ($)</span>
@@ -894,7 +1128,42 @@ function renderResults(plots, accAssignments, availableItems = []) {
     
     const slipsText = (usesV11Features(window.terrariumVersion)) ? ` <span style="font-size:0.6em; color:var(--text-secondary); font-weight:normal;">(Costs ${totalSlips} Slips/day)</span>` : '';
     document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(4)}${slipsText}`;
+    document.getElementById('total-baxs-daily').innerHTML = `(~${(totalBaxs * 24).toFixed(4)}/day)`;
     document.getElementById('results-container').style.display = 'block';
+}
+
+function renderRotationResults(data) {
+    const container = document.getElementById('rotation-results');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    if (data.envRows.length === 0) return;
+    
+    let hasIdle = data.envRows.some(r => r.idlePlots > 0);
+    if (!hasIdle) return; // don't show if no idle plots at all
+
+    let html = `
+        <div class="plot-card" style="border-top-color: #9b59b6; margin-bottom: 2rem;">
+            <div class="plot-title">☁️ Cloud Rotation Verdict</div>
+            <div style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9em;">
+                You have ${data.leftoverTeams} leftover team(s) after active plots are assigned.
+            </div>
+    `;
+    
+    data.envRows.forEach(row => {
+        if (row.idlePlots === 0) return;
+        html += `
+            <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid ${row.verdict === 'rotate' ? '#2ecc71' : (row.verdict === 'none' ? 'var(--text-secondary)' : '#f39c12')}">
+                <h4 style="margin-top: 0; margin-bottom: 0.5rem; color: var(--text-primary);">${row.env.label} (${row.idlePlots} idle plots)</h4>
+                <strong>Verdict: </strong>
+                <span style="color: ${row.verdict === 'rotate' ? '#2ecc71' : (row.verdict === 'none' ? 'var(--text-secondary)' : '#f39c12')}">${row.verdictLabel}</span>
+                <p style="margin-top: 0.5rem; margin-bottom: 0; font-size: 0.9em; color: var(--text-secondary); line-height: 1.4;">${row.reason}</p>
+            </div>
+        `;
+    });
+    
+    html += `</div>`;
+    container.innerHTML = html;
 }
 
 window.onload = init;
