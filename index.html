@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Axie Terrarium Optimizer</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 <div class="container">
@@ -15,16 +15,13 @@
     </nav>
     <header>
         <h1>Terrarium Optimizer</h1>
-        <p class="subtitle">Maximize your bAXS rewards across your land plots. V1.1 default · V1.2 ready (live Aug 19).</p>
+        <p class="subtitle">V1.2 live — Estates, evolved-part buff, and 6-plot cloud rotation.</p>
     </header>
 
     <div class="glass-panel" id="collection-stats">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
             <h2 style="margin: 0;">Your Collection</h2>
-            <select id="version-select" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.4rem 0.8rem; border-radius: 8px; font-family: 'Inter', sans-serif;">
-                <option value="1.1" selected>Version 1.1 (Current / Default)</option>
-                <option value="1.2">Version 1.2 (Aug 19 — Estates + evo buff)</option>
-            </select>
+            <span class="version-badge">Terrariums V1.2</span>
         </div>
         <div class="grid-2">
             <div class="stat-box">
@@ -105,12 +102,13 @@
 
     <div id="results-container" style="display: none;">
         <h2 style="text-align: center; margin-top: 3rem;">Optimization Results</h2>
-        <div class="total-baxs">Total Expected: <span id="total-baxs-val">0</span> bAXS/tick</div>
+        <div class="total-baxs">Total Expected: <span id="total-baxs-val">0</span> bAXS/tick <span id="total-baxs-daily" style="font-size: 0.6em; opacity: 0.8; margin-left: 10px;"></span></div>
+        <div id="rotation-results"></div>
         <div class="results-grid" id="plots-grid"></div>
     </div>
 </div>
 
-<script src="user_data.js?v=4"></script>
-<script src="script.js?v=4"></script>
+<script src="user_data.js?v=5"></script>
+<script src="script.js?v=5"></script>
 </body>
 </html>
