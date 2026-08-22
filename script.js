@@ -34,7 +34,8 @@ const ENV_MULT = {
 
 const RARITY_BOOST = { 'Common': 0.0005, 'Rare': 0.0010, 'Epic': 0.0075, 'Mystic': 0.0150 };
 
-const FORTUNE_SLIPS = { savannah: 3, forest: 8, arctic: 22, mystic: 48, genesis: 960, luna: 2880 };
+// Shrine / Fortune Slip +10% is NOT applied. It is a manual spend (not automatic),
+// and with cloud rotation it would overstate flame on every hop.
 
 // --- Versioned flame tables (V1.1 current / V1.2 Aug 19 2026) ---
 // Index = evolved part count (0..6). 0 parts => no evolved boost.
@@ -114,7 +115,7 @@ function currentVersion() {
 }
 
 function usesV11Features(version) {
-    // Land items, accessories, fortune slips exist in 1.1+
+    // Land items and accessories exist in 1.1+. Shrine/fortune-slip buff is opt-in in-game and excluded here.
     return version === '1.1' || version === '1.2';
 }
 
@@ -495,7 +496,6 @@ function optimize() {
     processAxies();
     const version = currentVersion();
     window.terrariumVersion = version;
-    const slipsMult = usesV11Features(version) ? 1.10 : 1.0;
 
     const baxsPriceStr = document.getElementById('baxs-price').value;
     const luniumPriceStr = document.getElementById('lunium-price').value;
@@ -639,7 +639,7 @@ function optimize() {
         for (let j = 0; j < availablePlots.length; j++) {
             let plot = availablePlots[j];
             const eMult = estateMultForPlot(plot);
-            let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * slipsMult * eMult);
+            let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * eMult);
             let expectedBaxs = (finalFlame / plot.globalFlame) * plot.rewardPool;
             let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
             
@@ -677,7 +677,7 @@ function optimize() {
         if (availablePlots.length >= 6) {
             let sortedForRotation = availablePlots.map((plot, idx) => {
                 const eMult = estateMultForPlot(plot);
-                let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * slipsMult * eMult);
+                let finalFlame = Math.floor(chunk.baseFlame * (1 + plot.itemBoost) * eMult);
                 let baxsFactor = (1 / plot.globalFlame) * plot.rewardPool * (1/6);
                 let expectedBaxs = finalFlame * baxsFactor * 0.96;
                 let passiveBaxs = (150 / plot.globalFlame) * plot.rewardPool * (1/6);
@@ -743,7 +743,7 @@ function optimize() {
                 let bestPlot = bestOption.plot;
                 bestPlot.axies = chunk.axies;
                 bestPlot.baseFlame = chunk.baseFlame;
-                bestPlot.finalFlame = Math.floor(chunk.baseFlame * (1 + bestPlot.itemBoost) * slipsMult);
+                bestPlot.finalFlame = Math.floor(chunk.baseFlame * (1 + bestPlot.itemBoost));
                 bestPlot.expectedBaxs = (bestPlot.finalFlame / bestPlot.globalFlame) * bestPlot.rewardPool;
                 
                 if (usesEstates(version) && (bestOption.estateMult || 1) > 1) {
@@ -827,7 +827,7 @@ function optimize() {
             }
             plot.itemBoost = boost;
             if (plot.axies.length > 0) {
-                plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost) * slipsMult);
+                plot.finalFlame = Math.floor(plot.baseFlame * (1 + plot.itemBoost));
                 if (plot.isRotationMaster) {
                     plot.expectedBaxs = plot.finalFlame * plot._rotationBaxsFactor * 0.96;
                 } else {
@@ -944,15 +944,11 @@ function renderResults(plots, accAssignments, availableItems = []) {
     }
     
     let totalBaxs = 0;
-    let totalSlips = 0;
     
     plots.forEach((plot, index) => {
         if (plot.axies.length === 0) return;
         
         totalBaxs += plot.expectedBaxs;
-        
-        let slipsCost = FORTUNE_SLIPS[plot.env.key] || 0;
-        totalSlips += slipsCost;
         
         const card = document.createElement('div');
         card.className = 'plot-card';
@@ -983,10 +979,6 @@ function renderResults(plots, accAssignments, availableItems = []) {
                 <div class="plot-detail">
                     <span class="label">Item Boost</span>
                     <span style="color: #2ecc71;">+${(plot.itemBoost * 100).toFixed(2)}%</span>
-                </div>
-                <div class="plot-detail">
-                    <span class="label">Fortune Slips Buff</span>
-                    <span style="color: #f1c40f;">+10% (-${slipsCost}/day)</span>
                 </div>
                 ` : ''}
                 ${plot.estateBoostApplied ? `
@@ -1126,8 +1118,7 @@ function renderResults(plots, accAssignments, availableItems = []) {
         container.appendChild(unusedHeader);
     }
     
-    const slipsText = (usesV11Features(window.terrariumVersion)) ? ` <span style="font-size:0.6em; color:var(--text-secondary); font-weight:normal;">(Costs ${totalSlips} Slips/day)</span>` : '';
-    document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(4)}${slipsText}`;
+    document.getElementById('total-baxs-val').innerHTML = `${totalBaxs.toFixed(4)}`;
     document.getElementById('total-baxs-daily').innerHTML = `(~${(totalBaxs * 24).toFixed(4)}/day)`;
     document.getElementById('results-container').style.display = 'block';
 }
